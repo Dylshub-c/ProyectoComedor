@@ -11,4 +11,4 @@
 6. Ejecuta `php artisan migrate`
 
 ## Autor
-Tu Nombre
+EL team lider cucho

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('tipo_becas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('propiedade_id')->unique()->constrained('propiedades')->onDelete('cascade');
+            $table->foreignId('propiedade_id')->constrained('propiedades')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->tinyInteger('estado')->default(1); // Estado del estudiante, por defecto 'activo'
             $table->string('foto', 255)->nullable(); // Foto del estudiante, puede ser nula
             $table->foreignId('especialidade_id')->constrained('especialidades')->onDelete('cascade');
-            $table->foreignId('persona_id')->unique->constrained('personas')->onDelete('cascade');
+            $table->foreignId('persona_id')->unique()->constrained('personas')->onDelete('cascade');
             $table->foreignId('seccione_id')->constrained('secciones')->onDelete('cascade');
             $table->foreignId('tipo_beca_id')->constrained('tipo_becas')->onDelete('cascade');
             $table->timestamps();

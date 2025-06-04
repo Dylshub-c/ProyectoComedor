@@ -8,7 +8,6 @@ class Encargado extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'idEncargado';
     protected $fillable = [
         'persona_id',
         'correo',
@@ -17,6 +16,6 @@ class Encargado extends Model
     // Relación: un encargado pertenece a persona
     public function persona()
     {
-        return $this->belongsTo(Persona::class, 'persona_id', 'idPersona');
+        return $this->belongsTo(Persona::class);
     }
 }

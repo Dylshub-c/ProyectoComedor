@@ -3,6 +3,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Encargado;
+use App\Models\Estudiante;
 
 
 class Persona extends Model
@@ -25,9 +27,9 @@ class Persona extends Model
         return $this->hasOne(Encargado::class);
     }
     // Relación con Usuario
-    public function usuario()
+    public function estudiante()
     {
-        return $this->hasOne(User::class);
+        return $this->hasOne(Estudiante::class);
     }
 }
 

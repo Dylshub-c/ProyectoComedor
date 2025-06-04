@@ -11,13 +11,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('encargados', function (Blueprint $table) {
-            $table->id('idEncargado');
-            $table->unsignedBigInteger('persona_id');
-            $table->string('correo')->unique();
+            $table->id();
+            $table->foreignId('persona_id')->unique()->constrained('personas')->onDelete('cascade');
+            $table->string('correo');
             $table->timestamps();
 
             // Llave foránea hacia personas
-            $table->foreign('persona_id')->references('idPersona')->on('personas')->onDelete('cascade');
         });
     }
 

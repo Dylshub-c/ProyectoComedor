@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,16 +8,17 @@ class Asistencia extends Model
 {
     use HasFactory;
 
+    protected $table = 'asistencias';
+
     protected $fillable = [
-        'fecha',
+        'fecha_hora',
         'tipo_asistencia',
-        'observaciones',
         'estado'
     ];
 
-    public function listadoAsistencias()
+    public function listadosAsistencia()
     {
-        return $this->hasMany(ListadoAsistencia::class, 'asistencia_id');
+        return $this->hasMany(ListadoAsistencia::class);
     }
 }
     

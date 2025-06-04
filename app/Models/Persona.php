@@ -11,8 +11,6 @@ class Persona extends Model
 {
 
     use HasFactory;
-    protected $primaryKey = 'idPersona';
-
 
     protected $fillable = [
         'Nombre',

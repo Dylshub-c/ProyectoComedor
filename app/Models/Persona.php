@@ -29,6 +29,11 @@ class Persona extends Model
     {
         return $this->hasOne(Estudiante::class);
     }
+    // Relación con Usuario
+    public function usuario()
+    {
+        return $this->hasOne(User::class);
+    }
 }
 
 

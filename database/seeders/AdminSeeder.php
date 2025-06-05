@@ -18,10 +18,10 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
          $personaData = [
-        'Nombre' => 'Jose adrian',
-        'PrimerApellido' => 'Elizondo',
-        'SegundoApellido' => 'Navarro',
-        'Cedula' => '3232837',
+        'Nombre' => 'José Manuel',
+        'PrimerApellido' => 'Manolo',
+        'SegundoApellido' => 'Nava',
+        'Cedula' => '343242147',
         'TipoUsuario' => 'admin',
         ];
 
@@ -31,7 +31,7 @@ class AdminSeeder extends Seeder
             $personaData
         );
 
-        $email = 'joseadri@gmail.com.com';
+        $email = 'manolo3@gmail.com';
 
         // Generar una contraseña predeterminada o aleatoria
         $password = Str::random(10);
@@ -47,7 +47,7 @@ class AdminSeeder extends Seeder
 
         // Si se creó el usuario (no existía antes), enviar correo con la contraseña
         if ($user->wasRecentlyCreated) {
-            Mail::to($email)->send(new \App\Mail\AdminPasswordMail($password));
+            Mail::to($email)->send(new \App\Mail\AdminPasswordMail($email, $password));
         }
             }
 }

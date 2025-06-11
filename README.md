@@ -13,4 +13,4 @@
     este es el comando con el cual pueden ejecutar todo de un solo 
     copy .env.example .env; composer install; php artisan key:generate; Read-Host -Prompt "Configura tu base de datos en .env y presiona Enter para continuar"; php artisan migrate
 ## Autor
-EL team lider cucho
+EL team leader cucho

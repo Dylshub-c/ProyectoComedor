@@ -42,9 +42,9 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Ruta protegida para el admin
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('admin.dashboard');
+    Route::get('/home', function () {
+        return view('home');
+    })->name('admin.home');
 });
 
 

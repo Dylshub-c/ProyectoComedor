@@ -1,0 +1,103 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	background: #130444;
+    color: #032B3F;
+}
+
+.row::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+/*------------------------------------------------------------------------*/
+/*--------------------------------MAIN------------------------------------*/
+
+main {
+    margin: 0;
+    color: #032B3F;
+    padding: 2rem;
+    margin: 3rem;
+}
+
+#fondo {
+    background-image: url('/img/FondoPrincipal.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+}
+
+strong {
+    color: rgb(58, 58, 58);
+}
+
+#rowSuperior {
+    background-color: #f7f7f7;
+    border-radius: 20px;
+}
+
+#rowInferior {
+    background-color: #f7f7f7;
+    border-radius: 20px;
+}
+
+#rowI {
+    padding: 0px;
+    margin: 3rem;
+}
+
+#btnAbrir {
+    background-color: #106AA4;
+    color: #f7f7f7;
+    font-size: x-large;
+}
+
+#btnIndividual {
+    background-color: #106AA4;
+    color: #f7f7f7;
+    font-size: x-large;
+}
+
+#btnCeleste {
+    background-color: #0095C8;
+    color: #f7f7f7;
+    font-size: x-large;
+}
+
+#fileInput {
+    display: none;
+}
+
+#lineaHorizontal {
+    border-right: 4px solid #032B3F;
+    max-width: 75vh;
+}
+
+#tb-a {
+    background-color: #f7f7f7;
+}
+
+#tb-b {
+    background-color: #e1f0fa;
+}
+
+#tabla {
+    border-color: #346c88;
+}
+
+/*------------------------------------------------------------------------*/
+/*------------------------------FOOTER------------------------------------*/
+
+#DivFooter {
+    background-color: #032B3F;
+}
+
+#footerText {
+    color: #f7f7f7;
+}
+
+/*------------------------------------------------------------------------*/

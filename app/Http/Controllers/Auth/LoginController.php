@@ -27,7 +27,7 @@ class LoginController extends Controller
                 Auth::logout();
                 return back()->withErrors(['email' => 'No tienes permisos para acceder.']);
             }
-            return redirect()->route('admin.dashboard');
+            return redirect()->route('admin.home');
         }
 
         return back()->withErrors(['email' => 'Credenciales incorrectas.']);

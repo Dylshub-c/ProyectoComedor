@@ -74,7 +74,7 @@ class EstudiantesController extends Controller
 
     public function formImportar()
     {
-        return view('estudiantes.importar'); // Asegúrate de tener esta vista
+        return view('estudiantes.importar');
     }
 
     public function importar(Request $request)
@@ -83,8 +83,28 @@ class EstudiantesController extends Controller
             'archivo' => 'required|file|mimes:xlsx,csv,xls',
         ]);
 
+        // Conteo antes
+        $countAntes = Estudiante::count();
+
+        // Importar
         Excel::import(new EstudiantesImport, $request->file('archivo'));
 
-        return redirect()->back()->with('success', 'Estudiantes importados correctamente.');
+        // Conteo después
+        $countDespues = Estudiante::count();
+
+        // Calcular los nuevos importados
+        $cantidadImportados = $countDespues - $countAntes;
+
+        // Obtener los nuevos estudiantes
+        $estudiantes = Estudiante::with(['persona', 'especialidade.propiedade', 'tipoBeca.propiedade'])
+                        ->latest()
+                        ->take($cantidadImportados)
+                        ->get();
+
+        // Pasarlos a la vista solo esta vez
+        return view('estudiantes.importar', compact('estudiantes'));
     }
+
+    
+    
 }

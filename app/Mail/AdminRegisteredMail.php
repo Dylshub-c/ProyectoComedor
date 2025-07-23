@@ -34,7 +34,7 @@ class AdminRegisteredMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Admin Registered Mail',
+            subject: 'Registrada en el sistema del comedor',
         );
     }
 

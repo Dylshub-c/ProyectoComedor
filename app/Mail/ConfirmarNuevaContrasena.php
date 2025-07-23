@@ -9,35 +9,40 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class AdminPasswordMail extends Mailable
+
+class ConfirmarNuevaContrasena extends Mailable
 {
     use Queueable, SerializesModels;
 
+    /**
+     * Create a new message instance.
+     */
+    public $user;
+    public $url;
 
-    public $email;
-    public $password;
-
-    public function __construct($email, $password)
+    public function __construct($user, $url)
     {
-        $this->email = $email;
-        $this->password = $password;
+        $this->user = $user;
+        $this->url = $url;
     }
 
     public function build()
     {
-        return $this->subject('Tu acceso al Sistema de Comedor')
-        ->view('emails.admin_password');
+        return $this->subject('Confirma el cambio de contraseña')
+                ->view('emails.admin-confirmacion');
     }
-
     /**
      * Get the message envelope.
      */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Nueva Contraseña',
+            subject: 'Confirmar Nueva Contraseña',
         );
     }
 
-
+    /**
+     * Get the message content definition.
+     */
+   
 }

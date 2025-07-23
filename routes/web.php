@@ -35,6 +35,11 @@ Route::post('/subir-fotos', [FotoController::class, 'importarFotos'])->name('sub
 Route::get('/admin/forgot-password', [PasswordResetController::class, 'showResetForm'])->name('admin.password.request');
 Route::post('/admin/forgot-password', [PasswordResetController::class, 'reset'])->name('admin.password.reset');
 
+Route::get('/admin/cambio-contra', [PasswordResetController::class, 'confirmReset'])
+    ->name('admin.password.confirm')
+    ->middleware('signed'); // Verifica que el enlace no haya sido manipulado
+
+
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);

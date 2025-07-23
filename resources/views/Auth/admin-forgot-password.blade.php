@@ -23,6 +23,17 @@
                 <button id="btnEnviar" type="submit" class="btn btn-primary w-100">Enviar instrucciones</button>
             </form>
 
+
+            @if ($errors->any())
+                <div class="alert alert-danger mt-3">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             @if(session('status'))
                 <div id="mensaje" class="mt-3 text-success text-center">
                     ✔️ {{ session('status') }}
@@ -30,8 +41,8 @@
             @endif
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/OlvidarContrasena.js') }}"></script>
 </body>
 </html>
-

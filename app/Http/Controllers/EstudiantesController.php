@@ -59,18 +59,95 @@ class EstudiantesController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function informacion(Request $request)
     {
-        //
+        $persona = null;
+        $editar = $request->has('editar') && $request->editar == 1;
+
+        if ($request->filled('cedula') || $request->filled('nombre')) {
+            $query = Persona::with([
+                'estudiante.seccione.propiedade',
+                'estudiante.especialidade.propiedade',
+                'estudiante.tipoBeca.propiedade'
+            ]);
+
+            if ($request->filled('cedula')) {
+                $query->where('Cedula', $request->cedula);
+            }
+
+            if ($request->filled('nombre')) {
+                $nombre = $request->nombre;
+
+                // Unimos los campos y los comparamos con el nombre completo ingresado
+                $query->whereRaw("CONCAT(Nombre, ' ', PrimerApellido, ' ', SegundoApellido) LIKE ?", ["%{$nombre}%"]);
+            }
+
+            $persona = $query->first();
+        }
+
+        $secciones = Seccione::all();
+        $especialidades = Especialidade::all();
+        $tiposBeca = TipoBeca::all();
+
+        return view('estudiantes.informacion', compact('persona', 'editar', 'secciones', 'especialidades', 'tiposBeca'));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $persona = Persona::findOrFail($id);
+
+        $request->validate([
+            'Nombre' => 'required|string|max:255',
+            'PrimerApellido' => 'required|string|max:255',
+            'SegundoApellido' => 'nullable|string|max:255',
+            'Cedula' => 'required|string|max:20',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'especialidade_id' => 'required|exists:especialidades,id',
+            'seccione_id' => 'required|exists:secciones,id',
+            'tipo_beca_id' => 'required|exists:tipo_becas,id',
+        ]);
+
+        // Actualizar datos personales
+        $persona->update([
+            'Nombre' => $request->Nombre,
+            'PrimerApellido' => $request->PrimerApellido,
+            'SegundoApellido' => $request->SegundoApellido,
+            'Cedula' => $request->Cedula,
+        ]);
+
+        // Actualizar estudiante
+        $estudiante = $persona->estudiante;
+        $estudiante->especialidade_id = $request->especialidade_id;
+        $estudiante->seccione_id = $request->seccione_id;
+        $estudiante->tipo_beca_id = $request->tipo_beca_id;
+
+        // Actualizar foto si se sube una nueva
+        if ($request->hasFile('foto')) {
+            $foto = $request->file('foto')->store('fotos', 'public');
+            $estudiante->foto = $foto;
+        }
+
+        $estudiante->save();
+
+        return redirect()->back()->with('success', 'Estudiante actualizado correctamente');
     }
+
+
+    public function destroy(Persona $persona)
+    {
+        // Eliminar persona y/o datos relacionados si es necesario
+        $persona->delete();
+
+        return redirect()->route('estudiantes.informacion')
+                        ->with('success', 'Estudiante eliminado correctamente.');
+    }
+
+
+
+
+
+
+
 
     public function formImportar()
     {
@@ -105,6 +182,6 @@ class EstudiantesController extends Controller
         return view('estudiantes.importar', compact('estudiantes'));
     }
 
-    
-    
+
+
 }

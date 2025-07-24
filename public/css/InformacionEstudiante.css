@@ -1,0 +1,214 @@
+
+/*********Estilos Barra horizontal*********************************************************************************************************************/
+body {
+  margin: 3rem;
+}
+
+.main-header {
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+
+.header {
+  background-color: white;
+  border-radius: 12px;
+  padding: 15px 20px;              
+}
+
+
+.botonBarra {
+  background-color: #032B3F;
+  border-radius: 50%;
+  width: 65px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: bold;
+}
+
+.icon-box {
+  font-size: 2rem;
+  color: #0d6efd;
+}
+
+.logo {
+  width: 13rem;
+}
+
+
+/*********Estilos Campos de busqueda*********************************************************************************************************************/
+
+.input-icon-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.input-icon-container .icon {
+  color: #555;
+}
+
+
+.input-line {
+  flex-grow: 1;
+  border: none;
+  border-bottom: 2px solid #032B3F;
+  background: transparent;
+  outline: none;
+  padding: 6px 4px;
+
+  transition: border-color 0.3s;
+}
+.input-separator {
+  width: 2px;
+  height: 30px;
+  background-color: #032B3F;
+}
+
+/******************************************************************************************************************************/
+
+.foto-perfil {
+  width: 100%;        
+  max-width: 350px;   
+  height: auto;       
+  border-radius: 50%;
+  box-shadow: none;
+  display: block;     
+  margin-left: auto;  
+  margin-right: auto;
+}
+
+
+
+/* Tarjeta principal */
+.card {
+  position: relative;
+  overflow: visible;
+}
+
+/* Espacio en la parte superior de la tarjeta */
+.card-body {
+  padding-top: 40px !important;
+}
+
+/* Encabezado */
+.titulo1 {
+  color: #464040;
+  font-weight: bold;
+  padding: 6px 20px;
+}
+
+
+
+/* Colores personalizados */
+.colorFondo1 { background: #032B3F; }
+.color1 { color: #032B3F; }
+.color2 { color: #0A5386; }
+.color3 { background-color: #CDD2D5; }
+.color4 { color: #464040; }
+.color5 { color: white; }
+
+/* Líneas */
+.linea1 {
+  height: 1.5px;
+  background-color: #0A5386;
+  margin: 1rem 0;
+  width: 100%;
+}
+.linea2 {
+  background-color: #032B3F;
+  width: 1px;
+  height: 20px;
+}
+
+/* Botones */
+.btnPrimario {
+  background-color: #032B3F;
+  color: white;
+  border: none;
+  border-radius: 13px;
+
+  padding: 6px 32px;
+}
+
+.btnVer {
+  border: none;
+  background: #CDD2D5;
+}
+.btnVer:hover,
+.btnVer:focus,
+.btnVer:active {
+  background-color: #CDD2D5 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  color: inherit !important;
+}
+
+/* Avatar redondo con ícono */
+.bg-avatar {
+  background-color: #0A5386;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bg-avatar i {
+  color: white;
+  font-size: 5rem;
+}
+
+/***********************Estilo para campos tipo texto*********************************************************************+++*/
+.inputColor {
+  background-color: #CDD2D5 !important;
+  color: black;
+  font-weight: bold;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 12px;
+}
+.form-group-horizontal {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: 2rem;
+  flex-wrap: wrap;
+}
+.form-label-fixed {
+  margin: 0;
+  white-space: nowrap;
+  width: 130px;
+  padding-left: 1rem;
+}
+.form-input-flex {
+  flex-grow: 1;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  font-size: 0.9rem;
+  height: auto;
+}
+.tipoBeca {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 2rem;
+}
+.input-ancho-reducido {
+  max-width: 200px;
+}

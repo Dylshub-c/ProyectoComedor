@@ -13,7 +13,7 @@
   <!-- HEADER -->
   <div class="container-fluid">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 main-header gap-3">
-      
+
       <!-- Información de usuario y logo -->
       <div class="header d-flex flex-column flex-md-row align-items-center justify-content-between shadow-sm w-100 gap-3">
         <div class="user-info d-flex align-items-center gap-2">
@@ -47,13 +47,15 @@
         </div>
       </div>
       <div class="col-sm-12 col-md-6 col-lg-4">
-        <div class="card card-fondo text-white text-center p-4 mt-2">
-          <div class="card-overlay"></div>
-          <div class="card-contentinfo text-start">
-            <i class="bi bi-people-fill card-icon"></i>
-            Información de estudiantes
-          </div>
-        </div>
+        <a href="{{ route('estudiantes.informacion') }}" class="text-decoration-none">
+            <div class="card card-fondo text-white text-center p-4 mt-2">
+            <div class="card-overlay"></div>
+            <div class="card-contentinfo text-start">
+                <i class="bi bi-people-fill card-icon"></i>
+                Información de estudiantes
+            </div>
+            </div>
+        </a>
       </div>
       <div class="col-sm-12 col-md-6 col-lg-4">
         <div class="card card-fondo text-white text-center p-4 mt-2">
@@ -116,7 +118,7 @@
             @csrf
             <button type="submit" class="btn btn-modal-confirmar">Cerrar Sesión</button>
           </form>
-          
+
         </div>
       </div>
     </div>

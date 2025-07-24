@@ -24,7 +24,7 @@ main {
 }
 
 #fondo {
-    background-image: url('/img/FondoPrincipal.webp');
+    background-image: url('../img/FondoPrincipal.webp');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -62,13 +62,33 @@ strong {
     font-size: x-large;
 }
 
+#btnComprimido {
+    background-color: #106AA4;
+    color: #f7f7f7;
+    font-size: x-large;
+}
+
+#btnSubir {
+    background-color: #0095C8;
+    color: #f7f7f7;
+    font-size: x-large;
+    display: none;
+}
+
+#btnDescomprimir {
+    background-color: #0095C8;
+    color: #f7f7f7;
+    font-size: x-large;
+    display: none;
+}
+
 #btnCeleste {
     background-color: #0095C8;
     color: #f7f7f7;
     font-size: x-large;
 }
 
-#fileInput {
+#fileInput, #fileRAR {
     display: none;
 }
 

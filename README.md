@@ -11,6 +11,7 @@
 6. Ejecuta `php artisan migrate`
 7. Paso que resulve los demas
     este es el comando con el cual pueden ejecutar todo de un solo 
-    copy .env.example .env; composer install; php artisan key:generate; Read-Host -Prompt "Configura tu base de datos en .env y presiona Enter para continuar"; php artisan migrate
+    copy .env.example .env; composer install; php artisan key:generate; Read-Host -Prompt "Configura tu base de datos en .env y presiona Enter para continuar"; php artisan migrate{
+8. php artisan storage:link . esto es para las fotos
 ## Autor
 EL team leader cucho

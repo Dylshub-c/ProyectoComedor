@@ -21,7 +21,12 @@ Route::get('estudiantes/importar', [EstudiantesController::class, 'formImportar'
 // Procesar la importación
 Route::post('estudiantes/importar', [EstudiantesController::class, 'importar'])->name('estudiantes.importar');
 
-Route::get('/estudiantes/informacion', [EstudiantesController::class, 'informacion'])
+
+// Rutas para el controlador de estudiantes
+Route::get('/estudiantes/informacion', [EstudiantesController::class, 'informacion']);
+
+
+Route::post('/estudiantes/informacion', [EstudiantesController::class, 'informacion'])
     ->name('estudiantes.informacion');
 
 Route::put('/estudiantes/{persona}', [EstudiantesController::class, 'update'])

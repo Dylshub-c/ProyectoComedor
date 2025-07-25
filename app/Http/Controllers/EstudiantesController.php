@@ -12,6 +12,7 @@ use App\Models\Seccione;
 use App\Models\TipoBeca;
 use App\Models\Persona;
 use Illuminate\Support\Facades\DB;
+use App\Models\Propiedade;
 
 class EstudiantesController extends Controller
 {
@@ -71,6 +72,9 @@ class EstudiantesController extends Controller
                 'estudiante.tipoBeca.propiedade'
             ]);
 
+            // Filtro: Solo personas con tipo Estudiante
+            $query->where('TipoUsuario', 'Estudiante'); // O usa el número si es int, ej: ->where('TipoUsuario', 3)
+
             if ($request->filled('cedula')) {
                 $query->where('Cedula', $request->cedula);
             }
@@ -92,7 +96,8 @@ class EstudiantesController extends Controller
         return view('estudiantes.informacion', compact('persona', 'editar', 'secciones', 'especialidades', 'tiposBeca'));
     }
 
-    public function update(Request $request, $id)
+
+  public function update(Request $request, $id)
     {
         $persona = Persona::findOrFail($id);
 
@@ -102,8 +107,8 @@ class EstudiantesController extends Controller
             'SegundoApellido' => 'nullable|string|max:255',
             'Cedula' => 'required|string|max:20',
             'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'especialidade_id' => 'required|exists:especialidades,id',
-            'seccione_id' => 'required|exists:secciones,id',
+            'especialidade_input' => 'required|string|max:255',
+            'seccione_input' => 'required|string|max:255',
             'tipo_beca_id' => 'required|exists:tipo_becas,id',
         ]);
 
@@ -115,10 +120,22 @@ class EstudiantesController extends Controller
             'Cedula' => $request->Cedula,
         ]);
 
-        // Actualizar estudiante
+        // Buscar o crear propiedad para especialidad
+        $propEspecialidad = Propiedade::firstOrCreate(['nombre' => $request->especialidade_input]);
+
+        // Buscar o crear especialidad con ese propiedade_id
+        $especialidad = Especialidade::firstOrCreate(['propiedade_id' => $propEspecialidad->id]);
+
+        // Buscar o crear propiedad para sección
+        $propSeccion = Propiedade::firstOrCreate(['nombre' => $request->seccione_input]);
+
+        // Buscar o crear sección con ese propiedade_id
+        $seccion = Seccione::firstOrCreate(['propiedade_id' => $propSeccion->id]);
+
+        // Actualizar estudiante con los IDs correspondientes
         $estudiante = $persona->estudiante;
-        $estudiante->especialidade_id = $request->especialidade_id;
-        $estudiante->seccione_id = $request->seccione_id;
+        $estudiante->especialidade_id = $especialidad->id;
+        $estudiante->seccione_id = $seccion->id;
         $estudiante->tipo_beca_id = $request->tipo_beca_id;
 
         // Actualizar foto si se sube una nueva
@@ -131,6 +148,8 @@ class EstudiantesController extends Controller
 
         return redirect()->back()->with('success', 'Estudiante actualizado correctamente');
     }
+
+
 
 
     public function destroy(Persona $persona)

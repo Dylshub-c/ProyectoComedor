@@ -16,7 +16,7 @@ body {
 .header {
   background-color: white;
   border-radius: 12px;
-  padding: 15px 20px;              
+  padding: 15px 20px;
 }
 
 
@@ -83,13 +83,13 @@ body {
 /******************************************************************************************************************************/
 
 .foto-perfil {
-  width: 100%;        
-  max-width: 350px;   
-  height: auto;       
+  width: 100%;
+  max-width: 350px;
+  height: auto;
   border-radius: 50%;
   box-shadow: none;
-  display: block;     
-  margin-left: auto;  
+  display: block;
+  margin-left: auto;
   margin-right: auto;
 }
 
@@ -212,3 +212,16 @@ body {
 .input-ancho-reducido {
   max-width: 200px;
 }
+
+
+
+/* Contenedor del formulario */
+#formEditar {
+  background: #f9fbfc; /* fondo suave */
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgb(3 43 63 / 0.15);
+  padding: 2rem 2.5rem;
+  margin-top: 1rem;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+

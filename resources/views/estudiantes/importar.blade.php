@@ -162,11 +162,11 @@
                 </table>
             </div>
 
-            <form action="{{ route('subir-fotos.importar') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('subir-fotos.importar') }}" method="POST" form="formSubir" enctype="multipart/form-data">
                 @csrf
                 <div class="row">
                     <div class="col-10">
-                        <button type="submit" id="btnComprimido" class="btn btn-success fs-5 ms-4 mb-4 mt-4 px-4 py-2">
+                        <button type="submit" id="btnComprimido" class="btn fs-5 ms-4 mb-4 mt-4 px-4 py-2">
                             <i class="fa-solid fa-image-portrait fa-lg" style="color: #f7f7f7;"></i> | Subir fotos de estudiantes
                         </button>
 
@@ -176,10 +176,10 @@
 
                         <input type="file" id="fileRAR" name="zip" accept=".zip,.rar" class="form-control mt-2" required>
                     </div>
-
+            </form>
 
                     <div class="col-2">
-                        <button type="button" id="btnIndividual" class="btn btn-warning fs-5 mt-3 mb-4 px-4 py-2">
+                        <button type="button" id="btnIndividual" onclick="window.location.href='{{ route('admin.home') }}'"  class="btn fs-5 mt-3 mb-4 px-4 py-2">
                             <i class="fa-solid fa-repeat fa-lg" style="color: #f7f7f7;"></i> | Finalizar
                         </button>
                     </div>

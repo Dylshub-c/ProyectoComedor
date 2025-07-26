@@ -22,6 +22,12 @@ Route::get('estudiantes/importar', [EstudiantesController::class, 'formImportar'
 // Procesar la importación
 Route::post('estudiantes/importar', [EstudiantesController::class, 'importar'])->name('estudiantes.importar');
 
+// Ruta para eliminar todos los estudiantes importados
+Route::delete('/estudiantes/eliminar-lista', [EstudiantesController::class, 'eliminarLista'])->name('estudiantes.eliminarLista');
+
+// Ruta para recargar lista (simplemente la vista sin estudiantes)
+Route::get('/estudiantes/recargar-lista', [EstudiantesController::class, 'recargarLista'])->name('estudiantes.recargarLista');
+
 
 // Rutas para el controlador de estudiantes
 Route::get('/estudiantes/informacion', [EstudiantesController::class, 'informacion']);

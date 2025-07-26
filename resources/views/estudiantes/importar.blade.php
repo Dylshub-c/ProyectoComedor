@@ -21,16 +21,20 @@
 
 <body id="fondo" class="d-flex flex-column min-vh-100">
 
+
     <button id="btn-Menu" class="btn ms-3 mb-3 fs-5 py-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
         <i class="fa-solid fa-bars fa-xl" style="color: #f7f7f7;"></i>
     </button>
-
-        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
         <div class="offcanvas-header justify-content-end">
             <button type="button" class="btn" data-bs-dismiss="offcanvas" aria-label="Close"> <i class="fa-solid fa-xmark fa-2xl" style="color: #f7f7f7;"></i> </button>
         </div>
         <div class="offcanvas-body">
             <div class="d-grid gap-3">
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location.href='{{ route('admin.home') }}'">
+                    <i class="fa-solid fa-house-chimney fa-lg" id="icono-menu" ></i>
+                    | Home
+                </button>
                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
                     <i class="fa-solid fa-clipboard-list fa-lg" id="icono-menu"></i>
                     | Ingreso al comedor
@@ -51,7 +55,7 @@
                     <i class="fa-solid fa-calendar-check fa-lg" id="icono-menu"></i>
                     | Gestionar asistencias
                 </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('tipobeca.index') }}'">
                     <i class="fa-solid fa-hand-holding-medical fa-lg" id="icono-menu"></i>
                     | Becas
                 </button>
@@ -90,7 +94,7 @@
 
                 <div class="col-5 px-5">
                     <h2 class="mt-3">Subir estudiantes desde la aplicación (individualmente):</h2>
-                    <button type="btn btn-success" id="btnIndividual" class="btn fs-5 mb-4 mt-4 px-4 py-2">
+                    <button type="btn btn-success" id="btnIndividual" class="btn fs-5 mb-4 mt-4 px-4 py-2" onclick="window.location='{{ route('estudiantes.create') }}'">
                         <i class="fa-solid fa-user-plus fa-lg" style="color: #f7f7f7;"></i> | Nuevo estudiante
                     </button>
                 </div>
@@ -158,28 +162,42 @@
                 </table>
             </div>
 
-            <div class="row">
-                <div class="col-10">
-                    <button type="btn btn-success" id="btnComprimido" class="btn fs-5 ms-4 mb-4 mt-4 px-4 py-2">
-                        <i class="fa-solid fa-image-portrait fa-lg" style="color: #f7f7f7;"></i>
-                        | Subir fotos de estudiantes
-                    </button>
+            <form action="{{ route('subir-fotos.importar') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="row">
+                    <div class="col-10">
+                        <button type="submit" id="btnComprimido" class="btn btn-success fs-5 ms-4 mb-4 mt-4 px-4 py-2">
+                            <i class="fa-solid fa-image-portrait fa-lg" style="color: #f7f7f7;"></i> | Subir fotos de estudiantes
+                        </button>
+
+                        <button type="submit" id="btnDescomprimir" class="btn btn-primary fs-5 ms-2 px-4 py-2">
+                            <i class="fa-solid fa-upload fa-lg" style="color: #f7f7f7;"></i> | Descomprimir y subir
+                        </button>
+
+                        <input type="file" id="fileRAR" name="zip" accept=".zip,.rar" class="form-control mt-2" required>
+                    </div>
 
 
-                    <button id="btnDescomprimir" class="btn fs-5 ms-2 px-4 py-2">
-                        <i class="fa-solid fa-upload fa-lg" style="color: #f7f7f7;"></i>
-                        | Descomprimir y subir
-                    </button>
+                    <div class="col-2">
+                        <button type="button" id="btnIndividual" class="btn btn-warning fs-5 mt-3 mb-4 px-4 py-2">
+                            <i class="fa-solid fa-repeat fa-lg" style="color: #f7f7f7;"></i> | Finalizar
+                        </button>
+                    </div>
+                    @if (session('success'))
+                        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert" id="alert-success">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            {{ session('success') }}
+                        </div>
+                    @endif
 
-
-                    <input type="file" id="fileRAR" accept=".zip, .rar">
+                    @if ($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert" id="alert-error">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            {{ $errors->first() }}
+                        </div>
+                    @endif
                 </div>
-                <div class="col-2">
-                    <button type="btn btn-success"  id="btnIndividual" class="btn fs-5 mt-3 mb-4 px-4 py-2 btn-success">
-                        <i class="fa-solid fa-repeat fa-lg" style="color: #f7f7f7;"></i> | Finalizar
-                    </button>
-                </div>
-            </div>
+            </form>
         </div>
     </main>
 
@@ -192,6 +210,23 @@
             </div>
         </div>
     </footer>
+    <script>
+    // Ocultar automáticamente después de 3 segundos
+    setTimeout(() => {
+        const alertSuccess = document.getElementById('alert-success');
+        const alertError = document.getElementById('alert-error');
+
+        if (alertSuccess) {
+            alertSuccess.classList.remove('show');
+            alertSuccess.classList.add('fade');
+        }
+
+        if (alertError) {
+            alertError.classList.remove('show');
+            alertError.classList.add('fade');
+        }
+    }, 3000); // 3000ms = 3 segundos
+</script>
 
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.min.js"></script>
 

@@ -1,0 +1,136 @@
+/*********Estilos Barra horizontal*********************************************************************************************************************/
+.header {
+  background-color: white;
+  border-radius: 12px;
+  padding: 15px 20px;
+  width: 100%;             
+  max-width: 1200px;       
+  margin: 0 auto;          
+}
+
+.botonBarra {
+  background-color: #032B3F;
+  border-radius: 50%;
+  width: 65px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.logo {
+  max-width: 100%;
+  height: auto;
+  width: 100px;
+}
+
+/*********Estilos Campos de búsqueda*********************************************************************************************************************/
+.input-icon-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap; /* permite que se envuelva en pantallas chicas */
+}
+
+.input-line {
+  flex-grow: 1;
+  min-width: 0; /* para que no se salga del contenedor en flex */
+  border: none;
+  border-bottom: 2px solid #032B3F;
+  background: transparent;
+  outline: none;
+  padding: 6px 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.input-line:focus {
+  border-color: #0A5386;
+  box-shadow: none;
+}
+
+/******************************************************************************************************************************/
+/* Tarjeta principal */
+.card {
+  position: relative;
+  overflow: visible;
+}
+
+/* Colores personalizados */
+.color1 { color: #032B3F; }
+.color4 { color: #464040; }
+.color5 { color: white; }
+
+/* Botones */
+.btnPrimario {
+  background-color: #032B3F;
+  color: white;
+  border: none;
+  border-radius: 13px;
+  font-size: 14px;
+  padding: 6px 16px; /* padding reducido para que no se salga */
+  width: 100%; /* ancho completo para que no se salga */
+  max-width: 300px; /* limita ancho máximo para no ser gigante */
+  box-sizing: border-box;
+}
+
+/* Etiquetas */
+.form-label-fixed {
+  white-space: normal; /* permite quiebre de texto */
+  width: auto;
+  padding-left: 1rem;
+  min-width: 130px;
+  flex-shrink: 0; /* evita que se encoja demasiado */
+}
+
+.form-group-horizontal {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: 2rem;
+  flex-wrap: wrap;
+  max-width: calc(100% - 2rem); /* Ajusta el ancho para no salirse */
+  box-sizing: border-box;
+}
+
+
+/* Estilos para input personalizado en el formulario */
+.inputColor {
+  background-color: #CDD2D5 !important;
+  color: black;
+  font-weight: bold;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 12px;
+  flex-grow: 1;
+  min-width: 0; /* para que el input pueda encoger en flex */
+  box-sizing: border-box;
+}
+
+.inputColor2 {
+  background-color: #1F73AA !important;
+  color: white;
+  font-weight: bold;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 12px;
+  flex-grow: 1;
+  min-width: 0; /* para que el input pueda encoger en flex */
+  box-sizing: border-box;
+}
+
+.sin-borde-focus:focus {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+.form-input-flex {
+  flex-grow: 1;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  font-size: 0.9rem;
+  height: auto;
+}
+

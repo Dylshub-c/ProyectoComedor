@@ -58,6 +58,7 @@
         </a>
       </div>
       <div class="col-sm-12 col-md-6 col-lg-4">
+        <a href="{{ route('tipobeca.index') }}" class="text-decoration-none">
         <div class="card card-fondo text-white text-center p-4 mt-2">
           <div class="card-overlay"></div>
           <div class="card-contenttipos text-start">
@@ -65,6 +66,7 @@
             Tipos de beca
           </div>
         </div>
+        </a>
       </div>
       <div class="col-sm-12 col-md-6 col-lg-4">
         <a href="{{ route('estudiantes.importar.form') }}" class="text-decoration-none">

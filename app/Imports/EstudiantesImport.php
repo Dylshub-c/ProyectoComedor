@@ -20,57 +20,59 @@ class EstudiantesImport implements ToCollection
         DB::beginTransaction();
 
         try {
-         foreach ($rows->skip(1) as $row) {
-            // Persona
-            $persona = Persona::firstOrCreate(
-                ['Cedula' => $row[3]],
-                [
-                    'Nombre' => $row[0],
-                    'PrimerApellido' => $row[1],
-                    'SegundoApellido' => $row[2],
-                    'TipoUsuario' => $row[4],
-                ]
-            );
+            DB::beginTransaction();
 
-            if (!$persona->id) {
-                throw new Exception("No se pudo crear o encontrar persona con cédula: " . $row[3]);
+            foreach ($rows->skip(1) as $row) {
+                // Persona
+                $persona = Persona::firstOrCreate(
+                    ['Cedula' => $row[3]],
+                    [
+                        'Nombre' => $row[0],
+                        'PrimerApellido' => $row[1],
+                        'SegundoApellido' => $row[2],
+                        'TipoUsuario' => $row[4],
+                    ]
+                );
+
+                if (!$persona->id) {
+                    throw new Exception("No se pudo crear o encontrar persona con cédula: " . $row[3]);
+                }
+
+                // Normaliza nombres
+                $nombreEspecialidad = trim(ucwords(strtolower($row[5])));
+                $nombreSeccion      = trim(ucwords(strtolower($row[6])));
+                $nombreBeca         = trim(ucwords(strtolower($row[7])));
+
+                // Propiedades
+                $propEspecialidad = Propiedade::firstOrCreate(['nombre' => $nombreEspecialidad]);
+                $propSeccion      = Propiedade::firstOrCreate(['nombre' => $nombreSeccion]);
+                $propBeca         = Propiedade::firstOrCreate(['nombre' => $nombreBeca]);
+
+                // Relaciones
+                $especialidad = Especialidade::firstOrCreate(['propiedade_id' => $propEspecialidad->id]);
+                $seccion      = Seccione::firstOrCreate(['propiedade_id' => $propSeccion->id]);
+                $tipoBeca     = TipoBeca::firstOrCreate(['propiedade_id' => $propBeca->id]);
+
+                // Verificar si ya existe el estudiante
+                $estudianteExistente = Estudiante::where('persona_id', $persona->id)->first();
+
+                if (!$estudianteExistente) {
+                    Estudiante::create([
+                        'persona_id'       => $persona->id,
+                        'especialidade_id' => $especialidad->id,
+                        'seccione_id'      => $seccion->id,
+                        'tipo_beca_id'     => $tipoBeca->id,
+                        'foto'             => 'fotos/' . $row[8], // Asegúrate de que el archivo exista si esto es real
+                    ]);
+                }
             }
-
-            // Especialidad
-            $especialidad = Especialidade::firstOrCreate([
-                'propiedade_id' => Propiedade::firstOrCreate(['nombre' => $row[5]])->id
-            ]);
-
-            // Sección
-            $seccion = Seccione::firstOrCreate([
-                'propiedade_id' => Propiedade::firstOrCreate(['nombre' => $row[6]])->id
-            ]);
-
-            // Tipo de beca
-            $tipoBeca = TipoBeca::firstOrCreate([
-                'propiedade_id' => Propiedade::firstOrCreate(['nombre' => $row[7]])->id
-            ]);
-
-            // ** Validar que el estudiante con esa persona no exista **
-            $estudianteExistente = Estudiante::where('persona_id', $persona->id)->first();
-
-            if (!$estudianteExistente) {
-                Estudiante::create([
-                    'persona_id' => $persona->id,
-                    'especialidade_id' => $especialidad->id,
-                    'seccione_id' => $seccion->id,
-                    'tipo_beca_id' => $tipoBeca->id,
-                    'foto' => 'fotos/' . $row[8],
-                ]);
-            }
-            // Si ya existe el estudiante, no hagas nada (o actualizar si quieres)
-        }
 
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
         }
+
     }
 }
 

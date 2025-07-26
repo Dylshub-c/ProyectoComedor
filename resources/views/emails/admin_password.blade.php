@@ -6,11 +6,11 @@
 </head>
 <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px;">
   <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; padding: 25px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
-    
+
     <h2 style="color: #0d6efd; text-align: center; margin-bottom: 20px;">Restablecimiento de Contraseña</h2>
 
     <p style="font-size: 16px; color: #333;">
-      Has solicitado restablecer la contraseña de tu cuenta de administrador del <strong>Sistema de Comedor</strong>.
+      Has solicitado restablecer la contraseña de tu cuenta de administrador@ del <strong>Sistema de Comedor</strong>.
     </p>
 
     <div style="background-color: #f1f8ff; padding: 15px 20px; border-left: 5px solid #0d6efd; border-radius: 5px; margin: 20px 0;">

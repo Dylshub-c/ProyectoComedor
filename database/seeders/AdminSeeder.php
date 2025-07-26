@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AdminPasswordMail;
+use App\Mail\AdminRegisteredMail;
 class AdminSeeder extends Seeder
 {
     /**
@@ -18,10 +19,10 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
          $personaData = [
-        'Nombre' => 'Dylan',
-        'PrimerApellido' => 'Gonzalo',
-        'SegundoApellido' => 'Jimenez',
-        'Cedula' => '34345566',
+        'Nombre' => 'Natalia',
+        'PrimerApellido' => 'Martinez',
+        'SegundoApellido' => 'Uribe',
+        'Cedula' => '78938234',
         'TipoUsuario' => 'admin',
         ];
 
@@ -31,7 +32,7 @@ class AdminSeeder extends Seeder
             $personaData
         );
 
-        $email = 'dylan@gmail.com';
+        $email = 'natalia@gmail.com';
 
         // Generar una contraseña predeterminada o aleatoria
         $password = Str::random(10);
@@ -47,7 +48,8 @@ class AdminSeeder extends Seeder
 
         // Si se creó el usuario (no existía antes), enviar correo con la contraseña
         if ($user->wasRecentlyCreated) {
-            Mail::to($email)->send(new \App\Mail\AdminPasswordMail($email, $password));
+            Mail::to($user->email)->send(new \App\Mail\AdminRegisteredMail($email, $password, $persona->Nombre));
+
         }
-            }
+        }
 }

@@ -15,17 +15,21 @@ class AdminRegisteredMail extends Mailable
 
     public $email;
     public $password;
+    public $nombre;
 
-    public function __construct($email, $password)
+    public function __construct($email, $password, $nombre )
     {
         $this->email = $email;
         $this->password = $password;
+        $this->nombre = $nombre;
     }
 
     public function build()
     {
         return $this->subject('Bienvenido al Sistema de Comedor')
-            ->view('emails.admin_registered');
+            ->view('emails.admin_registered')->with([
+                'nombre' => $this->nombre,
+            ]);
     }
 
     /**

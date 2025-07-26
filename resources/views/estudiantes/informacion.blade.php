@@ -20,6 +20,10 @@
         </div>
         <div class="offcanvas-body">
             <div class="d-grid gap-3">
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location.href='{{ route('admin.home') }}'">
+                    <i class="fa-solid fa-house-chimney fa-lg" id="icono-menu" ></i>
+                    | Home
+                </button>
                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
                     <i class="fa-solid fa-clipboard-list fa-lg" id="icono-menu"></i>
                     | Ingreso al comedor
@@ -28,7 +32,7 @@
                     <i class="fa-solid fa-street-view fa-lg" id="icono-menu"></i>
                     | Agregar estudiantes
                 </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('estudiantes.informacion') }}'">
                     <i class="fa-solid fa-address-card fa-lg" id="icono-menu"></i>
                     | Ver lista de estudiantes
                 </button>
@@ -40,7 +44,7 @@
                     <i class="fa-solid fa-calendar-check fa-lg" id="icono-menu"></i>
                     | Gestionar asistencias
                 </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('tipobeca.index') }}'">
                     <i class="fa-solid fa-hand-holding-medical fa-lg" id="icono-menu"></i>
                     | Becas
                 </button>
@@ -97,14 +101,29 @@
             </div>
         </div>
     </div>
+    @if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show mt-3" role="alert" id="alert-success">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        {{ session('success') }}
+    </div>
+    @endif
+
 
     @if($persona)
+    @if(session('guardado'))
+    <div class="alert alert-success text-center">
+        ¡Cambios guardados correctamente!
+    </div>
+    @endif
     <div class="container-fluid h-100 overflow-hidden d-flex justify-content-center align-items-center p-5 pt-0 mb-4">
         <div class="card rounded-4 shadow p-3 w-100">
             <div class="row g-3 align-items-center">
+                @php
+                    $mostrarEditar = $editar || $errors->any();
+                @endphp
 
                 <!-- Columna de texto: VISTA NORMAL -->
-                <div class="col-md-8 p-2" id="vistaDatos">
+                <div class="col-md-8 p-2" id="vistaDatos"  style="{{ $mostrarEditar ? 'display:none;' : '' }}">
                     <h1 class="fw-bold color4 mb-4 ps-3">
                         {{ $persona->Nombre }} {{ $persona->PrimerApellido }} {{ $persona->SegundoApellido }}
                     </h1>
@@ -140,20 +159,43 @@
                                 <i class="bi bi-person-badge-fill"></i><strong> | Revisar Asistencia</strong>
                             </button>
                         </div>
-                        <div class="text-center mt-2">
-                            <form method="POST" action="{{ route('estudiantes.destroy', $persona->id) }}" onsubmit="return confirm('¿Seguro que quieres eliminar este estudiante?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btnPrimario fs-5">
-                                    <i class="bi bi-trash-fill"></i><strong> | Eliminar</strong>
-                                </button>
-                            </form>
-                        </div>
+                        <form method="POST" action="{{ route('estudiantes.destroy', $persona->id) }}" id="formEliminar">
+                            @csrf
+                            @method('DELETE')
+                            <button
+                                type="button"
+                                class="btnPrimario fs-5"
+                                data-bs-toggle="modal"
+                                data-bs-target="#confirmDeleteModal">
+                                <i class="bi bi-trash-fill"></i><strong> | Eliminar</strong>
+                            </button>
+                        </form>
                     </div>
                 </div>
 
+            <!-- Modal -->
+            <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title text-danger" id="confirmDeleteModalLabel">Confirmar eliminación</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+                        <div class="modal-body">
+                            ¿Seguro que quieres eliminar este estudiante? Esta acción no se puede deshacer.
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-danger" id="btnConfirmDelete">Eliminar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
             <!-- FORMULARIO EDICIÓN OCULTO -->
-            <div class="col-md-8 p-2" id="formEditar" style="display:none;">
+            <div class="col-md-8 p-2" id="formEditar" style="{{ $mostrarEditar ? '' : 'display:none;' }}">
                 <form method="POST" action="{{ route('estudiantes.update', $persona->id) }}" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
@@ -225,8 +267,8 @@
             </div>
 
             <!-- imagen -->
-            <div class="col-md-4 text-center mb-5">
-                <img src="{{ asset($persona->estudiante->foto ?? '../img/FotoEstudiante.webp') }}" alt="Foto del estudiante" class="foto-perfil rounded">
+            <div class="col-md-4 text-center mb-5 align-self-center">
+               <img src="{{ asset($persona->estudiante->foto ?? 'img/FotoEstudiante.webp') }}" alt="Foto del estudiante" class="foto-perfil rounded">
             </div>
 
         </div>
@@ -241,23 +283,36 @@
     @endif
 
   <!-- Scripts -->
-    <script>
-    const btnEditar = document.getElementById('btnEditar');
-    const vistaDatos = document.getElementById('vistaDatos');
-    const formEditar = document.getElementById('formEditar');
-    const btnCancelar = document.getElementById('btnCancelar');
-
-    btnEditar.addEventListener('click', () => {
-        vistaDatos.style.display = 'none';
-        formEditar.style.display = 'block';
+<script>
+    document.getElementById('btnEditar').addEventListener('click', function () {
+    document.getElementById('vistaDatos').style.display = 'none';
+    document.getElementById('formEditar').style.display = 'block';
+    });
+    document.getElementById('btnCancelar').addEventListener('click', function () {
+        document.getElementById('formEditar').style.display = 'none';
+        document.getElementById('vistaDatos').style.display = 'block';
     });
 
-    btnCancelar.addEventListener('click', () => {
-        formEditar.style.display = 'none';
-        vistaDatos.style.display = 'block';
+    setTimeout(() => {
+        const alert = document.querySelector('.alert-success');
+        if (alert) {
+            alert.style.display = 'none';
+        }
+    }, 3000);
+    document.getElementById('btnConfirmDelete').addEventListener('click', function () {
+    document.getElementById('formEliminar').submit();
     });
 
+    setTimeout(() => {
+        const alert = document.getElementById('alert-success');
+        if (alert) {
 
+            alert.classList.remove('show');
+            alert.classList.add('hide');
+
+            setTimeout(() => alert.remove(), 500);
+        }
+    }, 3000);
 </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>

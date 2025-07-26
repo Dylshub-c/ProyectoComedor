@@ -1,0 +1,177 @@
+/* Fondo de la página */
+body {
+  background-image: url('../img/FondoPrincipal.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+}
+
+/* Header principal */
+.main-header {
+  padding: 10px 20px;
+}
+
+/* Logo */
+.logo {
+  max-width: 100%;
+  height: auto;
+  width: 100px;
+}
+
+/* Caja de info de usuario */
+.header {
+  background-color: white;
+  border-radius: 12px;
+  padding: 15px 20px;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.header2 {
+  background-color: white;
+  border-radius: 12px;
+  padding: 15px 20px;
+  width: 100px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Botón logout */
+.btn.btn-outline {
+  height: 60px;
+  width: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Info de usuario */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon-box {
+  font-size: 2rem;
+  color: #0d6efd;
+}
+
+/* Contenedor principal de tarjetas */
+.container-fluid2 {
+  background-color: white;
+  border-radius: 12px;
+  max-width: 95%;
+  padding: 20px;
+  margin: auto;
+  margin-top: 20px;
+  box-sizing: border-box;
+}
+
+/* Tarjeta base */
+.card {
+  background-color: rgba(13, 110, 253, 0.75);
+  color: white;
+  text-align: center;
+  padding: 30px 20px;
+  border-radius: 10px;
+  height: 100%;
+  font-size: 1.2rem;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+/* Tarjeta con fondo */
+.card-fondo {
+  position: relative;
+  background-image: url('../img/FondoOpciones.webp');
+  background-size: cover;
+  background-position: center;
+  height: 310px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Capa de superposición */
+.card-fondo .card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 123, 255, 0.65);
+  backdrop-filter: brightness(0.25);
+  z-index: 1;
+}
+
+/* Íconos en tarjetas */
+.card-icon {
+  position: absolute;
+  top: 10px;
+  left: 15px;
+  font-size: 30px;
+  color: white;
+  z-index: 2;
+}
+
+/* Contenido de tarjetas */
+.card-fondo .card-content,
+.card-fondo .card-contentinfo,
+.card-fondo .card-contenttipos {
+  position: relative;
+  z-index: 2;
+  font-size: 28px;
+  font-weight: bold;
+  padding-left: 100px;
+  padding-top: 100px;
+  text-align: left;
+}
+
+/* Ajustes específicos */
+.card-fondo .card-contentinfo { padding-left: 95px; }
+.card-fondo .card-contenttipos { padding-left: 155px; }
+
+/* ==== MODAL PERSONALIZADO ==== */
+.modal-estilo {
+  border-radius: 16px;
+  overflow: hidden;
+  padding: 0;
+  border: none;
+}
+
+.modal-header-estilo {
+  background-color: #0a5386;
+  border-bottom: none;
+  padding: 1rem 1.5rem;
+}
+
+.modal-header-estilo .modal-title {
+  font-weight: bold;
+}
+
+.modal-footer .btn-modal-cancelar,
+.modal-footer .btn-modal-confirmar {
+  border-radius: 10px;
+  padding: 6px 18px;
+  font-weight: bold;
+  font-size: 1rem;
+  color: white;
+  background-color: #0a5386;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.modal-footer .btn-modal-cancelar:hover,
+.modal-footer .btn-modal-confirmar:hover {
+  background-color: #074a76;
+}
+
+.btn-close-white {
+  filter: invert(1);
+}
+
+

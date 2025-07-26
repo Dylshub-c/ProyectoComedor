@@ -11,8 +11,6 @@ class Persona extends Model
 {
 
     use HasFactory;
-    protected $primaryKey = 'idPersona';
-
 
     protected $fillable = [
         'Nombre',
@@ -30,6 +28,11 @@ class Persona extends Model
     public function estudiante()
     {
         return $this->hasOne(Estudiante::class);
+    }
+    // Relación con Usuario
+    public function usuario()
+    {
+        return $this->hasOne(User::class);
     }
 }
 

@@ -1,0 +1,47 @@
+    body {
+      background: url(../img/FondoPrincipal.webp) no-repeat center center fixed;
+      background-size: cover;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .recuperar-container {
+      background-color: rgba(0, 0, 0, 0.6); 
+      border-radius: 20px;
+      padding: 30px;
+      color: white;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .form-label {
+      color: #ccc;
+    }
+    #modalVerificacion {
+      display: none;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 1050;
+    }
+
+    #modalVerificacion .modal-box {
+      background-color: white;
+      border-radius: 20px;
+      padding: 30px;
+      text-align: center;
+      width: 320px;
+    }
+
+    #modalVerificacion .modal-box h5 {
+      color: #0095C8;
+    }
+
+    #modalVerificacion .circle-check {
+      width: 60px;
+      height: 60px;
+      background-color: #0095C8;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto 10px auto;
+    }

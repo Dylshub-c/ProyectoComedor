@@ -113,6 +113,13 @@
                         </div>
                     </form>
                 </div>
+                @if (session('success'))
+                    <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                    </div>
+                @endif
+
                 {{-- Formulario oculto para editar (puedes mostrarlo con JS) --}}
                 <div id="formEditar" style="display:none;">
                     <form method="POST" id="formEditarTipoBeca" action="">
@@ -134,16 +141,37 @@
                         {{ $tipo->propiedade->nombre ?? 'Sin nombre' }}
                     </div>
 
-                    {{-- Formulario eliminar --}}
-                    <form method="POST" action="{{ route('tipobeca.destroy', $tipo->id) }}" onsubmit="return confirm('¿Seguro que quieres eliminar este tipo de beca?');">
-                        @csrf
-                        @method('DELETE')
-                        <div class="text-center ms-5">
-                        <button type="submit" class="btnPrimario fs-5">
+                    {{-- Botón que abre el modal --}}
+                    <div class="text-center">
+                        <button type="button" class="btnPrimario fs-5" data-bs-toggle="modal" data-bs-target="#modalEliminar{{ $tipo->id }}">
                             <i class="bi bi-trash-fill"></i> Eliminar
                         </button>
+                    </div>
+
+                    {{-- Modal --}}
+                    <div class="modal fade" id="modalEliminar{{ $tipo->id }}" tabindex="-1" aria-labelledby="modalLabel{{ $tipo->id }}" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title text-danger" id="modalLabel{{ $tipo->id }}">Confirmar eliminación</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                </div>
+                                <div class="modal-body">
+                                    ¿Estás seguro de que deseas eliminar este registro? Esta acción no se puede deshacer.
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+
+                                    {{-- Formulario de eliminación --}}
+                                    <form method="POST" action="{{ route('tipobeca.destroy', $tipo->id) }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
-                    </form>
+                    </div>
 
                     {{-- Formulario editar (modal o formulario inline) --}}
                     <div class="text-center me-5">
@@ -172,6 +200,20 @@
         function ocultarEditar() {
             document.getElementById('formEditar').style.display = 'none';
         }
+        document.addEventListener("DOMContentLoaded", function () {
+        const successAlert = document.querySelector('.alert-success');
+        if (successAlert) {
+            setTimeout(() => {
+                // Opcional: efecto fade-out antes de remover
+                successAlert.classList.remove('show');
+                successAlert.classList.add('fade');
+
+                setTimeout(() => {
+                    successAlert.remove();
+                }, 500); // Espera a que termine el fade
+            }, 4000); // Mostrar durante 4 segundos
+        }
+        });
     </script>
 
     {{-- Bootstrap JS --}}

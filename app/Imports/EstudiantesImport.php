@@ -20,9 +20,12 @@ class EstudiantesImport implements ToCollection
         DB::beginTransaction();
 
         try {
-            DB::beginTransaction();
+            foreach ($rows->skip(1) as $index => $row) {
+                // Validar que haya al menos 9 columnas
+                if (count($row) < 9) {
+                    throw new Exception("Fila " . ($index + 2) . " incompleta. Se requieren al menos 9 columnas.");
+                }
 
-            foreach ($rows->skip(1) as $row) {
                 // Persona
                 $persona = Persona::firstOrCreate(
                     ['Cedula' => $row[3]],
@@ -62,7 +65,7 @@ class EstudiantesImport implements ToCollection
                         'especialidade_id' => $especialidad->id,
                         'seccione_id'      => $seccion->id,
                         'tipo_beca_id'     => $tipoBeca->id,
-                        'foto'             => 'fotos/' . $row[8], // Asegúrate de que el archivo exista si esto es real
+                        'foto'             => 'fotos/' . ($row[8] ?? 'default.jpg'),
                     ]);
                 }
             }
@@ -72,7 +75,6 @@ class EstudiantesImport implements ToCollection
             DB::rollBack();
             throw $e;
         }
-
     }
 }
 

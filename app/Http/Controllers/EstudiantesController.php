@@ -23,7 +23,7 @@ class EstudiantesController extends Controller
     public function index()
     {
         $estudiantes = Estudiante::with(['persona', 'especialidade.propiedade', 'seccione.propiedade', 'tipoBeca.propiedade'])->get();
-        return view('estudiantes.index', compact('estudiantes'));
+        return view('estudiantes.informacion', compact('estudiantes'));
     }
 
     /**
@@ -301,6 +301,24 @@ class EstudiantesController extends Controller
         return view('estudiantes.importar', compact('estudiantes'));
     }
 
+    public function eliminarLista()
+    {
+        // Aquí borras los estudiantes que se importaron
+        // Si quieres borrar TODO de la tabla Estudiantes:
+        Estudiante::truncate();
 
+        // También puedes borrar personas relacionadas si quieres, o solo estudiantes.
+
+        return redirect()->route('estudiantes.informacion')->with('success', 'Lista de estudiantes eliminada.');
+    }
+
+    public function recargarLista()
+    {
+        // Simplemente redirige o carga la vista sin estudiantes
+        // Podrías pasar una colección vacía
+        $estudiantes = collect();
+
+        return view('estudiantes.informacion', compact('estudiantes'));
+    }
 
 }

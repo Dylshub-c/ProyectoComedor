@@ -32,14 +32,20 @@
     <div class="row">
         <div class="col-3 mb-4 mt-5">
             <div id="PrimerModulo" class="container-fluid text-center mt-5">
-            <img class="img-fluid" id="fotoEstudiante" 
-     src="{{ $persona?->estudiante?->foto ? asset('storage/' . $persona->estudiante->foto) : '/img/FotoEstudiante.webp' }}" 
-     alt="Foto del Estudiante">
+              @php
+    $foto = isset($persona) && $persona?->estudiante?->foto
+        ? asset('storage/' . $persona->estudiante->foto)
+        : asset('/img/FotoEstudiante.webp');
+@endphp
 
+<img class="img-fluid" id="fotoEstudiante" src="{{ $foto }}" alt="Foto del estudiante">
+
+  
      <label id="NomEstudiante" class=" mt-1 text-center fs-4" for="">
     <strong>
-        {{ $persona ? $persona->Nombre . ' ' . $persona->PrimerApellido . ' ' . $persona->SegundoApellido : 'Nombre del estudiante' }}
-    </strong>
+    {{ isset($persona) ? "{$persona->Nombre} {$persona->PrimerApellido} {$persona->SegundoApellido}" : 'Nombre del estudiante' }}
+</strong>
+
 </label>
 
                 <ul id="ul-Estudiante" class="list-group mt-5">
@@ -180,6 +186,9 @@
 <!------------------------------------------------------SCRIPTS------------------------------------------------------------>
 
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.min.js"></script>
+    <script>
+        const asistenciasEstudiante = @json($asistencias ?? []);
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src={{ asset('js/IngresoComedor.js') }}></script>

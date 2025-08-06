@@ -7,7 +7,22 @@ document.addEventListener('DOMContentLoaded', function () {
   let selectedDateStr = null;
   let lastJsEvent = null;
   const fechasAceptadas = new Set();
-  let interaccionUsuario = false; //detectar interacción real
+  let interaccionUsuario = false;
+
+  // Convertir asistenciasEstudiante a eventos para FullCalendar
+  const eventosAsistencia = Object.entries(asistenciasEstudiante).map(([fecha, estado]) => {
+    return {
+      start: fecha,
+      allDay: true,
+      display: 'block',
+      classNames: ['evento-icono'],
+      extendedProps: {
+        esMarca: true,
+        icono: estado === 'presente' ? 'fa-solid fa-square-check' : 'fa-solid fa-square-xmark',
+        color: estado === 'presente' ? 'green' : 'red',
+      }
+    };
+  });
 
   const calendar = new FullCalendar.Calendar(calendarEl, {
     locale: 'es',
@@ -18,9 +33,10 @@ document.addEventListener('DOMContentLoaded', function () {
       center: 'title',
       right: 'dayGridMonth,listWeek'
     },
+    events: eventosAsistencia,  // Asignamos eventos aquí
 
     select: function (info) {
-      interaccionUsuario = true; // Marca que hubo interacción
+      interaccionUsuario = true;
       selectedDateStr = info.startStr;
       lastJsEvent = info.jsEvent;
 
@@ -80,7 +96,6 @@ document.addEventListener('DOMContentLoaded', function () {
     marcarDia('fa-solid fa-triangle-exclamation', 'blue');
     hidePopover();
   });
-  
 
   function marcarDia(icono, color) {
     if (!selectedDateStr) return;
@@ -111,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // Click fuera para ocultar popover y modal
+  // Ocultar popover si se hace click afuera
   document.addEventListener('click', function (e) {
     if (!popover.contains(e.target) && !calendarEl.contains(e.target) && !modalConfirmacion.contains(e.target)) {
       hidePopover();
@@ -119,19 +134,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  // Botón Aceptar modal
   btnAceptarModal.addEventListener('click', function () {
     if (selectedDateStr) fechasAceptadas.add(selectedDateStr);
-
     modalConfirmacion.style.display = 'none';
     if (lastJsEvent) {
       mostrarPopover(lastJsEvent);
     }
   });
+
 });
-
-
-///////////////////////////////////////////////////////
-const quillObservaciones = new Quill('#editor-Observaciones', {
-    theme: 'snow'
-  });

@@ -14,6 +14,9 @@ use App\Models\Persona;
 use Illuminate\Support\Facades\DB;
 use App\Models\Propiedade;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
+use App\Models\Asistencia;
+use App\Models\ListadoAsistencia;
 
 class EstudiantesController extends Controller
 {
@@ -330,5 +333,67 @@ class EstudiantesController extends Controller
 
         return view('estudiantes.informacion', compact('estudiantes'));
     }
+
+   public function mostrarEnComedor(Request $request)
+{
+    $persona = null;
+    $asistencias = [];
+
+    if ($request->filled('cedula')) {
+        $persona = Persona::with([
+            'estudiante.seccione.propiedade',
+            'estudiante.especialidade.propiedade',
+            'estudiante.tipoBeca.propiedade'
+        ])
+        ->where('TipoUsuario', 'Estudiante')
+        ->where('Cedula', $request->cedula)
+        ->first();
+
+        if ($persona && $persona->estudiante) {
+            $hora = \Illuminate\Support\Carbon::now()->format('H');
+            $tipoAsistencia = $hora < 12 ? 'desayuno' : 'almuerzo';
+
+            $asistencia = Asistencia::whereDate('fecha_hora', \Illuminate\Support\Carbon::today())
+                ->where('tipo_asistencia', $tipoAsistencia)
+                ->where('estado', 'presente')
+                ->first();
+
+            if ($asistencia) {
+                $yaRegistrado = ListadoAsistencia::where('estudiante_id', $persona->estudiante->id)
+                    ->where('asistencia_id', $asistencia->id)
+                    ->exists();
+
+                if (!$yaRegistrado) {
+                    ListadoAsistencia::create([
+                        'estudiante_id' => $persona->estudiante->id,
+                        'asistencia_id' => $asistencia->id,
+                        'observaciones' => null
+                    ]);
+                }
+            }
+
+            // Obtener asistencias del estudiante para el mes actual
+            $inicioMes = \Illuminate\Support\Carbon::now()->startOfMonth();
+            $finMes = \Illuminate\Support\Carbon::now()->endOfMonth();
+
+            $listado = ListadoAsistencia::with('asistencia')
+                ->where('estudiante_id', $persona->estudiante->id)
+                ->whereHas('asistencia', function ($query) use ($inicioMes, $finMes) {
+                    $query->whereBetween('fecha_hora', [$inicioMes, $finMes]);
+                })->get();
+
+            // Preparar arreglo con fecha => estado
+            foreach ($listado as $item) {
+                $fecha = $item->asistencia->fecha_hora->format('Y-m-d');
+                $asistencias[$fecha] = $item->asistencia->estado; // 'presente' o 'ausente'
+            }
+        }
+    }
+
+    return view('IngresoCom.IngresoComedor', compact('persona', 'asistencias'));
+}
+
+
+
 
 }

@@ -36,6 +36,7 @@
 
   <!-- TARJETAS -->
   <div class="container-fluid2">
+  <a href="{{ route('IngresoCom.IngresoComedor') }}" class="text-decoration-none">
     <div class="row g-4">
       <div class="col-sm-12 col-md-6 col-lg-4">
         <div class="card card-fondo text-white text-center p-4 mt-2">
@@ -45,6 +46,7 @@
             Ingreso al Comedor
           </div>
         </div>
+</a>
       </div>
       <div class="col-sm-12 col-md-6 col-lg-4">
         <a href="{{ route('estudiantes.informacion') }}" class="text-decoration-none">

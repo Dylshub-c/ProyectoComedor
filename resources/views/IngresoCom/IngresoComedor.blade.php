@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="es">
 
 <!---------------------------------------------------------LINKS----------------------------------------------------------->
@@ -14,7 +14,7 @@
         <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.17/locales/es.global.min.js"></script>
 
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-        <link rel="Stylesheet" href="/IngresoComedor.css" type="text/css">
+        <link rel="Stylesheet" href="{{ asset('css/IngresoComedor.css') }}">
         <link rel="icon" href="/img/LogoDW-Negro.png" media="(prefers-color-scheme: light)">
         <link rel="icon" href="/img/LogoDW-Blanco.png" media="(prefers-color-scheme: dark)">
         <title>Desarrollo Web</title>
@@ -25,32 +25,48 @@
 <body id="fondo" class="d-flex flex-column min-vh-100">
 
 <!------------------------------------------------------------------------------------------------------------------------->
-<!-----------------------------------------------------CONTENIDO----------------------------------------------------------->
+<!-----------------------------------------------------CONTENIDO-----------------------------------------------------------> 
 
     <main class="flex-grow-1">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-3 mb-4 mt-5">
-                    <div id="PrimerModulo" class="container-fluid text-center mt-5">
-                        <img class="img-fluid" id="fotoEstudiante" src="/img/FotoEstudiante.webp" alt="FotoEstudiante">
-                        <label id="NomEstudiante" class=" mt-1 text-center fs-4" for=""><strong>Nombre del estudiante</strong></label>
+    <div class="container-fluid">
+    <div class="row">
+        <div class="col-3 mb-4 mt-5">
+            <div id="PrimerModulo" class="container-fluid text-center mt-5">
+              @php
+    $foto = isset($persona) && $persona?->estudiante?->foto
+        ? asset('storage/' . $persona->estudiante->foto)
+        : asset('/img/FotoEstudiante.webp');
+@endphp
 
-                        <ul id="ul-Estudiante" class="list-group mt-5">
-                            <li id="li-Estudiante" class="list-group-item">
-                              <strong class="fs-5">Cédula:</strong><br />
-                              <span id="cedula">-</span>
-                            </li>
-                            <li id="li-Estudiante" class="list-group-item">
-                              <strong class="fs-5">Especialidad:</strong><br />
-                              <span id="especialidad">-</span>
-                            </li>
-                            <li id="li-Estudiante" class="list-group-item">
-                              <strong class="fs-5">Tipo de beca:</strong><br />
-                              <span id="tipo-beca">-</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+<img class="img-fluid" id="fotoEstudiante" src="{{ $foto }}" alt="Foto del estudiante">
+
+  
+     <label id="NomEstudiante" class=" mt-1 text-center fs-4" for="">
+    <strong>
+    {{ isset($persona) ? "{$persona->Nombre} {$persona->PrimerApellido} {$persona->SegundoApellido}" : 'Nombre del estudiante' }}
+</strong>
+
+</label>
+
+                <ul id="ul-Estudiante" class="list-group mt-5">
+                    <li id="li-Estudiante" class="list-group-item">
+                        <strong class="fs-5">Cédula:</strong><br />
+                        <span id="cedula">{{ $persona?->Cedula ?? '-' }}</span>
+                    </li>
+                    <li id="li-Estudiante" class="list-group-item">
+                        <strong class="fs-5">Especialidad:</strong><br />
+                        <span id="especialidad">{{ $persona?->estudiante?->especialidade?->propiedade?->nombre ?? '-' }}</span>
+                    </li>
+                    <li id="li-Estudiante" class="list-group-item">
+                        <strong class="fs-5">Tipo de beca:</strong><br />
+                        <span id="tipo-beca">{{ $persona?->estudiante?->tipoBeca?->propiedade?->nombre ?? '-' }}</span>
+
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+
 
                 <div class="col-6 mb-4 mt-4">
                     <div id="SegundoModulo" class="container-fluid">
@@ -76,7 +92,7 @@
                             <button id="btnAceptarModal" class="btn-aceptar fs-5">Aceptar</button>
                           </div>
                         </div>
-
+                        
                         <div class="d-flex justify-content-between">
 
                           <div>
@@ -84,6 +100,8 @@
                               <i class="fa-regular fa-address-card fa-lg me-1" style="color: #f7f7f7;"></i>
                               | Buscar por cédula
                             </button>
+                            <form action="{{ route('comedor.buscar') }}" method="GET">
+                            @csrf
                             <div class="modal fade" id="modalBuscar" tabindex="-1" aria-labelledby="modalBuscarLabel" aria-hidden="true">
                               <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
@@ -93,16 +111,17 @@
                                   <div class="modal-body">
                                     <div class="mb-3">
                                       <label for="cedulaEstudiante" class="form-label fs-5">Ingrese la cédula completa del estudiante:</label>
-                                      <input type="text" class="form-control" id="cedulaEstudiante">
+                                      <input type="text" class="form-control" name="cedula" id="cedulaEstudiante" >
                                     </div>
                                   </div>
                                   <div class="modal-footer">
                                     <button type="button" class="btn btn-cancelar fs-5" data-bs-dismiss="modal">Cancelar</button>
-                                    <button type="button" class="btn btn-aceptar fs-5">Realizar busqueda</button>
+                                    <button type="submit" class="btn btn-aceptar fs-5">Realizar búsqueda</button>
                                   </div>
                                 </div>
                               </div>
                             </div>
+                          </form>
                           </div>
 
                           <div>
@@ -140,7 +159,7 @@
                         </label>
                         <div id="editor-Observaciones" class="form-control border border-top-0 rounded-bottom-only">
                         </div>
-                      </div>
+                      </div>   
                       <div class="position-absolute bottom-0 start-50 translate-middle-x text-center mb-3">
                         <img class="img-fluid" id="LogoCovao" src="/img/LogoCovao.webp" alt="LogoCovao">
                       </div>
@@ -151,7 +170,7 @@
     </main>
 
 <!------------------------------------------------------------------------------------------------------------------------->
-<!-------------------------------------------------------FOOTER------------------------------------------------------------>
+<!-------------------------------------------------------FOOTER------------------------------------------------------------>   
 
     <footer id="DivFooter" class="text-dark py-3 mt-auto">
         <div class="container">
@@ -167,9 +186,12 @@
 <!------------------------------------------------------SCRIPTS------------------------------------------------------------>
 
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.min.js"></script>
+    <script>
+        const asistenciasEstudiante = @json($asistencias ?? []);
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script src="/IngresoComedor.js"></script>
+    <script src={{ asset('js/IngresoComedor.js') }}></script>
     <script src="https://kit.fontawesome.com/1e23feddae.js" crossorigin="anonymous"></script>
 
 <!------------------------------------------------------------------------------------------------------------------------->

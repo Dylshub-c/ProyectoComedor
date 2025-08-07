@@ -8,12 +8,21 @@ use App\Http\Controllers\FotoController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\TipoBecaController;
+use App\Http\Controllers\AsistenciaController;
 
 Route::get('/', function () {
     return view('Auth/login'); // Make sure you have a 'login.blade.php' view
 
 });
+//------------------------------------------
 
+
+Route::get('/ingreso-comedor', [AsistenciaController::class, 'index'])->name('IngresoCom.IngresoComedor');
+Route::get('/asistencia/buscar', [AsistenciaController::class, 'buscarEstudiante'])->name('buscar.estudiante');
+Route::get('/comedor/buscar', [EstudiantesController::class, 'mostrarEnComedor'])->name('comedor.buscar');
+
+
+//-------------------
 
 Route::get('/estudiantes', [EstudiantesController::class, 'index'])->name('estudiantes.index');
 // Mostrar el formulario

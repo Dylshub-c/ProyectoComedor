@@ -47,9 +47,24 @@ class EstudiantesController extends Controller
             'seccion' => 'required|string',
             'especialidad' => 'required|string',
             'tipo_beca_id' => 'required|exists:tipo_becas,id',
-            'foto' => 'nullable|image|max:2048',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ], [
         'cedula.unique' => 'El estudiante ya está registrado en el sistema.', ] );
+        $fotoRuta = null;
+
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            $nombreArchivo = time() . '_' . $file->getClientOriginalName();
+            $rutaDestino = public_path('fotos');
+
+            if (!file_exists($rutaDestino)) {
+                mkdir($rutaDestino, 0755, true);
+            }
+
+            $file->move($rutaDestino, $nombreArchivo);
+
+            $fotoRuta = 'fotos/' . $nombreArchivo;
+        }
 
         // Dividir nombre completo
         $partes = explode(' ', trim($request->input('nombre')));
@@ -94,11 +109,6 @@ class EstudiantesController extends Controller
             // Obtener tipoBeca directamente por id (no crearlo ni buscar propiedad)
             $tipoBeca = TipoBeca::findOrFail($request->tipo_beca_id);
 
-            // Guardar foto si la hay
-            $fotoRuta = null;
-            if ($request->hasFile('foto')) {
-                $fotoRuta = $request->file('foto')->store('fotos', 'public');
-            }
 
             // Crear estudiante
             Estudiante::create([

@@ -32,7 +32,7 @@ class AdminSeeder extends Seeder
             $personaData
         );
 
-        $email = 'natalia@gmail.com';
+        $email = 'dylanperira0204@gmail.com';
 
         // Generar una contraseña predeterminada o aleatoria
         $password = Str::random(10);

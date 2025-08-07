@@ -60,7 +60,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Hola {{ auth()->user()->persona->Nombre }},</h1>
+        <h1>Hola {{ $nombre }},</h1>
 
         <p>Recibimos una solicitud para cambiar la contraseña de administrador asociada a este correo.</p>
 

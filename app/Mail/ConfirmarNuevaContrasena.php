@@ -3,36 +3,52 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-
 
 class ConfirmarNuevaContrasena extends Mailable
 {
     use Queueable, SerializesModels;
 
-    /**
-     * Create a new message instance.
-     */
     public $user;
     public $url;
+    public $nombre;
 
-    public function __construct($user, $url)
+    /**
+     * Create a new message instance.
+     *
+     * @param mixed $user
+     * @param string $url
+     * @param string $nombre
+     */
+    public function __construct($user, $url, $nombre)
     {
         $this->user = $user;
         $this->url = $url;
+        $this->nombre = $nombre;
     }
 
+    /**
+     * Build the message.
+     *
+     * @return $this
+     */
     public function build()
     {
         return $this->subject('Confirma el cambio de contraseña')
-                ->view('emails.admin-confirmacion');
+                    ->view('emails.admin-confirmacion')
+                    ->with([
+                        'nombre' => $this->nombre,
+                        'url' => $this->url,
+                        'user' => $this->user,
+                    ]);
     }
+
     /**
      * Get the message envelope.
+     *
+     * @return \Illuminate\Mail\Mailables\Envelope
      */
     public function envelope(): Envelope
     {
@@ -40,9 +56,4 @@ class ConfirmarNuevaContrasena extends Mailable
             subject: 'Confirmar Nueva Contraseña',
         );
     }
-
-    /**
-     * Get the message content definition.
-     */
-   
 }

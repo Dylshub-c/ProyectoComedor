@@ -56,10 +56,14 @@
             </div>
         </div>
         <div class="offcanvas-footer p-3 border-top">
-            <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
                 <i class="fa-solid fa-arrow-right-to-bracket fa-lg" id="icono-menu"></i>
                 | Cerrar sesión
-            </button>
+                </button>
+            </form>
+
             </div>
         </div>
 
@@ -268,7 +272,8 @@
 
             <!-- imagen -->
             <div class="col-md-4 text-center mb-5 align-self-center">
-               <img src="{{ asset($persona->estudiante->foto ?? 'img/FotoEstudiante.webp') }}" alt="Foto del estudiante" class="foto-perfil rounded">
+               <img src="{{ asset($persona->estudiante && $persona->estudiante->foto ? $persona->estudiante->foto : 'img/FotoEstudiante.webp') }}" alt="Foto del estudiante" class="foto-perfil rounded">
+
             </div>
 
         </div>

@@ -62,10 +62,13 @@
             </div>
         </div>
         <div class="offcanvas-footer p-3 border-top">
-            <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
                 <i class="fa-solid fa-arrow-right-to-bracket fa-lg" id="icono-menu"></i>
                 | Cerrar sesión
-            </button>
+                </button>
+            </form>
             </div>
         </div>
 

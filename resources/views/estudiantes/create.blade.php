@@ -60,10 +60,13 @@
             </div>
         </div>
         <div class="offcanvas-footer p-3 border-top">
-            <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
                 <i class="fa-solid fa-arrow-right-to-bracket fa-lg" id="icono-menu"></i>
                 | Cerrar sesión
-            </button>
+                </button>
+            </form>
             </div>
         </div>
 
@@ -152,6 +155,7 @@
                 <i class="bi bi-x-circle-fill"></i> Cancelar
               </button>
             </div>
+            <input type="file" id="foto" name="foto" accept="image/*" style="display:none" />
           </form>
         </div>
 
@@ -194,7 +198,7 @@
             </button>
 
             <!-- Input oculto -->
-            <input type="file" id="foto" name="foto" accept="image/*" style="display:none" />
+
         </div>
         </div>
 

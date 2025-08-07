@@ -24,7 +24,7 @@
                     <i class="fa-solid fa-house-chimney fa-lg" id="icono-menu" ></i>
                     | Home
                 </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('IngresoCom.IngresoComedor') }}'">
                     <i class="fa-solid fa-clipboard-list fa-lg" id="icono-menu"></i>
                     | Ingreso al comedor
                 </button>

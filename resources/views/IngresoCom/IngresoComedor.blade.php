@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="es">
 
 <!---------------------------------------------------------LINKS----------------------------------------------------------->
@@ -15,6 +15,7 @@
 
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
         <link rel="Stylesheet" href="{{ asset('css/IngresoComedor.css') }}">
+          <link rel="Stylesheet" href="{{ asset('css/MenuLateral.css') }}" type="text/css" />
         <link rel="icon" href="/img/LogoDW-Negro.png" media="(prefers-color-scheme: light)">
         <link rel="icon" href="/img/LogoDW-Blanco.png" media="(prefers-color-scheme: dark)">
         <title>Desarrollo Web</title>
@@ -25,8 +26,62 @@
 <body id="fondo" class="d-flex flex-column min-vh-100">
 
 <!------------------------------------------------------------------------------------------------------------------------->
-<!-----------------------------------------------------CONTENIDO-----------------------------------------------------------> 
+<!-----------------------------------------------------CONTENIDO----------------------------------------------------------->
+    <button id="btn-Menu" class="btn ms-3 mb-3 fs-5 py-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
+        <i class="fa-solid fa-bars fa-xl" style="color: #f7f7f7;"></i>
+    </button>
+     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+        <div class="offcanvas-header justify-content-end">
+            <button type="button" class="btn" data-bs-dismiss="offcanvas" aria-label="Close"> <i class="fa-solid fa-xmark fa-2xl" style="color: #f7f7f7;"></i> </button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="d-grid gap-3">
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location.href='{{ route('admin.home') }}'">
+                    <i class="fa-solid fa-house-chimney fa-lg" id="icono-menu" ></i>
+                    | Home
+                </button>
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+                    <i class="fa-solid fa-clipboard-list fa-lg" id="icono-menu"></i>
+                    | Ingreso al comedor
+                </button>
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('estudiantes.importar.form') }}'">
+                    <i class="fa-solid fa-street-view fa-lg" id="icono-menu"></i>
+                    | Agregar estudiantes
+                </button>
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('estudiantes.informacion') }}'">
+                    <i class="fa-solid fa-address-card fa-lg" id="icono-menu"></i>
+                    | Ver lista de estudiantes
+                </button>
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+                    <i class="fa-solid fa-download fa-lg" id="icono-menu"></i>
+                    | Descargar reportes
+                </button>
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+                    <i class="fa-solid fa-calendar-check fa-lg" id="icono-menu"></i>
+                    | Gestionar asistencias
+                </button>
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('tipobeca.index') }}'">
+                    <i class="fa-solid fa-hand-holding-medical fa-lg" id="icono-menu"></i>
+                    | Becas
+                </button>
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+                    <i class="fa-solid fa-star-half-stroke fa-lg" id="icono-menu"></i>
+                    | Asistencia rápida
+                </button>
 
+            </div>
+        </div>
+        <div class="offcanvas-footer p-3 border-top">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+                <i class="fa-solid fa-arrow-right-to-bracket fa-lg" id="icono-menu"></i>
+                | Cerrar sesión
+                </button>
+            </form>
+
+            </div>
+        </div>
     <main class="flex-grow-1">
     <div class="container-fluid">
     <div class="row">
@@ -40,7 +95,7 @@
 
 <img class="img-fluid" id="fotoEstudiante" src="{{ $foto }}" alt="Foto del estudiante">
 
-  
+
      <label id="NomEstudiante" class=" mt-1 text-center fs-4" for="">
     <strong>
     {{ isset($persona) ? "{$persona->Nombre} {$persona->PrimerApellido} {$persona->SegundoApellido}" : 'Nombre del estudiante' }}
@@ -92,7 +147,7 @@
                             <button id="btnAceptarModal" class="btn-aceptar fs-5">Aceptar</button>
                           </div>
                         </div>
-                        
+
                         <div class="d-flex justify-content-between">
 
                           <div>
@@ -159,7 +214,7 @@
                         </label>
                         <div id="editor-Observaciones" class="form-control border border-top-0 rounded-bottom-only">
                         </div>
-                      </div>   
+                      </div>
                       <div class="position-absolute bottom-0 start-50 translate-middle-x text-center mb-3">
                         <img class="img-fluid" id="LogoCovao" src="/img/LogoCovao.webp" alt="LogoCovao">
                       </div>
@@ -170,7 +225,7 @@
     </main>
 
 <!------------------------------------------------------------------------------------------------------------------------->
-<!-------------------------------------------------------FOOTER------------------------------------------------------------>   
+<!-------------------------------------------------------FOOTER------------------------------------------------------------>
 
     <footer id="DivFooter" class="text-dark py-3 mt-auto">
         <div class="container">

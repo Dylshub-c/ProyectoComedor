@@ -87,12 +87,7 @@
       <!-- Botones -->
       <div class="d-flex justify-content-between">
         <div>
-          <button type="reset" id="btn-cancelar" class="btn btn-dark px-4 shadow fs-5 me-3">
-            <i class="bi bi-x-lg"></i> Borrar
-          </button>
-          <button type="button" id="btn-editar" class="btn btn-secondary px-4 shadow fs-5">
-            <i class="bi bi-pencil"></i> Editar
-          </button>
+         
         </div>
         <button type="button" class="btn btn-guardar px-4 shadow fs-5" id="btnGuardar">
           <i class="bi bi-check-square"></i> Guardar

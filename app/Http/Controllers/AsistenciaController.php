@@ -49,52 +49,46 @@ class AsistenciaController extends Controller
         return view('IngresoCom.IngresoComedor', compact('estudiante'));
     }
 
-    public function guardarAsistenciaRapida(Request $request)
-    {
-        $validated = $request->validate([
-            'fecha_hora' => 'required|date',
-            'tipo_asistencia' => 'required|string',
-            'estado' => 'required|string',
-            'observaciones' => 'nullable|string',
-        ]);
+  public function guardarAsistenciaRapida(Request $request)
+{
+    $validated = $request->validate([
+        'fecha_hora' => 'required|date',
+        'tipo_asistencia' => 'required|string',
+        'estado' => 'required|string',
+        'observaciones' => 'nullable|string',
+    ]);
 
-        try {
-            $fecha = $request->input('fecha_hora');
-            $tipo = $request->input('tipo_asistencia');
-            $estado = strtolower($request->input('estado'));
-            $observaciones = $request->input('observaciones');
+    try {
+        $fecha = $request->input('fecha_hora');
+        $tipo = $request->input('tipo_asistencia');
+        $estado = strtolower($request->input('estado'));
+        $observaciones = $request->input('observaciones');
 
-            // Crear asistencias según el tipo
-            $asistencias_creadas = [];
+        // Traer todos los estudiantes
+        $estudiantes = Estudiante::all();
 
-            if ($tipo === 'desayuno_almuerzo') {
-                $asistencias_creadas[] = Asistencia::create([
-                    'fecha_hora' => $fecha,
-                    'tipo_asistencia' => 'desayuno',
-                    'estado' => $estado,
-                    'observaciones' => $observaciones,
-                ]);
-                $asistencias_creadas[] = Asistencia::create([
-                    'fecha_hora' => $fecha,
-                    'tipo_asistencia' => 'almuerzo',
-                    'estado' => $estado,
-                    'observaciones' => $observaciones,
-                ]);
-            } else {
-                $asistencias_creadas[] = Asistencia::create([
-                    'fecha_hora' => $fecha,
-                    'tipo_asistencia' => $tipo,
-                    'estado' => $estado,
-                    'observaciones' => $observaciones,
-                ]);
-            }
+        foreach ($estudiantes as $estudiante) {
+            // Definir los tipos a crear según si es desayuno_almuerzo o uno solo
+            $tiposCrear = $tipo === 'desayuno_almuerzo' ? ['desayuno', 'almuerzo'] : [$tipo];
 
-            // Traer todos los estudiantes
-            $estudiantes = Estudiante::all();
+            foreach ($tiposCrear as $tipoCrear) {
+                // Validar si ya existe una asistencia para ese estudiante, fecha y tipo
+                $existeAsistencia = ListadoAsistencia::where('estudiante_id', $estudiante->id)
+                    ->whereHas('asistencia', function($query) use ($fecha, $tipoCrear) {
+                        $query->whereDate('fecha_hora', $fecha)
+                              ->where('tipo_asistencia', $tipoCrear);
+                    })->exists();
 
-            // Por cada estudiante, crear listado_asistencia con cada asistencia creada
-            foreach ($estudiantes as $estudiante) {
-                foreach ($asistencias_creadas as $asistencia) {
+                if (!$existeAsistencia) {
+                    // Crear asistencia
+                    $asistencia = Asistencia::create([
+                        'fecha_hora' => $fecha,
+                        'tipo_asistencia' => $tipoCrear,
+                        'estado' => $estado,
+                        'observaciones' => $observaciones,
+                    ]);
+
+                    // Asociar en listado_asistencias
                     ListadoAsistencia::create([
                         'estudiante_id' => $estudiante->id,
                         'asistencia_id' => $asistencia->id,
@@ -102,14 +96,15 @@ class AsistenciaController extends Controller
                     ]);
                 }
             }
-
-            return response()->json(['message' => 'Asistencias guardadas y asignadas a estudiantes'], 200);
-
-        } catch (\Exception $e) {
-            \Log::error('Error al guardar asistencia rápida: ' . $e->getMessage());
-            return response()->json(['error' => $e->getMessage()], 500);
         }
+
+        return response()->json(['message' => 'Asistencias guardadas y asignadas sin duplicados'], 200);
+
+    } catch (\Exception $e) {
+        \Log::error('Error al guardar asistencia rápida: ' . $e->getMessage());
+        return response()->json(['error' => $e->getMessage()], 500);
     }
+}
 
     public function asistenciaRapidaIndex(Request $request)
     {

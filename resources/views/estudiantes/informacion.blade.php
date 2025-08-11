@@ -94,7 +94,7 @@
                         <input type="text" name="nombre" class="input-line fs-5 form-control" placeholder="Buscar por nombre" value="{{ request('nombre') }}">
                     </div>
 
-                    <button type="submit" class="btn btn-primary fs-5 ms-2">Buscar</button>
+                    <button type="submit" class="btn btnPrimario btnCancelar fs-5 ms-2">Buscar</button>
                 </form>
 
                 <!--Logo-->
@@ -159,7 +159,7 @@
                             </button>
                         </div>
                         <div class="text-center mt-2">
-                            <button type="button" class="btnPrimario fs-5">
+                            <button type="button" class="btnPrimario fs-5 mb-2">
                                 <i class="bi bi-person-badge-fill"></i><strong> | Revisar Asistencia</strong>
                             </button>
                         </div>
@@ -182,15 +182,15 @@
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title text-danger" id="confirmDeleteModalLabel">Confirmar eliminación</h5>
+                            <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar eliminación</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                         </div>
                         <div class="modal-body">
                             ¿Seguro que quieres eliminar este estudiante? Esta acción no se puede deshacer.
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="button" class="btn btn-danger" id="btnConfirmDelete">Eliminar</button>
+                            <button type="button" class="btn btnPrimario btnCancelar" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btnPrimario btnCancelar" id="btnConfirmDelete">Eliminar</button>
                         </div>
                     </div>
                 </div>
@@ -199,54 +199,54 @@
 
 
             <!-- FORMULARIO EDICIÓN OCULTO -->
-            <div class="col-md-8 p-2" id="formEditar" style="{{ $mostrarEditar ? '' : 'display:none;' }}">
+            <div class="col-md-7 p-2 ms-4" id="formEditar" style="{{ $mostrarEditar ? '' : 'display:none;' }}">
                 <form method="POST" action="{{ route('estudiantes.update', $persona->id) }}" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
                     <div class="mb-3">
-                        <label for="Nombre" class="form-label">Nombre</label>
-                        <input type="text" id="Nombre" name="Nombre" class="form-control" value="{{ old('Nombre', $persona->Nombre) }}" required>
+                        <label for="Nombre" class="form-label color1 fs-5"><strong>Nombre</strong></label>
+                        <input type="text" id="Nombre" name="Nombre" class="form-control form-input-flex inputColor fs-5" value="{{ old('Nombre', $persona->Nombre) }}" required>
                         @error('Nombre')<small class="text-danger">{{ $message }}</small>@enderror
                     </div>
 
                     <div class="mb-3">
-                        <label for="PrimerApellido" class="form-label">Primer Apellido</label>
-                        <input type="text" id="PrimerApellido" name="PrimerApellido" class="form-control" value="{{ old('PrimerApellido', $persona->PrimerApellido) }}" required>
+                        <label for="PrimerApellido" class="form-label color1 fs-5"><strong>Primer Apellido</strong></label>
+                        <input type="text" id="PrimerApellido" name="PrimerApellido" class="form-control form-input-flex inputColor fs-5" value="{{ old('PrimerApellido', $persona->PrimerApellido) }}" required>
                         @error('PrimerApellido')<small class="text-danger">{{ $message }}</small>@enderror
                     </div>
 
                     <div class="mb-3">
-                        <label for="SegundoApellido" class="form-label">Segundo Apellido</label>
-                        <input type="text" id="SegundoApellido" name="SegundoApellido" class="form-control" value="{{ old('SegundoApellido', $persona->SegundoApellido) }}">
+                        <label for="SegundoApellido" class="form-label color1 fs-5"><strong>Segundo Apellido</strong></label>
+                        <input type="text" id="SegundoApellido" name="SegundoApellido" class="form-control form-input-flex inputColor fs-5" value="{{ old('SegundoApellido', $persona->SegundoApellido) }}">
                         @error('SegundoApellido')<small class="text-danger">{{ $message }}</small>@enderror
                     </div>
 
                     <div class="mb-3">
-                        <label for="Cedula" class="form-label">Cédula</label>
-                        <input type="text" id="Cedula" name="Cedula" class="form-control" value="{{ old('Cedula', $persona->Cedula) }}" required>
+                        <label for="Cedula" class="form-label color1 fs-5"><strong>Cédula</strong></label>
+                        <input type="text" id="Cedula" name="Cedula" class="form-control form-input-flex inputColor fs-5" value="{{ old('Cedula', $persona->Cedula) }}" required>
                         @error('Cedula')<small class="text-danger">{{ $message }}</small>@enderror
                     </div>
 
                     <div class="mb-3">
-                        <label for="especialidade_input" class="form-label">Especialidad</label>
-                        <input type="text" id="especialidade_input" name="especialidade_input" class="form-control"
+                        <label for="especialidade_input" class="form-label color1 fs-5"><strong>Especialidad</strong></label>
+                        <input type="text" id="especialidade_input" name="especialidade_input" class="form-control form-input-flex inputColor fs-5"
                             value="{{ $persona->estudiante->especialidade->propiedade->nombre ?? '' }}" required>
                         <small class="text-muted">Escribe una nueva especialidad o deja la que aparece</small>
                         @error('especialidade_input')<small class="text-danger">{{ $message }}</small>@enderror
                     </div>
 
                     <div class="mb-3">
-                        <label for="seccione_input" class="form-label">Sección</label>
-                        <input type="text" id="seccione_input" name="seccione_input" class="form-control"
+                        <label for="seccione_input" class="form-label color1 fs-5"><strong>Sección</strong></label>
+                        <input type="text" id="seccione_input" name="seccione_input" class="form-control form-input-flex inputColor fs-5"
                             value="{{ $persona->estudiante->seccione->propiedade->nombre ?? '' }}" required>
                         <small class="text-muted">Escribe una nueva sección o deja la que aparece</small>
                         @error('seccione_input')<small class="text-danger">{{ $message }}</small>@enderror
                     </div>
 
                     <div class="mb-3">
-                        <label for="tipo_beca_id" class="form-label">Tipo de beca</label>
-                        <select id="tipo_beca_id" name="tipo_beca_id" class="form-select" required>
+                        <label for="tipo_beca_id" class="form-label color1 fs-5"><strong>Tipo de beca</strong></label>to
+                        <select id="tipo_beca_id" name="tipo_beca_id" class="form-select inputColor fs-5" required>
                             <option value="">Seleccione un tipo de beca</option>
                             @foreach($tiposBeca as $tipo)
                                 <option value="{{ $tipo->id }}"
@@ -259,31 +259,40 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="foto" class="form-label">Foto</label>
-                        <input type="file" id="foto" name="foto" class="form-control" accept="image/*">
+                        <label for="foto" class="form-label color1 fs-5"><strong>Foto</strong></label>
+                        <input type="file" id="foto" name="foto" class="form-control inputColor fs-5" accept="image/*">
                         @error('foto')<small class="text-danger">{{ $message }}</small>@enderror
                         <small class="text-muted">Sube una nueva foto para actualizar (opcional)</small>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100">Guardar Cambios</button>
-                    <button type="button" id="btnCancelar" class="btn btn-secondary w-100 mt-2">Cancelar</button>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <button type="submit" class="btn btnPrimario btnAjustado color1 fs-5"><strong>Guardar Cambios</strong></button>
+                        <button type="button" id="btnCancelar" class="btn btnPrimario btnAjustado color1 fs-5"><strong>Cancelar</strong></button>
+                    </div>
+
+
                 </form>
             </div>
 
             <!-- imagen -->
             <div class="col-md-4 text-center mb-5 align-self-center">
-               <img src="{{ asset($persona->estudiante && $persona->estudiante->foto ? $persona->estudiante->foto : 'img/FotoEstudiante.webp') }}" alt="Foto del estudiante" class="foto-perfil rounded">
-
+                <img 
+                    src="{{ asset($persona->estudiante && $persona->estudiante->foto ? $persona->estudiante->foto : 'img/FotoEstudiante.webp') }}" 
+                    alt="Foto del estudiante" 
+                    class="foto-perfil-redonda"
+                >
             </div>
+
 
         </div>
     </div>
     @elseif(request()->hasAny(['nombre', 'cedula']))
     <!-- Mensaje si no encontró resultado -->
     <div class="container mt-4">
-        <div class="alert alert-warning text-center">
-            No se encontró ningún estudiante con los criterios indicados.
-        </div>
+    <div class="alert alert-warning alert-custom text-center">
+        No se encontró ningún estudiante con los criterios indicados.
+    </div>
+
     </div>
     @endif
 

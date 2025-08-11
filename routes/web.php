@@ -9,60 +9,69 @@ use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\TipoBecaController;
 use App\Http\Controllers\AsistenciaController;
+use Spatie\Permission\Models\Role;
 
 Route::get('/', function () {
-    return view('Auth/login'); // Make sure you have a 'login.blade.php' view
+    return view('Auth/login');
 
 });
-//------------------------------------------
+
+Route::middleware(['auth'])->group(function () {
 
 
-Route::get('/ingreso-comedor', [AsistenciaController::class, 'index'])->name('IngresoCom.IngresoComedor');
-Route::get('/asistencia/buscar', [AsistenciaController::class, 'buscarEstudiante'])->name('buscar.estudiante');
-Route::get('/comedor/buscar', [EstudiantesController::class, 'mostrarEnComedor'])->name('comedor.buscar');
+    Route::get('/ingreso-comedor', [AsistenciaController::class, 'index'])->name('IngresoCom.IngresoComedor');
+    Route::get('/asistencia/buscar', [AsistenciaController::class, 'buscarEstudiante'])->name('buscar.estudiante');
+    Route::get('/comedor/buscar', [EstudiantesController::class, 'mostrarEnComedor'])->name('comedor.buscar');
 
 
-//-------------------
-
-Route::get('/estudiantes', [EstudiantesController::class, 'index'])->name('estudiantes.index');
-// Mostrar el formulario
-Route::get('estudiantes/importar', [EstudiantesController::class, 'formImportar'])->name('estudiantes.importar.form');
-
-// Procesar la importación
-Route::post('estudiantes/importar', [EstudiantesController::class, 'importar'])->name('estudiantes.importar');
-
-// Ruta para eliminar todos los estudiantes importados
-Route::delete('/estudiantes/eliminar-lista', [EstudiantesController::class, 'eliminarLista'])->name('estudiantes.eliminarLista');
-
-// Ruta para recargar lista (simplemente la vista sin estudiantes)
-Route::get('/estudiantes/recargar-lista', [EstudiantesController::class, 'recargarLista'])->name('estudiantes.recargarLista');
+    Route::get('/estudiantes', [EstudiantesController::class, 'index'])->name('estudiantes.index');
+    Route::get('estudiantes/importar', [EstudiantesController::class, 'formImportar'])->name('estudiantes.importar.form');
+    Route::post('estudiantes/importar', [EstudiantesController::class, 'importar'])->name('estudiantes.importar');
+    Route::delete('/estudiantes/eliminar-lista', [EstudiantesController::class, 'eliminarLista'])->name('estudiantes.eliminarLista');
+    Route::get('/estudiantes/recargar-lista', [EstudiantesController::class, 'recargarLista'])->name('estudiantes.recargarLista');
+    Route::get('/estudiantes/informacion', [EstudiantesController::class, 'informacion']);
+    Route::post('/estudiantes/informacion', [EstudiantesController::class, 'informacion'])->name('estudiantes.informacion');
+    Route::put('/estudiantes/{persona}', [EstudiantesController::class, 'update'])->name('estudiantes.update');
+    Route::get('/estudiantes/create', [EstudiantesController::class, 'create'])->name('estudiantes.create');
+    Route::post('/estudiantes', [EstudiantesController::class, 'store'])->name('estudiantes.store');
+    Route::delete('/estudiantes/{persona}', [EstudiantesController::class, 'destroy'])->name('estudiantes.destroy');
 
 
-// Rutas para el controlador de estudiantes
-Route::get('/estudiantes/informacion', [EstudiantesController::class, 'informacion']);
-Route::post('/estudiantes/informacion', [EstudiantesController::class, 'informacion'])
-    ->name('estudiantes.informacion');
-Route::put('/estudiantes/{persona}', [EstudiantesController::class, 'update'])
-    ->name('estudiantes.update');
-Route::get('/estudiantes/create', [EstudiantesController::class, 'create'])
-    ->name('estudiantes.create');
-Route::post('/estudiantes', [EstudiantesController::class, 'store'])
-    ->name('estudiantes.store');
-Route::delete('/estudiantes/{persona}', [EstudiantesController::class, 'destroy'])
-    ->name('estudiantes.destroy');
+    Route::get('/tipobeca', [TipoBecaController::class, 'index'])->name('tipobeca.index');
+    Route::get('/tipobeca/create', [TipoBecaController::class, 'create'])->name('tipobeca.create');
+    Route::post('/tipobeca', [TipoBecaController::class, 'store'])->name('tipobeca.store');
+    Route::get('/tipobeca/{id}/edit', [TipoBecaController::class, 'edit'])->name('tipobeca.edit');
+    Route::put('/tipobeca/{id}', [TipoBecaController::class, 'update'])->name('tipobeca.update');
+    Route::delete('/tipobeca/{id}', [TipoBecaController::class, 'destroy'])->name('tipobeca.destroy');
 
 
-//controlador de tipoBeca
-Route::get('/tipobeca', [TipoBecaController::class, 'index'])->name('tipobeca.index');
-Route::get('/tipobeca/create', [TipoBecaController::class, 'create'])->name('tipobeca.create');
-Route::post('/tipobeca', [TipoBecaController::class, 'store'])->name('tipobeca.store');
-Route::get('/tipobeca/{id}/edit', [TipoBecaController::class, 'edit'])->name('tipobeca.edit');
-Route::put('/tipobeca/{id}', [TipoBecaController::class, 'update'])->name('tipobeca.update');
-Route::delete('/tipobeca/{id}', [TipoBecaController::class, 'destroy'])->name('tipobeca.destroy');
+    Route::get('/subir-fotos', [FotoController::class, 'showForm'])->name('subir-fotos.form');
+    Route::post('/subir-fotos', [FotoController::class, 'importarFotos'])->name('subir-fotos.importar');
 
 
-Route::get('/subir-fotos', [FotoController::class, 'showForm'])->name('subir-fotos.form');
-Route::post('/subir-fotos', [FotoController::class, 'importarFotos'])->name('subir-fotos.importar');
+    Route::get('/encargados', [EncargadoController::class, 'index'])->name('encargados.index');
+
+    // Mostrar formulario para crear nuevo encargado
+    Route::get('/encargados/create', [EncargadoController::class, 'create'])->name('encargados.create');
+
+    // Guardar nuevo encargado (POST)
+    Route::post('/encargados', [EncargadoController::class, 'store'])->name('encargados.store');
+
+    // Mostrar información o buscar encargado (GET y POST)
+    Route::match(['get', 'post'], '/encargados/informacion', [EncargadoController::class, 'informacion'])
+        ->name('encargados.informacion');
+
+    // Mostrar formulario para editar encargado
+    Route::get('/encargados/{encargado}/edit', [EncargadoController::class, 'edit'])->name('encargados.edit');
+
+    // Actualizar encargado (PUT/PATCH)
+    Route::put('/encargados/{encargado}', [EncargadoController::class, 'update'])->name('encargados.update');
+
+    // Eliminar encargado
+    Route::delete('/encargados/{encargado}', [EncargadoController::class, 'destroy'])->name('encargados.destroy');
+
+
+});
 
 
 Route::get('/admin/forgot-password', [PasswordResetController::class, 'showResetForm'])->name('admin.password.request');

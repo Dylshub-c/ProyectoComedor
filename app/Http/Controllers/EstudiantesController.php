@@ -17,6 +17,12 @@ use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use App\Models\Asistencia;
 use App\Models\ListadoAsistencia;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Models\User;
+use Spatie\Permission\Models\Role;
+
 
 class EstudiantesController extends Controller
 {
@@ -51,8 +57,12 @@ class EstudiantesController extends Controller
             'especialidad' => 'required|string',
             'tipo_beca_id' => 'required|exists:tipo_becas,id',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'email' => 'required|email|unique:users,email', // 👈 añadido para el usuario
         ], [
-        'cedula.unique' => 'El estudiante ya está registrado en el sistema.', ] );
+            'cedula.unique' => 'El estudiante ya está registrado en el sistema.',
+            'email.unique' => 'El correo ya está registrado.',
+        ]);
+
         $fotoRuta = null;
 
         if ($request->hasFile('foto')) {
@@ -65,11 +75,10 @@ class EstudiantesController extends Controller
             }
 
             $file->move($rutaDestino, $nombreArchivo);
-
             $fotoRuta = 'fotos/' . $nombreArchivo;
         }
 
-        // Dividir nombre completo
+        // Separar nombre y apellidos
         $partes = explode(' ', trim($request->input('nombre')));
         $nombre = '';
         $primerApellido = '';
@@ -82,11 +91,8 @@ class EstudiantesController extends Controller
         } elseif (count($partes) == 2) {
             $primerApellido = array_pop($partes);
             $nombre = $partes[0];
-            $segundoApellido = '';
-        } elseif (count($partes) == 1) {
+        } else {
             $nombre = $partes[0];
-            $primerApellido = '';
-            $segundoApellido = '';
         }
 
         DB::beginTransaction();
@@ -101,17 +107,12 @@ class EstudiantesController extends Controller
                 'TipoUsuario' => 'Estudiante',
             ]);
 
-            // Crear o encontrar propiedades (especialidad y seccion)
+            //  Crear especialidad y sección
             $especialidadProp = Propiedade::firstOrCreate(['nombre' => $request->especialidad]);
             $seccionProp = Propiedade::firstOrCreate(['nombre' => $request->seccion]);
-
-            // Buscar modelos relacionados
             $especialidad = Especialidade::firstOrCreate(['propiedade_id' => $especialidadProp->id]);
             $seccion = Seccione::firstOrCreate(['propiedade_id' => $seccionProp->id]);
-
-            // Obtener tipoBeca directamente por id (no crearlo ni buscar propiedad)
             $tipoBeca = TipoBeca::findOrFail($request->tipo_beca_id);
-
 
             // Crear estudiante
             Estudiante::create([
@@ -122,10 +123,25 @@ class EstudiantesController extends Controller
                 'foto' => $fotoRuta,
             ]);
 
+            //  Crear usuario y asignar rol de Spatie
+            $password = Str::random(10);
+            $user = User::create([
+                'persona_id' => $persona->id,
+                'email' => $request->email,
+                'password' => Hash::make($password),
+            ]);
+
+            // Asegurar que el rol "Estudiante" existe
+            Role::firstOrCreate(['name' => 'Estudiante']);
+            $user->assignRole('Estudiante');
+
+            // (Opcional) enviar correo al estudiante con su contraseña
+            // Mail::to($user->email)->send(new EstudianteRegisteredMail($request->email, $password, $nombre));
+
             DB::commit();
 
             return redirect()->route('estudiantes.informacion')
-                            ->with('success', 'Estudiante creado correctamente');
+                            ->with('success', 'Estudiante creado correctamente y usuario generado.');
 
         } catch (\Exception $e) {
             DB::rollBack();

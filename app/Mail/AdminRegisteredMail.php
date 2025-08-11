@@ -26,7 +26,7 @@ class AdminRegisteredMail extends Mailable
 
     public function build()
     {
-        return $this->subject('Bienvenido al Sistema de Comedor')
+        return $this->subject('Bienvenid@ al Sistema de Comedor')
             ->view('emails.admin_registered')->with([
                 'nombre' => $this->nombre,
             ]);
@@ -38,7 +38,7 @@ class AdminRegisteredMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Registrada en el sistema del comedor',
+            subject: 'Registrad@ en el sistema del comedor',
         );
     }
 

@@ -48,4 +48,43 @@ class AsistenciaController extends Controller
 
         return view('IngresoCom.IngresoComedor', compact('estudiante'));
     }
+
+    public function guardarAsistenciaRapida(Request $request)
+{
+    $validated = $request->validate([
+        'fecha_hora' => 'required|date',
+        'tipo_asistencia' => 'required|string',
+        'estado' => 'required|string',
+        'observaciones' => 'nullable|string',
+    ]);
+
+    try {
+        $asistencia = Asistencia::create([
+            'fecha_hora' => $validated['fecha_hora'],
+            'tipo_asistencia' => $validated['tipo_asistencia'],
+            'estado' => $validated['estado'],
+        ]);
+
+        $estudiantes = Estudiante::all();
+
+        foreach ($estudiantes as $estudiante) {
+            $asistencia->listadosAsistencia()->create([
+                'estudiante_id' => $estudiante->id,
+                'observaciones' => $validated['observaciones'] ?? null,
+            ]);
+        }
+
+        return response()->json(['message' => 'Asistencia guardada con éxito'], 200);
+
+    } catch (\Exception $e) {
+        \Log::error('Error al guardar asistencia rápida: '.$e->getMessage());
+        return response()->json(['error' => 'Error interno del servidor'], 500);
+    }
+
+
+
+public function asistenciaRapidaIndex(Request $request) {
+    return view('AsistenciaRapida.asistenciaRapida');
+    
+}
 }

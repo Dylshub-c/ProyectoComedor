@@ -87,10 +87,11 @@
           <div class="card-content text-start">
             <i class="bi bi-file-earmark-arrow-down-fill card-icon"></i>
             Descargar Reportes
-          </div>
+          </div>asistenciaRapidaIndex
         </div>
       </div>
       <div class="col-sm-12 col-md-6 col-lg-4">
+        <a href="{{route('AsistenciaRapida.asistenciaRapida') }}" class="text-decoration-none">
         <div class="card card-fondo text-white text-center p-4 mt-2">
           <div class="card-overlay"></div>
           <div class="card-content text-start">
@@ -98,6 +99,7 @@
             Asistencias rápidas
           </div>
         </div>
+        </a>
       </div>
     </div>
   </div>

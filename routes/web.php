@@ -15,7 +15,10 @@ Route::get('/', function () {
 
 });
 //------------------------------------------
+Route::post('/asistencia-rapida', [AsistenciaController::class, 'asistenciaRapida'])->name('asistencia.rapida');
 
+Route::get('/asistencia-rapida', [AsistenciaController::class, 'asistenciaRapidaIndex'])->name('AsistenciaRapida.asistenciaRapida');
+Route::post('/asistencia-rapida', [AsistenciaController::class, 'guardarAsistenciaRapida'])->name('asistencia.rapida.guardar');
 
 Route::get('/ingreso-comedor', [AsistenciaController::class, 'index'])->name('IngresoCom.IngresoComedor');
 Route::get('/asistencia/buscar', [AsistenciaController::class, 'buscarEstudiante'])->name('buscar.estudiante');

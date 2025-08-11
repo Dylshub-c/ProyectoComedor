@@ -1,4 +1,5 @@
-/* Fondo de la página */
+/*------------------------------ Header ------------------------------------*/
+
 body {
   background-image: url('../img/FondoPrincipal.webp');
   background-size: cover;
@@ -7,19 +8,16 @@ body {
   min-height: 100vh;
 }
 
-/* Header principal */
 .main-header {
   padding: 10px 20px;
 }
 
-/* Logo */
 .logo {
   max-width: 100%;
   height: auto;
   width: 100px;
 }
 
-/* Caja de info de usuario */
 .header {
   background-color: white;
   border-radius: 12px;
@@ -40,7 +38,6 @@ body {
   justify-content: center;
 }
 
-/* Botón logout */
 .btn.btn-outline {
   height: 60px;
   width: 80px;
@@ -49,19 +46,20 @@ body {
   justify-content: center;
 }
 
-/* Info de usuario */
 .user-info {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
+/*------------------------------------------------------------------------*/
+/*---------------------------- Tarjetas ----------------------------------*/
+
 .icon-box {
   font-size: 2rem;
   color: #0d6efd;
 }
 
-/* Contenedor principal de tarjetas */
 .container-fluid2 {
   background-color: white;
   border-radius: 12px;
@@ -72,12 +70,10 @@ body {
   box-sizing: border-box;
 }
 
-/* Tarjeta base */
 .card {
   background-color: rgba(13, 110, 253, 0.75);
   color: white;
   text-align: center;
-  padding: 30px 20px;
   border-radius: 10px;
   height: 100%;
   font-size: 1.2rem;
@@ -85,7 +81,6 @@ body {
   transition: 0.3s;
 }
 
-/* Tarjeta con fondo */
 .card-fondo {
   position: relative;
   background-image: url('../img/FondoOpciones.webp');
@@ -96,7 +91,6 @@ body {
   overflow: hidden;
 }
 
-/* Capa de superposición */
 .card-fondo .card-overlay {
   position: absolute;
   top: 0;
@@ -108,7 +102,6 @@ body {
   z-index: 1;
 }
 
-/* Íconos en tarjetas */
 .card-icon {
   position: absolute;
   top: 10px;
@@ -118,7 +111,6 @@ body {
   z-index: 2;
 }
 
-/* Contenido de tarjetas */
 .card-fondo .card-content,
 .card-fondo .card-contentinfo,
 .card-fondo .card-contenttipos {
@@ -126,16 +118,17 @@ body {
   z-index: 2;
   font-size: 28px;
   font-weight: bold;
-  padding-left: 100px;
-  padding-top: 100px;
-  text-align: left;
 }
 
-/* Ajustes específicos */
-.card-fondo .card-contentinfo { padding-left: 95px; }
-.card-fondo .card-contenttipos { padding-left: 155px; }
+.card-content {
+  display: flex;
+  align-items: center; 
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+}
 
-/* ==== MODAL PERSONALIZADO ==== */
+
 .modal-estilo {
   border-radius: 16px;
   overflow: hidden;
@@ -153,7 +146,7 @@ body {
   font-weight: bold;
 }
 
-.modal-footer .btn-modal-cancelar,
+.modal-footer .btn-modal-gestionar,
 .modal-footer .btn-modal-confirmar {
   border-radius: 10px;
   padding: 6px 18px;
@@ -165,7 +158,7 @@ body {
   transition: all 0.2s ease;
 }
 
-.modal-footer .btn-modal-cancelar:hover,
+.modal-footer .btn-modal-gestionar:hover,
 .modal-footer .btn-modal-confirmar:hover {
   background-color: #074a76;
 }
@@ -173,5 +166,36 @@ body {
 .btn-close-white {
   filter: invert(1);
 }
+
+#iconUser {
+  color: #074a76;
+}
+
+#iconUser:hover {
+  color: #3392d1;
+}
+
+.header {
+  background-color: #fff;
+}
+
+
+.logo {
+  height: 50px;
+}
+
+
+/*----------------------------- Footer -----------------------------------*/
+
+#DivFooter {
+  background-color: #032B3F;
+}
+
+#footerText {
+  color: #f7f7f7;
+}
+
+/*------------------------------------------------------------------------*/
+
 
 

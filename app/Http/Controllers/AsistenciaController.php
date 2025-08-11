@@ -2,12 +2,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asistencia;
+use App\Models\ListadoAsistencia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Persona;
 use App\Models\Estudiante;
-
 
 class AsistenciaController extends Controller
 {
@@ -36,8 +36,8 @@ class AsistenciaController extends Controller
         }
 
         return view('IngresoCom.IngresoComedor');
-
     }
+
     public function buscarEstudiante(Request $request)
     {
         $cedula = $request->input('cedula');
@@ -50,41 +50,69 @@ class AsistenciaController extends Controller
     }
 
     public function guardarAsistenciaRapida(Request $request)
-{
-    $validated = $request->validate([
-        'fecha_hora' => 'required|date',
-        'tipo_asistencia' => 'required|string',
-        'estado' => 'required|string',
-        'observaciones' => 'nullable|string',
-    ]);
-
-    try {
-        $asistencia = Asistencia::create([
-            'fecha_hora' => $validated['fecha_hora'],
-            'tipo_asistencia' => $validated['tipo_asistencia'],
-            'estado' => $validated['estado'],
+    {
+        $validated = $request->validate([
+            'fecha_hora' => 'required|date',
+            'tipo_asistencia' => 'required|string',
+            'estado' => 'required|string',
+            'observaciones' => 'nullable|string',
         ]);
 
-        $estudiantes = Estudiante::all();
+        try {
+            $fecha = $request->input('fecha_hora');
+            $tipo = $request->input('tipo_asistencia');
+            $estado = strtolower($request->input('estado'));
+            $observaciones = $request->input('observaciones');
 
-        foreach ($estudiantes as $estudiante) {
-            $asistencia->listadosAsistencia()->create([
-                'estudiante_id' => $estudiante->id,
-                'observaciones' => $validated['observaciones'] ?? null,
-            ]);
+            // Crear asistencias según el tipo
+            $asistencias_creadas = [];
+
+            if ($tipo === 'desayuno_almuerzo') {
+                $asistencias_creadas[] = Asistencia::create([
+                    'fecha_hora' => $fecha,
+                    'tipo_asistencia' => 'desayuno',
+                    'estado' => $estado,
+                    'observaciones' => $observaciones,
+                ]);
+                $asistencias_creadas[] = Asistencia::create([
+                    'fecha_hora' => $fecha,
+                    'tipo_asistencia' => 'almuerzo',
+                    'estado' => $estado,
+                    'observaciones' => $observaciones,
+                ]);
+            } else {
+                $asistencias_creadas[] = Asistencia::create([
+                    'fecha_hora' => $fecha,
+                    'tipo_asistencia' => $tipo,
+                    'estado' => $estado,
+                    'observaciones' => $observaciones,
+                ]);
+            }
+
+            // Traer todos los estudiantes
+            $estudiantes = Estudiante::all();
+
+            // Por cada estudiante, crear listado_asistencia con cada asistencia creada
+            foreach ($estudiantes as $estudiante) {
+                foreach ($asistencias_creadas as $asistencia) {
+                    ListadoAsistencia::create([
+                        'estudiante_id' => $estudiante->id,
+                        'asistencia_id' => $asistencia->id,
+                        'observaciones' => $observaciones,
+                    ]);
+                }
+            }
+
+            return response()->json(['message' => 'Asistencias guardadas y asignadas a estudiantes'], 200);
+
+        } catch (\Exception $e) {
+            \Log::error('Error al guardar asistencia rápida: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-
-        return response()->json(['message' => 'Asistencia guardada con éxito'], 200);
-
-    } catch (\Exception $e) {
-        \Log::error('Error al guardar asistencia rápida: '.$e->getMessage());
-        return response()->json(['error' => 'Error interno del servidor'], 500);
     }
 
-
-
-public function asistenciaRapidaIndex(Request $request) {
-    return view('AsistenciaRapida.asistenciaRapida');
-    
-}
+    public function asistenciaRapidaIndex(Request $request)
+    {
+        return view('AsistenciaRapida.asistenciaRapida');
+    }
 }

@@ -34,6 +34,7 @@ class AdminSeeder extends Seeder
 
         $email = 'uwu@gmail.com';
 
+
         // Generar una contraseña predeterminada o aleatoria
         $password = Str::random(10);
 

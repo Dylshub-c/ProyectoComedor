@@ -104,37 +104,37 @@
             @csrf
 
             <div class="mb-4 row align-items-start">
-              <label for="nombre" class="col-sm-3 col-form-label text-end color1 fs-5"><strong>Nombre</strong></label>
+              <label for="nombre" class="col-sm-3 col-form-label text-end color1 fs-5"><strong>Nombre completo</strong></label>
               <div class="col-sm-9">
-                <input type="text" id="nombre" name="nombre" class="form-control customInput fs-5" placeholder="Ingrese nombre completo" required>
+                <input type="text" id="nombre" name="nombre" class="form-input-flex inputColor fs-5" placeholder="Ingrese nombre completo" required>
               </div>
             </div>
 
             <div class="mb-4 row align-items-start">
               <label for="cedula" class="col-sm-3 col-form-label text-end color1 fs-5"><strong>Cédula</strong></label>
               <div class="col-sm-9">
-                <input type="text" id="cedula" name="cedula" class="form-control customInput fs-5" placeholder="Ingrese la cédula" required>
+                <input type="text" id="cedula" name="cedula" class="form-input-flex inputColor fs-5" placeholder="Ingrese la cédula" required>
               </div>
             </div>
 
             <div class="mb-4 row align-items-start">
               <label for="seccion" class="col-sm-3 col-form-label text-end color1 fs-5"><strong>Sección</strong></label>
               <div class="col-sm-9">
-                <input type="text" id="seccion" name="seccion" class="form-control customInput fs-5" placeholder="Ingrese la sección" required>
+                <input type="text" id="seccion" name="seccion" class="form-input-flex inputColor fs-5" placeholder="Ingrese la sección" required>
               </div>
             </div>
 
             <div class="mb-4 row align-items-start">
               <label for="especialidad" class="col-sm-3 col-form-label text-end color1 fs-5 text-end"><strong>Especialidad</strong></label>
               <div class="col-sm-9">
-                <input type="text" id="especialidad" name="especialidad" class="form-control customInput fs-5" placeholder="Ingrese la especialidad" required>
+                <input type="text" id="especialidad" name="especialidad" class="form-input-flex inputColor fs-5" placeholder="Ingrese la especialidad" required>
               </div>
             </div>
 
             <div class="mb-2 row align-items-start">
               <label for="tipo_beca_id" class="col-sm-3 col-form-label text-end color1 fs-5"><strong>Tipo de beca</strong></label>
               <div class="col-sm-9">
-                <select id="tipo_beca_id" name="tipo_beca_id" class="form-select customInput fs-5" required>
+                <select id="tipo_beca_id" name="tipo_beca_id" class="form-select inputColor fs-5" required>
                   <option disabled selected value="">Seleccione una opción</option>
                   @foreach ($tiposBeca as $beca)
                     <option value="{{ $beca->id }}">{{ $beca->propiedade->nombre }}</option>
@@ -147,11 +147,11 @@
               <i class="bi bi-exclamation-circle-fill fs-5"></i> Llene todos los campos para continuar
             </div>
 
-            <div class="d-flex justify-content-end gap-3 mt-4 pe-5">
-              <button type="submit" class="btnPrimario fs-5">
+            <div class="d-flex justify-content-start gap-3 mt-4 pe-5 ms-5">
+              <button type="submit" class="btnPrimario fs-5 ms-5">
                 <i class="bi bi-save2-fill"></i> Guardar
               </button>
-              <button type="reset" class="btnPrimario fs-5" onclick="window.location='{{ route('estudiantes.importar.form') }}'">
+              <button type="reset" class="btnPrimario fs-5 ms-5" onclick="window.location='{{ route('estudiantes.importar.form') }}'">
                 <i class="bi bi-x-circle-fill"></i> Cancelar
               </button>
             </div>
@@ -159,48 +159,32 @@
           </form>
         </div>
 
-       <div class="col-md-4 text-center mb-4 position-relative">
-        <div
-            class="bg-avatar mx-auto position-relative rounded-circle overflow-hidden"
-            style="width: 240px; height: 240px; border: 4px solid #007bff; background-color: #e9ecef; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
-        >
-            <!-- Imagen previa -->
-            <img
-            id="previewFoto"
-            src="{{ asset('img/FotoEstudiante.webp') }}"
-            alt="Previsualización Foto"
-            class="rounded-circle w-100 h-100"
-            style="object-fit: cover;"
-            />
-            <!-- Ícono persona oculto porque ya hay imagen -->
-            <i class="bi bi-person-fill icono-avatar" style="display: none;"></i>
+        <div class="col-md-4 text-center mb-4">
+  <div class="foto-estudiante-wrapper">
+    <!-- Imagen redonda -->
+    <img
+      id="previewFoto"
+      src="{{ asset('img/FotoEstudiante.webp') }}"
+      alt="Previsualización Foto"
+      class="foto-estudiante"
+    />
 
-            <!-- Botón para agregar imagen -->
-            <button
-            class="btn btn-primary btn-lg"
-            title="Agregar imagen"
-            onclick="document.getElementById('foto').click()"
-            style="
-                position: absolute;
-                bottom: 15px;
-                right: 15px;
-                border-radius: 50%;
-                width: 50px;
-                height: 50px;
-                padding: 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-            "
-            >
-            <i class="bi bi-plus fs-3"></i>
-            </button>
+    <!-- Botón para subir imagen -->
+    <button
+      class="btn-agregar-foto"
+      type="button"
+      title="Agregar imagen"
+      onclick="document.getElementById('foto').click()"
+    >
+      <i class="bi bi-plus fs-4"></i>
+    </button>
+  </div>
 
-            <!-- Input oculto -->
+  <!-- Input de archivo oculto -->
+  <input type="file" id="foto" name="foto" accept="image/*" hidden />
+</div>
 
-        </div>
-        </div>
+
 
 
 

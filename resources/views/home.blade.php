@@ -118,7 +118,7 @@
           Opciones Adicionales
         </div>
         <div class="modal-footer d-flex justify-content-center gap-3 border-0 pb-4">
-          <button type="button" class="btn btn-modal-gestionar" href='#'>Gestionar Administradores</button>
+          <a href="{{ route('roles.index') }}" class="btn btn-modal-gestionar">Gestionar Roles</a>
 
           <form method="POST" action="{{ route('logout') }}">
             @csrf

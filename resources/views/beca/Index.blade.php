@@ -36,11 +36,11 @@
                 </button>
                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('estudiantes.importar.form') }}'">
                     <i class="fa-solid fa-street-view fa-lg" id="icono-menu"></i>
-                    | Agregar estudiantes
+                    | Agregar Usuarios
                 </button>
                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('estudiantes.informacion') }}'">
                     <i class="fa-solid fa-address-card fa-lg" id="icono-menu"></i>
-                    | Ver lista de estudiantes
+                    | Ver lista de usuarios
                 </button>
                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
                     <i class="fa-solid fa-download fa-lg" id="icono-menu"></i>

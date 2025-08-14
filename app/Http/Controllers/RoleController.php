@@ -36,7 +36,9 @@ class RoleController extends Controller
     public function edit(Role $role)
     {
         $permissions = Permission::all();
-        return view('roles.edit', compact('role', 'permissions'));
+        $rolePermissions = $role->permissions->pluck('name')->toArray(); //necesario para marcar los checkboxes
+
+        return view('roles.edit', compact('role', 'permissions', 'rolePermissions'));
     }
 
     public function update(Request $request, Role $role)
@@ -47,7 +49,7 @@ class RoleController extends Controller
         ]);
 
         $role->update(['name' => $request->name]);
-        $role->syncPermissions($request->permissions);
+        $role->syncPermissions($request->input('permissions', []));
 
         return redirect()->route('roles.index')->with('success', 'Rol actualizado con éxito.');
     }

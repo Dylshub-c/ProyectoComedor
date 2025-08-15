@@ -153,7 +153,7 @@ Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Ruta protegida para el admin
-Route::middleware('auth')->group(function () {
+Route::prefix('admin')->middleware(['auth', 'permission:administrar usuarios'])->group(function () {
     Route::get('/home', function () {
         return view('home');
     })->name('admin.home');

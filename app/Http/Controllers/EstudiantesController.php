@@ -19,6 +19,16 @@ use App\Models\Asistencia;
 use App\Models\ListadoAsistencia;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Hash;
+use App\Mail\AdminRegisteredMail;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redirect;
+
 
 class EstudiantesController extends Controller
 {
@@ -37,7 +47,7 @@ class EstudiantesController extends Controller
     public function create()
     {
         $tiposBeca = TipoBeca::with('propiedade')->get();
-        $roles = Role::all(); 
+        $roles = Role::all();
 
         return view('estudiantes.create', compact('tiposBeca', 'roles'));
     }
@@ -45,100 +55,115 @@ class EstudiantesController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        // Validación general y condicional
-        $request->validate([
-            'nombre' => 'required|string',
-            'cedula' => 'required|string|unique:personas,Cedula',
-            'rol' => 'required|exists:roles,name',
+public function store(Request $request)
+{
+    // Validación
+    $request->validate([
+        'nombre' => 'required|string',
+        'cedula' => 'required|string|unique:personas,Cedula',
+        'rol' => 'required|exists:roles,name',
+        'correo' => 'required_if:rol,!Estudiante|email',
+        'seccion' => 'required_if:rol,Estudiante|string|nullable',
+        'especialidad' => 'required_if:rol,Estudiante|string|nullable',
+        'tipo_beca_id' => 'required_if:rol,Estudiante|nullable|exists:tipo_becas,id',
+        'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
 
-            // Solo si el rol es Estudiante
-            'seccion' => 'required_if:rol,Estudiante|string|nullable',
-            'especialidad' => 'required_if:rol,Estudiante|string|nullable',
-            'tipo_beca_id' => 'required_if:rol,Estudiante|nullable|exists:tipo_becas,id',
+    // Dividir nombre completo
+    $partes = explode(' ', trim($request->nombre));
+    $nombre = '';
+    $primerApellido = '';
+    $segundoApellido = '';
 
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ], [
-            'cedula.unique' => 'La cédula ya está registrada en el sistema.',
-            'rol.required' => 'Debe seleccionar un rol.',
+    if(count($partes) >= 3){
+        $segundoApellido = array_pop($partes);
+        $primerApellido = array_pop($partes);
+        $nombre = implode(' ', $partes);
+    } elseif(count($partes) == 2){
+        $primerApellido = array_pop($partes);
+        $nombre = $partes[0];
+    } elseif(count($partes) == 1){
+        $nombre = $partes[0];
+    }
+
+    DB::beginTransaction();
+    try {
+        // Crear persona
+        $persona = Persona::create([
+            'Nombre' => $nombre,
+            'PrimerApellido' => $primerApellido,
+            'SegundoApellido' => $segundoApellido,
+            'Cedula' => $request->cedula,
+            'TipoUsuario' => $request->rol,
         ]);
 
-        // Manejo de la foto
-        $fotoRuta = null;
-        if ($request->hasFile('foto')) {
-            $file = $request->file('foto');
-            $nombreArchivo = time() . '_' . $file->getClientOriginalName();
-            $rutaDestino = public_path('fotos');
-            if (!file_exists($rutaDestino)) {
-                mkdir($rutaDestino, 0755, true);
-            }
-            $file->move($rutaDestino, $nombreArchivo);
-            $fotoRuta = 'fotos/' . $nombreArchivo;
-        }
-
-        // Procesamiento de nombre completo
-        $partes = explode(' ', trim($request->input('nombre')));
-        $nombre = '';
-        $primerApellido = '';
-        $segundoApellido = '';
-
-        if (count($partes) >= 3) {
-            $segundoApellido = array_pop($partes);
-            $primerApellido = array_pop($partes);
-            $nombre = implode(' ', $partes);
-        } elseif (count($partes) == 2) {
-            $primerApellido = array_pop($partes);
-            $nombre = $partes[0];
-        } elseif (count($partes) == 1) {
-            $nombre = $partes[0];
-        }
-
-        DB::beginTransaction();
-        try {
-            // Crear persona
-            $persona = Persona::create([
-                'Nombre' => $nombre,
-                'PrimerApellido' => $primerApellido,
-                'SegundoApellido' => $segundoApellido,
-                'Cedula' => $request->cedula,
-                'TipoUsuario' => $request->rol,
-            ]);
-
-            // Asignar rol al usuario (si tienes relación persona → user)
-            if (method_exists($persona, 'user') && $persona->user) {
-                $persona->user->assignRole($request->rol);
-            }
-
-            // Crear estudiante solo si rol == Estudiante
-            if ($request->rol === 'Estudiante') {
-                $especialidadProp = Propiedade::firstOrCreate(['nombre' => $request->especialidad]);
-                $seccionProp = Propiedade::firstOrCreate(['nombre' => $request->seccion]);
-
-                $especialidad = Especialidade::firstOrCreate(['propiedade_id' => $especialidadProp->id]);
-                $seccion = Seccione::firstOrCreate(['propiedade_id' => $seccionProp->id]);
-
-                $tipoBeca = TipoBeca::findOrFail($request->tipo_beca_id);
-
-                Estudiante::create([
+        // Si no es estudiante, crear usuario
+        if(strtolower($request->rol) !== 'estudiante'){
+            $password = Str::random(10);
+            $user = User::firstOrCreate(
+                ['email' => $request->correo],
+                [
                     'persona_id' => $persona->id,
-                    'especialidade_id' => $especialidad->id,
-                    'seccione_id' => $seccion->id,
-                    'tipo_beca_id' => $tipoBeca->id,
-                    'foto' => $fotoRuta,
-                ]);
+                    'password' => bcrypt($password),
+                ]
+            );
+
+            // Asignar rol
+            $rol = Role::firstOrCreate(['name' => $request->rol]);
+            $user->syncRoles([$rol->id]);
+
+            // Sincronizar permisos del rol al usuario
+            $user->syncPermissions($rol->permissions);
+
+            // Enviar correo si se creó el usuario
+            if($user->wasRecentlyCreated){
+                Mail::to($user->email)->send(new \App\Mail\AdminRegisteredMail(
+                    $request->correo,
+                    $password,
+                    $persona->Nombre
+                ));
+            }
+        }
+
+        // Si es estudiante, crear registro en estudiantes
+        if(strtolower($request->rol) === 'estudiante'){
+            $fotoRuta = null;
+            if($request->hasFile('foto')){
+                $file = $request->file('foto');
+                $nombreArchivo = time() . '_' . $file->getClientOriginalName();
+                $rutaDestino = public_path('fotos');
+                if(!file_exists($rutaDestino)) mkdir($rutaDestino, 0755, true);
+                $file->move($rutaDestino, $nombreArchivo);
+                $fotoRuta = 'fotos/' . $nombreArchivo;
             }
 
-            DB::commit();
+            $especialidadProp = Propiedade::firstOrCreate(['nombre' => $request->especialidad]);
+            $seccionProp = Propiedade::firstOrCreate(['nombre' => $request->seccion]);
 
-            return redirect()->route('estudiantes.informacion')
-                             ->with('success', 'Registro completado correctamente.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->withErrors(['error' => 'Error al guardar: ' . $e->getMessage()])
-                         ->withInput();
+            $especialidad = Especialidade::firstOrCreate(['propiedade_id' => $especialidadProp->id]);
+            $seccion = Seccione::firstOrCreate(['propiedade_id' => $seccionProp->id]);
+            $tipoBeca = TipoBeca::findOrFail($request->tipo_beca_id);
+
+            Estudiante::create([
+                'persona_id' => $persona->id,
+                'especialidade_id' => $especialidad->id,
+                'seccione_id' => $seccion->id,
+                'tipo_beca_id' => $tipoBeca->id,
+                'foto' => $fotoRuta,
+            ]);
         }
+
+        DB::commit();
+        return redirect()->route('estudiantes.informacion')
+                         ->with('success', 'Registro completado correctamente.');
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return back()->withErrors(['error' => 'Error al guardar: '.$e->getMessage()])
+                     ->withInput();
     }
+}
+
 
 
 
@@ -162,57 +187,66 @@ class EstudiantesController extends Controller
      * Update the specified resource in storage.
      */
     public function informacion(Request $request)
-    {
-        $editar = $request->input('editar') == 1;
+{
+    $editar = $request->input('editar') == 1;
+    $persona = null;
 
-        $persona = null;
+    // Obtener todos los roles para el select
+    $roles = Role::all();
 
-        // Primero revisa si tienes persona guardada en sesión
-        if (session()->has('persona_id')) {
-            $persona = Persona::with([
-                'estudiante.seccione.propiedade',
-                'estudiante.especialidade.propiedade',
-                'estudiante.tipoBeca.propiedade'
-            ])->find(session('persona_id'));
+    // Primero revisa si tienes persona guardada en sesión
+    if (session()->has('persona_id')) {
+        $persona = Persona::with([
+            'estudiante.seccione.propiedade',
+            'estudiante.especialidade.propiedade',
+            'estudiante.tipoBeca.propiedade',
+            'user.roles' // traer roles del usuario
+        ])->find(session('persona_id'));
+    }
+
+    // Si no hay persona en sesión, buscar por cédula, nombre o rol (solo en POST)
+    if ($request->isMethod('post') && ($request->filled('cedula') || $request->filled('nombre') || $request->filled('rol'))) {
+        $query = Persona::with([
+            'estudiante.seccione.propiedade',
+            'estudiante.especialidade.propiedade',
+            'estudiante.tipoBeca.propiedade',
+            'user.roles'
+        ])->where('TipoUsuario', 'Estudiante');
+
+        if ($request->filled('cedula')) {
+            $query->where('Cedula', $request->cedula);
         }
 
-        // Si no hay persona en sesión, buscar por cédula o nombre (solo en POST)
-        if ($request->isMethod('post') && ($request->filled('cedula') || $request->filled('nombre'))) {
-            $query = Persona::with([
-                'estudiante.seccione.propiedade',
-                'estudiante.especialidade.propiedade',
-                'estudiante.tipoBeca.propiedade'
-            ]);
-
-            $query->where('TipoUsuario', 'Estudiante');
-
-            if ($request->filled('cedula')) {
-                $query->where('Cedula', $request->cedula);
-            }
-
-            if ($request->filled('nombre')) {
-                $nombre = $request->nombre;
-                $query->whereRaw("CONCAT(Nombre, ' ', PrimerApellido, ' ', SegundoApellido) LIKE ?", ["%{$nombre}%"]);
-            }
-
-            $persona = $query->first();
-
-            if ($persona) {
-                // Guarda el id en sesión para futuras vistas
-                session(['persona_id' => $persona->id]);
-            }
+        if ($request->filled('nombre')) {
+            $nombre = $request->nombre;
+            $query->whereRaw("CONCAT(Nombre, ' ', PrimerApellido, ' ', SegundoApellido) LIKE ?", ["%{$nombre}%"]);
         }
 
-        // Si no hay persona, limpia la sesión para evitar mostrar info vieja
-        if (!$persona) {
-            session()->forget('persona_id');
+        if ($request->filled('rol')) {
+            $rol = $request->rol;
+            $query->whereHas('usuario.roles', function($q) use ($rol) {
+                $q->where('name', $rol);
+            });
         }
 
-        $secciones = Seccione::all();
-        $especialidades = Especialidade::all();
-        $tiposBeca = TipoBeca::all();
+        $persona = $query->first();
 
-        return view('estudiantes.informacion', compact('persona', 'editar', 'secciones', 'especialidades', 'tiposBeca'));
+        if ($persona) {
+            // Guarda el id en sesión para futuras vistas
+            session(['persona_id' => $persona->id]);
+        }
+    }
+
+    // Si no hay persona, limpia la sesión para evitar mostrar info vieja
+    if (!$persona) {
+        session()->forget('persona_id');
+    }
+
+    $secciones = Seccione::all();
+    $especialidades = Especialidade::all();
+    $tiposBeca = TipoBeca::all();
+
+    return view('estudiantes.informacion', compact('persona', 'editar', 'secciones', 'especialidades', 'tiposBeca', 'roles'));
 }
 
 

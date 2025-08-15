@@ -106,21 +106,23 @@
                             @endforeach
                         </td>
                         <td>
-                            <a href="{{ route('roles.edit', $rol->id) }}" class="btn btn-warning btn-sm me-1">
-                                <i class="bi bi-pencil"></i> Editar
-                            </a>
-                            <form action="{{ route('roles.destroy', $rol->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar rol? Esta acción no se puede deshacer.')">
-                                @csrf
-                                @method('DELETE')
-                                <button class="btn btn-danger btn-sm" type="submit">
-                                    <i class="bi bi-trash"></i> Eliminar
-                                </button>
-                            </form>
+                            @if (Str::lower($rol->name) !== 'administrador')
+                                <a href="{{ route('roles.edit', $rol->id) }}" class="btn btn-warning btn-sm me-1">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </a>
+                                <form action="{{ route('roles.destroy', $rol->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar rol? Esta acción no se puede deshacer.')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-danger btn-sm" type="submit">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </button>
+                                </form>
+                            @endif
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="3" class="text-center fs-5">No hay roles registrados.</td>
+                        <td colspan="3" class="text-center">No hay roles registrados</td>
                     </tr>
                     @endforelse
                 </tbody>

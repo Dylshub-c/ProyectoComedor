@@ -15,7 +15,7 @@
   <div class="position-fixed top-0 start-0 w-100 h-100 z-n1">
     <img src="{{ asset('img/FondoPrincipal.webp') }}" class="w-100 h-100" alt="Fondo">
   </div>
-  
+
   <!-- Botón y menú lateral -->
   <button id="btn-Menu" class="btn ms-3 mb-3 fs-5 py-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample" aria-label="Abrir menú">
     <i class="fa-solid fa-bars fa-xl" style="color: #f7f7f7;"></i>
@@ -169,7 +169,7 @@
               alt="Previsualización Foto"
               class="foto-estudiante"
             />
-  
+
             <button
               class="btn-agregar-foto"
               type="button"
@@ -185,75 +185,69 @@
     </div>
   </div>
 
-  <script>
-    const rolSelect = document.getElementById('rol');
-    const camposComunes = document.getElementById('campos-comunes');
-    const camposEstudiante = document.getElementById('campos-estudiante');
-    const fotoWrapper = document.getElementById('foto-wrapper');
-    const campoCorreo = document.getElementById('campo-correo');
+<script>
+  const rolSelect = document.getElementById('rol');
+  const camposComunes = document.getElementById('campos-comunes');
+  const camposEstudiante = document.getElementById('campos-estudiante');
+  const fotoWrapper = document.getElementById('foto-wrapper');
+  const campoCorreo = document.getElementById('campo-correo');
 
-    function actualizarCampos() {
-      const rol = rolSelect.value.toLowerCase();
+  function actualizarCampos() {
+    const rol = rolSelect.value?.toLowerCase() || '';
 
-      if (!rol) {
-        camposComunes.style.display = 'none';
-        camposEstudiante.style.display = 'none';
-        fotoWrapper.style.display = 'none';
-        campoCorreo.style.display = 'none';
+    // Ocultar todo por defecto usando !important
+    camposComunes.style.setProperty('display', 'none', 'important');
+    camposEstudiante.style.setProperty('display', 'none', 'important');
+    fotoWrapper.style.setProperty('display', 'none', 'important');
+    campoCorreo.style.setProperty('display', 'none', 'important');
 
-        ['nombre', 'cedula', 'correo', 'seccion', 'especialidad', 'tipo_beca_id', 'foto'].forEach(id => {
-          const el = document.getElementById(id);
-          if(el) el.required = false;
-        });
-        return;
-      }
-
-      // Mostrar campos comunes para cualquier rol (nombre y cedula)
-      camposComunes.style.display = 'block';
-
-      if (rol === 'estudiante') {
-        camposEstudiante.style.display = 'block';
-        fotoWrapper.style.display = 'flex';
-        campoCorreo.style.display = 'none';
-
-        ['nombre', 'cedula', 'seccion', 'especialidad'].forEach(id => {
-          const el = document.getElementById(id);
-          if(el) el.required = true;
-        });
-
-        ['correo', 'tipo_beca_id', 'foto'].forEach(id => {
-          const el = document.getElementById(id);
-          if(el) el.required = false;
-        });
-
-      } else {
-        camposEstudiante.style.display = 'none';
-        fotoWrapper.style.display = 'none';
-        campoCorreo.style.display = 'flex';
-
-        ['nombre', 'cedula', 'correo'].forEach(id => {
-          const el = document.getElementById(id);
-          if(el) el.required = true;
-        });
-
-        ['seccion', 'especialidad', 'tipo_beca_id', 'foto'].forEach(id => {
-          const el = document.getElementById(id);
-          if(el) el.required = false;
-        });
-      }
-    }
-
-    rolSelect.addEventListener('change', actualizarCampos);
-
-    // Previsualización de foto al seleccionar archivo
-    document.getElementById('foto').addEventListener('change', function(event) {
-      const [file] = this.files;
-      if (file) {
-        const preview = document.getElementById('previewFoto');
-        preview.src = URL.createObjectURL(file);
-      }
+    // Resetear required
+    ['nombre', 'cedula', 'correo', 'seccion', 'especialidad', 'tipo_beca_id', 'foto'].forEach(id => {
+      const el = document.getElementById(id);
+      if(el) el.required = false;
     });
-  </script>
+
+    if (!rol) return;
+
+    // Campos comunes visibles
+    camposComunes.style.setProperty('display', 'block', 'important');
+    ['nombre', 'cedula'].forEach(id => {
+      const el = document.getElementById(id);
+      if(el) el.required = true;
+    });
+
+    if (rol === 'estudiante') {
+      camposEstudiante.style.setProperty('display', 'block', 'important');
+      fotoWrapper.style.setProperty('display', 'flex', 'important'); // foto visible solo para estudiante
+      campoCorreo.style.setProperty('display', 'none', 'important');
+
+      ['seccion', 'especialidad'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.required = true;
+      });
+
+    } else {
+      // Para otros roles
+      campoCorreo.style.setProperty('display', 'flex', 'important');
+      const correo = document.getElementById('correo');
+      if(correo) correo.required = true;
+    }
+  }
+
+  // Ejecutar al cambiar rol
+  rolSelect.addEventListener('change', actualizarCampos);
+
+  // Ejecutar al cargar la página
+  window.addEventListener('DOMContentLoaded', actualizarCampos);
+
+  // Previsualización de foto
+  document.getElementById('foto').addEventListener('change', function() {
+    const [file] = this.files;
+    if(file) {
+      document.getElementById('previewFoto').src = URL.createObjectURL(file);
+    }
+  });
+</script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>

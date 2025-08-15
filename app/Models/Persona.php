@@ -25,15 +25,16 @@ class Persona extends Model
         return $this->hasOne(Encargado::class);
     }
     // Relación con Usuario
-    public function estudiante()
+   public function estudiante()
     {
         return $this->hasOne(Estudiante::class);
     }
-    // Relación con Usuario
+
     public function usuario()
     {
         return $this->hasOne(User::class);
     }
+
 }
 
 

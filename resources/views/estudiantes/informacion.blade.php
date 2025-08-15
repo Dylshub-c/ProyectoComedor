@@ -276,9 +276,9 @@
 
             <!-- imagen -->
             <div class="col-md-4 text-center mb-5 align-self-center">
-                <img 
-                    src="{{ asset($persona->estudiante && $persona->estudiante->foto ? $persona->estudiante->foto : 'img/FotoEstudiante.webp') }}" 
-                    alt="Foto del estudiante" 
+                <img
+                    src="{{ asset($persona->estudiante && $persona->estudiante->foto ? $persona->estudiante->foto : 'img/FotoEstudiante.webp') }}"
+                    alt="Foto del estudiante"
                     class="foto-perfil-redonda"
                 >
             </div>

@@ -28,6 +28,25 @@ class PermissionSeeder extends Seeder
             'editar tipo beca',
             'eliminar tipo beca',
 
+            // Asistencia
+            'ver asistencia',
+            'registrar asistencia',
+
+            // Roles
+            'ver roles',
+            'crear roles',
+            'editar roles',
+            'eliminar roles',
+
+            // Permisos
+            'ver permisos',
+            'crear permisos',
+            'editar permisos',
+            'eliminar permisos',
+
+            // Admin
+            'administrar usuarios',
+
             // Fotos
             'subir fotos',
         ];

@@ -49,7 +49,7 @@ class AsistenciaController extends Controller
         return view('IngresoCom.IngresoComedor', compact('estudiante'));
     }
 
-  public function guardarAsistenciaRapida(Request $request)
+public function guardarAsistenciaRapida(Request $request)
 {
     $validated = $request->validate([
         'fecha_hora' => 'required|date',
@@ -68,37 +68,51 @@ class AsistenciaController extends Controller
         $estudiantes = Estudiante::all();
 
         foreach ($estudiantes as $estudiante) {
-            // Definir los tipos a crear según si es desayuno_almuerzo o uno solo
-            $tiposCrear = $tipo === 'desayuno_almuerzo' ? ['desayuno', 'almuerzo'] : [$tipo];
+            // Tipos a procesar
+            $tiposProcesar = $tipo === 'desayuno_almuerzo' ? ['desayuno', 'almuerzo'] : [$tipo];
 
-            foreach ($tiposCrear as $tipoCrear) {
-                // Validar si ya existe una asistencia para ese estudiante, fecha y tipo
-                $existeAsistencia = ListadoAsistencia::where('estudiante_id', $estudiante->id)
-                    ->whereHas('asistencia', function($query) use ($fecha, $tipoCrear) {
-                        $query->whereDate('fecha_hora', $fecha)
-                              ->where('tipo_asistencia', $tipoCrear);
-                    })->exists();
+            foreach ($tiposProcesar as $tipoProc) {
+                // Buscar asistencia existente
+                $asistencia = Asistencia::whereDate('fecha_hora', $fecha)
+                    ->where('tipo_asistencia', $tipoProc)
+                    ->first();
 
-                if (!$existeAsistencia) {
-                    // Crear asistencia
+                if ($asistencia) {
+                    // Actualizar datos existentes
+                    $asistencia->update([
+                        'estado' => $estado,
+                        'observaciones' => $observaciones
+                    ]);
+                } else {
+                    // Crear nueva asistencia
                     $asistencia = Asistencia::create([
                         'fecha_hora' => $fecha,
-                        'tipo_asistencia' => $tipoCrear,
+                        'tipo_asistencia' => $tipoProc,
                         'estado' => $estado,
-                        'observaciones' => $observaciones,
+                        'observaciones' => $observaciones
                     ]);
+                }
 
-                    // Asociar en listado_asistencias
+                // Crear o actualizar listado para el estudiante
+                $listado = ListadoAsistencia::where('estudiante_id', $estudiante->id)
+                    ->where('asistencia_id', $asistencia->id)
+                    ->first();
+
+                if ($listado) {
+                    $listado->update([
+                        'observaciones' => $observaciones
+                    ]);
+                } else {
                     ListadoAsistencia::create([
                         'estudiante_id' => $estudiante->id,
                         'asistencia_id' => $asistencia->id,
-                        'observaciones' => $observaciones,
+                        'observaciones' => $observaciones
                     ]);
                 }
             }
         }
 
-        return response()->json(['message' => 'Asistencias guardadas y asignadas sin duplicados'], 200);
+        return response()->json(['message' => 'Asistencias creadas/actualizadas correctamente'], 200);
 
     } catch (\Exception $e) {
         \Log::error('Error al guardar asistencia rápida: ' . $e->getMessage());

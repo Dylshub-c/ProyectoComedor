@@ -9,6 +9,7 @@ use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\TipoBecaController;
 use App\Http\Controllers\AsistenciaController;
+use App\Http\Controllers\ReporteController;
 
 Route::get('/', function () {
     return view('Auth/login'); // Make sure you have a 'login.blade.php' view
@@ -27,6 +28,11 @@ Route::get('/comedor/buscar', [EstudiantesController::class, 'mostrarEnComedor']
 
 //-------------------
 
+Route::get('/reporte/descargar', [ReporteController::class, 'descargar'])
+    ->name('Reportes.DescargarReporte');
+
+
+//-------------------
 Route::get('/estudiantes', [EstudiantesController::class, 'index'])->name('estudiantes.index');
 // Mostrar el formulario
 Route::get('estudiantes/importar', [EstudiantesController::class, 'formImportar'])->name('estudiantes.importar.form');

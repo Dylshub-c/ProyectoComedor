@@ -82,6 +82,8 @@
         </a>
       </div>
       <div class="col-sm-12 col-md-6 col-lg-4">
+          <a href="{{ route('Reportes.DescargarReporte') }}" class="text-decoration-none">
+
         <div class="card card-fondo text-white text-center p-4 mt-2">
           <div class="card-overlay"></div>
           <div class="card-content text-start">
@@ -89,6 +91,7 @@
             Descargar Reportes
           </div>asistenciaRapidaIndex
         </div>
+          </a>
       </div>
       <div class="col-sm-12 col-md-6 col-lg-4">
         <a href="{{route('AsistenciaRapida.asistenciaRapida') }}" class="text-decoration-none">

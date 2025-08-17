@@ -101,25 +101,12 @@
 
           <!-- opciones -->
           <div class="sidebar">
-            <label for="tipoReporte" class="form-label fs-5">Tipo de reporte</label>
-            <select class="form-select mb-3 fs-5" id="tipoReporte">
-              <option>Semanal</option>
-              <option selected>Mensual</option>
-              <option>Anual</option>
-            </select>
-
-            <label for="tipoBeca" class="form-label fs-5">Tipo de beca</label>
-            <select class="form-select mb-3 fs-5" id="tipoBeca">
-              <option>Desayuno</option>
-              <option selected>Almuerzo</option>
-              <option>Desayuno / Almuerzo</option>
-            </select>
-
+            
             <!-- Sección para fecha -->
             <div class="p-3 mb-5 mt-5 bg-light rounded shadow-sm">
               <label for="fecha" class="form-label fw-bold">Seleccione la fecha a consultar:</label>
               <div class="input-group">
-                <input type="date" id="fecha" class="form-control fs-5" placeholder="dd/mm/aaaa" aria-describedby="fechaHelp">
+                <input type="month" id="fecha" name="fecha" class="form-control fs-5">
                 <span class="input-group-text"><i class="bi bi-calendar"></i></span>
               </div>
               <!-- Mensaje de error -->
@@ -129,9 +116,7 @@
             </div>
 
             <!-- Botón para realizar la búsqueda -->
-            <button id="btnBuscar" class="btn btn-dark w-100 mb-2 fs-5">
-              <i class="bi bi-search me-1"></i>| Buscar
-            </button>
+           
             <!-- Input para búsqueda por nombre -->
             <input type="text" id="searchInput" class="form-control" placeholder="Buscar por nombre...">
 
@@ -142,8 +127,8 @@
                 | Descargar
               </button>
               <ul class="dropdown-menu w-100 fs-5">
-                <li><a class="dropdown-item" href="#">PDF</a></li>
-                <li><a class="dropdown-item" href="#">Excel</a></li>
+                <li><a id="pdfLink" class="dropdown-item" href="#">PDF</a></li>
+                
               </ul>
             </div>
           </div>
@@ -157,107 +142,61 @@
               </div>
               <img src="../img/LogoCovao.webp" class="logo" alt="COVAO">
             </div>
-
             <div class="tabla-scroll">
-              <div class="overflow-auto">
-                <table class="table table-bordered align-middle text-center mb-0" id="tablaEstudiantes">
-                  <thead class="table-light fs-5" style="background-color: #E9EBED;">
-                    <tr>
-                      <th>Cédula</th>
-                      <th>Nombre</th>
-                      <th>Asistencia</th>
-                      <th>Acción</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>305670954</td>
-                      <td>Felipe Navarro</td>
-                      <td>Presente</td>
-                      <td><a href="/HTML/InformacionEstudiante.html"><button class="btn-ver px-3">Ver Estudiante</button></a></td>
-                    </tr>
-                    <tr>
-                      <td>104350654</td>
-                      <td>Gustavo Gutierrez</td>
-                      <td>Ausente</td>
-                      <td><a href="/HTML/InformacionEstudiante.html"><button class="btn-ver px-3">Ver Estudiante</button></a></td>
-                    </tr>
-                    <tr>
-                      <td>305670954</td>
-                      <td>Felipe Navarro</td>
-                      <td>Presente</td>
-                      <td><a href="/HTML/InformacionEstudiante.html"><button class="btn-ver px-3">Ver Estudiante</button></a></td>
-                    </tr>
-                    <tr>
-                      <td>104350654</td>
-                      <td>Gustavo Gutierrez</td>
-                      <td>Ausente</td>
-                      <td><a href="/HTML/InformacionEstudiante.html"><button class="btn-ver px-3">Ver Estudiante</button></a></td>
-                    </tr>
-                    <tr>
-                      <td>305670954</td>
-                      <td>Felipe Navarro</td>
-                      <td>Presente</td>
-                      <td><a href="/HTML/InformacionEstudiante.html"><button class="btn-ver px-3">Ver Estudiante</button></a></td>
-                    </tr>
-                    <tr>
-                      <td>104350654</td>
-                      <td>Gustavo Gutierrez</td>
-                      <td>Ausente</td>
-                      <td><a href="/HTML/InformacionEstudiante.html"><button class="btn-ver px-3">Ver Estudiante</button></a></td>
-                    </tr>
-                    <tr>
-                      <td>305670954</td>
-                      <td>Felipe Navarro</td>
-                      <td>Presente</td>
-                      <td><a href="/HTML/InformacionEstudiante.html"><button class="btn-ver px-3">Ver Estudiante</button></a></td>
-                    </tr>
-                    <tr>
-                      <td>104350654</td>
-                      <td>Gustavo Gutierrez</td>
-                      <td>Ausente</td>
-                      <td><a href="/HTML/InformacionEstudiante.html"><button class="btn-ver px-3">Ver Estudiante</button></a></td>
-                    </tr>
-                    <tr>
-                      <td>305670954</td>
-                      <td>Felipe Navarro</td>
-                      <td>Presente</td>
-                      <td><a href="/HTML/InformacionEstudiante.html"><button class="btn-ver px-3">Ver Estudiante</button></a></td>
-                    </tr>
-                    <tr>
-                      <td>104350654</td>
-                      <td>Gustavo Gutierrez</td>
-                      <td>Ausente</td>
-                      <td><a href="/HTML/InformacionEstudiante.html"><button class="btn-ver px-3">Ver Estudiante</button></a></td>
-                    </tr>
-                    <tr>
-                      <td>305670954</td>
-                      <td>Felipe Navarro</td>
-                      <td>Presente</td>
-                      <td><a href="/HTML/InformacionEstudiante.html"><button class="btn-ver px-3">Ver Estudiante</button></a></td>
-                    </tr>
-                    <tr>
-                      <td>104350654</td>
-                      <td>Gustavo Gutierrez</td>
-                      <td>Ausente</td>
-                      <td><a href="/HTML/InformacionEstudiante.html"><button class="btn-ver px-3">Ver Estudiante</button></a></td>
-                    </tr>
-                    <tr>
-                      <td>305670954</td>
-                      <td>Felipe Navarro</td>
-                      <td>Presente</td>
-                      <td><a href="/HTML/InformacionEstudiante.html"><button class="btn-ver px-3">Ver Estudiante</button></a></td>
-                    </tr>
-                    <tr>
-                      <td>104350654</td>
-                      <td>Gustavo Gutierrez</td>
-                      <td>Ausente</td>
-                      <td><a href="/HTML/InformacionEstudiante.html"><button class="btn-ver px-3">Ver Estudiante</button></a></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+  <div class="overflow-auto">
+    <table class="table table-bordered align-middle text-center mb-0" id="tablaEstudiantes">
+      <thead class="table-light fs-5" style="background-color: #E9EBED;">
+        <tr>
+          <th>Cédula</th>
+          <th>Nombre</th>
+          <th>%Asistencia Total</th>
+          <th>%Desayuno</th>
+          <th>%Almuerzo</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach($estudiantes as $estudiante)
+          @php
+              $listados = $estudiante->listadosAsistencia;
+
+              // Total de asistencias
+              $total = $listados->count();
+              $presentes = $listados->where('asistencia.estado', 'presente')->count();
+              $porcentajeTotal = $total > 0 ? round(($presentes / $total) * 100, 2) : 0;
+
+              // Desayuno
+              $desayunoTotal = $listados->where('asistencia.tipo_asistencia', 'desayuno')->count();
+              $desayunoPresente = $listados->where('asistencia.tipo_asistencia', 'desayuno')
+                                           ->where('asistencia.estado', 'presente')
+                                           ->count();
+              $porcentajeDesayuno = $desayunoTotal > 0 ? round(($desayunoPresente / $desayunoTotal) * 100, 2) : 0;
+
+              // Almuerzo
+              $almuerzoTotal = $listados->where('asistencia.tipo_asistencia', 'almuerzo')->count();
+              $almuerzoPresente = $listados->where('asistencia.tipo_asistencia', 'almuerzo')
+                                          ->where('asistencia.estado', 'presente')
+                                          ->count();
+              $porcentajeAlmuerzo = $almuerzoTotal > 0 ? round(($almuerzoPresente / $almuerzoTotal) * 100, 2) : 0;
+
+              // Nombre completo
+              $persona = $estudiante->persona;
+              $nombreCompleto = $persona ? $persona->Nombre.' '.$persona->PrimerApellido.' '.$persona->SegundoApellido : 'N/A';
+          @endphp
+          <tr>
+            <td>{{ $persona ? $persona->Cedula : 'N/A' }}</td>
+            <td>{{ $nombreCompleto }}</td>
+            <td>{{ $porcentajeTotal }}%</td>
+            <td>{{ $porcentajeDesayuno }}%</td>
+            <td>{{ $porcentajeAlmuerzo }}%</td>
+          </tr>
+        @endforeach
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+            
           </div>
 
         </div>
@@ -287,6 +226,17 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/locales/bootstrap-datepicker.es.min.js"></script>
   <script src="https://kit.fontawesome.com/1e23feddae.js" crossorigin="anonymous"></script>
   <script src="AñadirEstudiantesM.js"></script>
+  <script>
+const fechaInput = document.getElementById("fecha");
+const pdfLink = document.getElementById("pdfLink");
+
+fechaInput.addEventListener("change", function() {
+    const fecha = this.value;
+    if (fecha) {
+        pdfLink.href = "/reporte/asistencia/pdf?fecha=" + fecha;
+    }
+});
+</script>
 
 <!------------------------------------------------------------------------------------------------------------------------->
 </body>

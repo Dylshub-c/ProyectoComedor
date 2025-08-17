@@ -32,6 +32,15 @@ Route::get('/reporte/descargar', [ReporteController::class, 'descargar'])
     ->name('Reportes.DescargarReporte');
 
 
+Route::get('/reporte/asistencia/pdf', [ReporteController::class, 'mensualPdf'])
+    ->name('reporte.asistencia.pdf');
+
+Route::get('/reporte/asistencia/pdf', [ReporteController::class, 'pdf'])->name('reporte.asistencia.pdf');
+
+
+
+
+
 //-------------------
 Route::get('/estudiantes', [EstudiantesController::class, 'index'])->name('estudiantes.index');
 // Mostrar el formulario

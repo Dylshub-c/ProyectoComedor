@@ -323,15 +323,13 @@ class EstudiantesController extends Controller
 
         return view('estudiantes.informacion', compact('estudiantes'));
     }
-
-   public function mostrarEnComedor(Request $request)
+public function mostrarEnComedor(Request $request)
 {
     $persona = null;
     $asistencias = [];
 
-    // Solo continuar si el usuario ingresó la cédula y seleccionó un tipo de asistencia
-    if ($request->filled('cedula') && $request->filled('tipo_asistencia')) {
-
+    if ($request->filled('cedula')) {
+        // Traer la persona con relaciones necesarias
         $persona = Persona::with([
             'estudiante.seccione.propiedade',
             'estudiante.especialidade.propiedade',
@@ -343,53 +341,60 @@ class EstudiantesController extends Controller
 
         if ($persona && $persona->estudiante) {
 
-            $tipoAsistencia = strtolower($request->input('tipo_asistencia'));
+            // Tomamos el tipo de asistencia seleccionado por el usuario
+            $tipoSeleccionado = $request->input('tipo_asistencia');
 
-            // Validación según tipo de beca
-            $tipoBecaRaw = $persona->estudiante->tipoBeca->propiedade->nombre;
+            // Validación del tipo de beca del estudiante
+            $tipoBecaRaw = $persona->estudiante->tipoBeca->propiedade->nombre ?? '';
             $tipoBeca = strtolower(str_replace([' ', '-'], ['','_'], $tipoBecaRaw));
-            $permitidos = [];
 
+            $tiposPermitidos = [];
             switch ($tipoBeca) {
                 case 'desayuno':
-                    $permitidos = ['desayuno'];
+                    $tiposPermitidos = ['desayuno'];
                     break;
                 case 'almuerzo':
-                    $permitidos = ['almuerzo'];
+                    $tiposPermitidos = ['almuerzo'];
                     break;
                 case 'desayuno_almuerzo':
-                    $permitidos = ['desayuno', 'almuerzo'];
+                    $tiposPermitidos = ['desayuno', 'almuerzo'];
                     break;
             }
 
-            if (!in_array($tipoAsistencia, $permitidos)) {
+            if (!in_array($tipoSeleccionado, $tiposPermitidos)) {
                 return redirect()->back()->with('error', 'El estudiante no cuenta con este tipo de beca.');
             }
 
-            // Buscar asistencia del día actual para el tipo seleccionado
-            $asistencia = Asistencia::whereDate('fecha_hora', \Illuminate\Support\Carbon::today())
-                ->where('tipo_asistencia', $tipoAsistencia)
-                ->where('estado', 'presente')
+            // Buscar la asistencia del día para el tipo seleccionado
+            $asistencia = Asistencia::whereDate('fecha_hora', Carbon::today())
+                ->where('tipo_asistencia', $tipoSeleccionado)
                 ->first();
 
             if ($asistencia) {
-                // Crear ListadoAsistencia solo si no existe
-                $yaRegistrado = ListadoAsistencia::where('estudiante_id', $persona->estudiante->id)
-                    ->where('asistencia_id', $asistencia->id)
-                    ->exists();
 
-                if (!$yaRegistrado) {
-                    ListadoAsistencia::create([
-                        'estudiante_id' => $persona->estudiante->id,
-                        'asistencia_id' => $asistencia->id,
-                        'observaciones' => null
-                    ]);
-                }
+                // 🔹 Eliminar cualquier ListadoAsistencia previa del estudiante para este tipo
+                $idsAsistenciasDia = Asistencia::whereDate('fecha_hora', Carbon::today())
+                    ->where('tipo_asistencia', $tipoSeleccionado)
+                    ->pluck('id');
+
+                ListadoAsistencia::where('estudiante_id', $persona->estudiante->id)
+                    ->whereIn('asistencia_id', $idsAsistenciasDia)
+                    ->delete();
+
+                // 🔹 Crear nuevo ListadoAsistencia con presente
+                ListadoAsistencia::create([
+                    'estudiante_id' => $persona->estudiante->id,
+                    'asistencia_id' => $asistencia->id,
+                    'observaciones' => null
+                ]);
+
+                // 🔹 Actualizar estado de la asistencia a presente
+                $asistencia->update(['estado' => 'presente']);
             }
 
             // Obtener asistencias del estudiante para el mes actual
-            $inicioMes = \Illuminate\Support\Carbon::now()->startOfMonth();
-            $finMes = \Illuminate\Support\Carbon::now()->endOfMonth();
+            $inicioMes = Carbon::now()->startOfMonth();
+            $finMes = Carbon::now()->endOfMonth();
 
             $listado = ListadoAsistencia::with('asistencia')
                 ->where('estudiante_id', $persona->estudiante->id)
@@ -397,7 +402,7 @@ class EstudiantesController extends Controller
                     $query->whereBetween('fecha_hora', [$inicioMes, $finMes]);
                 })->get();
 
-            // Preparar arreglo con fecha => estado
+            // Preparar arreglo con fecha => estado para el calendario
             foreach ($listado as $item) {
                 $fecha = $item->asistencia->fecha_hora->format('Y-m-d');
                 $asistencias[$fecha] = $item->asistencia->estado; // 'presente' o 'ausente'
@@ -407,6 +412,7 @@ class EstudiantesController extends Controller
 
     return view('IngresoCom.IngresoComedor', compact('persona', 'asistencias'));
 }
+
 
 
 

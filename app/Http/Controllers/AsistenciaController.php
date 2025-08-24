@@ -12,31 +12,79 @@ use App\Models\Estudiante;
 class AsistenciaController extends Controller
 {
     public function index()
-    {
-        $fecha = Carbon::today(); // Fecha actual sin hora
+{
+    $fecha = Carbon::today(); // Fecha actual sin hora
 
-        $tipos = ['desayuno', 'almuerzo'];
-        $estados = ['presente', 'ausente'];
+    $tipos = ['desayuno', 'almuerzo'];
+    $estados = ['presente', 'ausente'];
 
-        foreach ($tipos as $tipo) {
-            foreach ($estados as $estado) {
-                $yaExiste = Asistencia::whereDate('fecha_hora', $fecha)
-                    ->where('tipo_asistencia', $tipo)
-                    ->where('estado', $estado)
+    // 1️⃣ Crear asistencias del día si no existen
+    foreach ($tipos as $tipo) {
+        foreach ($estados as $estado) {
+            $yaExiste = Asistencia::whereDate('fecha_hora', $fecha)
+                ->where('tipo_asistencia', $tipo)
+                ->where('estado', $estado)
+                ->exists();
+
+            if (!$yaExiste) {
+                Asistencia::create([
+                    'fecha_hora' => Carbon::now(),
+                    'tipo_asistencia' => $tipo,
+                    'estado' => $estado,
+                ]);
+            }
+        }
+    }
+
+    // 2️⃣ Asignar ausencias a los estudiantes según su tipo de beca
+    $estudiantes = Estudiante::with('tipoBeca.propiedade')->get();
+
+    foreach ($estudiantes as $estudiante) {
+
+        // Normalizar nombre de la beca
+        $tipoBecaRaw = $estudiante->tipoBeca->propiedade->nombre ?? '';
+        $tipoBeca = strtolower(str_replace([' ', '-'], ['','_'], $tipoBecaRaw));
+
+        $tiposAsignar = [];
+        switch ($tipoBeca) {
+            case 'desayuno':
+                $tiposAsignar = ['desayuno'];
+                break;
+            case 'almuerzo':
+                $tiposAsignar = ['almuerzo'];
+                break;
+            case 'desayuno_almuerzo':
+                $tiposAsignar = ['desayuno', 'almuerzo'];
+                break;
+        }
+
+        foreach ($tiposAsignar as $tipo) {
+            // Obtener asistencia del día correspondiente al tipo y estado 'ausente'
+            $asistencia = Asistencia::whereDate('fecha_hora', $fecha)
+                ->where('tipo_asistencia', $tipo)
+                ->where('estado', 'ausente')
+                ->first();
+
+            if ($asistencia) {
+                // Crear ListadoAsistencia solo si no existe
+                $yaRegistrado = ListadoAsistencia::where('estudiante_id', $estudiante->id)
+                    ->where('asistencia_id', $asistencia->id)
                     ->exists();
 
-                if (!$yaExiste) {
-                    Asistencia::create([
-                        'fecha_hora' => Carbon::now(),
-                        'tipo_asistencia' => $tipo,
-                        'estado' => $estado,
+                if (!$yaRegistrado) {
+                    ListadoAsistencia::create([
+                        'estudiante_id' => $estudiante->id,
+                        'asistencia_id' => $asistencia->id,
+                        'observaciones' => null
                     ]);
                 }
             }
         }
-
-        return view('IngresoCom.IngresoComedor');
     }
+
+    return view('IngresoCom.IngresoComedor');
+}
+
 
     public function buscarEstudiante(Request $request)
     {

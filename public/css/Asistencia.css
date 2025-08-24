@@ -1,0 +1,176 @@
+
+/* Fondo general */
+body {
+  background-image: url('img/FondoPrincipal.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+}
+
+/* Contenedor principal */
+.main-container {
+  padding: 20px;
+}
+
+/* Panel izquierdo */
+.left-panel {
+  width: 25%;
+  gap: 20px;
+}
+
+/* Panel derecho */
+.right-panel {
+  width: 75%;
+  margin-left: 20px;
+}
+
+/* Estilo tarjeta estudiante */
+.estudiante-card {
+  width: 100%;
+  background-color: white;
+  border-radius: 10px;
+  padding: 15px;
+}
+
+.estudiante-avatar {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  margin: auto;
+  border-radius: 50%;
+  background-color: #ffffff;
+}
+
+/* Tarjeta tipo de beca */
+.tipo-beca-card {
+  background-color: white;
+  padding: 15px;
+  border-radius: 10px;
+  width: 100%;
+  height: 350px;
+}
+
+.logo-covao {
+  width: 250px;
+  height: auto;
+  margin: auto;
+
+}
+
+/* Tabla */
+.table th, .table td {
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+/* Iconos */
+.table .bi-check-circle {
+  color: green;
+}
+
+.table .bi-x-circle {
+  color: red;
+}
+
+.table .bi-dash-circle {
+  color: gray;
+}
+.custom-btn {
+  display: flex;
+  align-items: center;
+  border: 1px solid #00000030;
+  background-color: #106AA4; /* Bootstrap blue */
+  color: white;
+  border-radius: 5px;
+  padding: 10px 20px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  font-weight: bold;
+  font-size: 1.2rem;
+  gap: 10px;
+  transition: background-color 0.3s;
+  height: 35px;
+}
+
+.custom-btn:hover {
+  background-color: #2481be;
+}
+
+.icon-section {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 1.3rem;
+}
+
+.small-icon {
+  font-size: 0.8rem;
+  transform: translateY(2px);
+}
+
+.divider {
+  height: 40px;
+  width: 2px;
+  background-color: white;
+  opacity: 0.5;
+}
+
+.text-section {
+  white-space: nowrap;
+}
+
+/* Responsive: adaptación para pantallas pequeñas (teléfonos, tablets) */
+@media (max-width: 768px) {
+  .main-container {
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+  }
+
+  .left-panel, .right-panel {
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+
+  .right-panel {
+    margin-top: 20px;
+  }
+
+  .custom-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 10px;
+    font-size: 1rem;
+  }
+
+  .divider {
+    height: 30px;
+  }
+
+  .d-flex.justify-content-around.mt-3 {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+
+  .logo-covao {
+    max-width: 100%;
+    width: 180px;
+    height: auto;
+  }
+
+  .student-avatar {
+    width: 80px;
+    height: 80px;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  .table {
+    font-size: 13px;
+  }
+}
+
+

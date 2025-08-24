@@ -31,6 +31,11 @@
     <div class="container-fluid">
     <div class="row">
         <div class="col-3 mb-4 mt-5">
+          <select class="form-select mb-3 fs-5" id="TipoAsistencia" name="tipo_asistencia">
+              <option value="desayuno">Desayuno</option>
+              <option value="almuerzo">Almuerzo</option>
+          </select>
+
             <div id="PrimerModulo" class="container-fluid text-center mt-5">
               @php
     $foto = isset($persona) && $persona?->estudiante?->foto
@@ -100,7 +105,7 @@
                               <i class="fa-regular fa-address-card fa-lg me-1" style="color: #f7f7f7;"></i>
                               | Buscar por cédula
                             </button>
-                            <form action="{{ route('comedor.buscar') }}" method="GET">
+                            <form id="formBuscar" action="{{ route('comedor.buscar') }}" method="GET">
                             @csrf
                             <div class="modal fade" id="modalBuscar" tabindex="-1" aria-labelledby="modalBuscarLabel" aria-hidden="true">
                               <div class="modal-dialog modal-dialog-centered">
@@ -189,7 +194,18 @@
     <script>
         const asistenciasEstudiante = @json($asistencias ?? []);
     </script>
+<script>
+  document.getElementById('formBuscar').addEventListener('submit', function(e){
+    const select = document.getElementById('TipoAsistencia');
+    // Crear un input hidden con el valor del select
+    let input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'tipo_asistencia';
+    input.value = select.value;
+    this.appendChild(input);
+});
 
+</script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src={{ asset('js/IngresoComedor.js') }}></script>
     <script src="https://kit.fontawesome.com/1e23feddae.js" crossorigin="anonymous"></script>

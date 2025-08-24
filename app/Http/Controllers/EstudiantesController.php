@@ -329,7 +329,9 @@ class EstudiantesController extends Controller
     $persona = null;
     $asistencias = [];
 
-    if ($request->filled('cedula')) {
+    // Solo continuar si el usuario ingresó la cédula y seleccionó un tipo de asistencia
+    if ($request->filled('cedula') && $request->filled('tipo_asistencia')) {
+
         $persona = Persona::with([
             'estudiante.seccione.propiedade',
             'estudiante.especialidade.propiedade',
@@ -340,15 +342,17 @@ class EstudiantesController extends Controller
         ->first();
 
         if ($persona && $persona->estudiante) {
-            $hora = \Illuminate\Support\Carbon::now()->format('H');
-            $tipoAsistencia = $hora < 12 ? 'desayuno' : 'almuerzo';
 
+            $tipoAsistencia = strtolower($request->input('tipo_asistencia')); // 'desayuno' o 'almuerzo'
+
+            // Buscar asistencia del día actual para el tipo seleccionado
             $asistencia = Asistencia::whereDate('fecha_hora', \Illuminate\Support\Carbon::today())
                 ->where('tipo_asistencia', $tipoAsistencia)
                 ->where('estado', 'presente')
                 ->first();
 
             if ($asistencia) {
+                // Crear ListadoAsistencia solo si no existe
                 $yaRegistrado = ListadoAsistencia::where('estudiante_id', $persona->estudiante->id)
                     ->where('asistencia_id', $asistencia->id)
                     ->exists();
@@ -382,6 +386,7 @@ class EstudiantesController extends Controller
 
     return view('IngresoCom.IngresoComedor', compact('persona', 'asistencias'));
 }
+
 
 
 

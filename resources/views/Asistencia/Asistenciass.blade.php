@@ -6,19 +6,32 @@
   <title>Asistencia</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
-  <link rel="stylesheet" href="Asistencia.css" />
+  <link rel="stylesheet" href="{{ asset('css/Asistencia.css') }}">
 </head>
 <body>
+  @if(!$persona)
+    <div class="container mt-4">
+      <div class="alert alert-warning text-center">
+        No hay estudiante seleccionado.  
+        <a href="{{ route('estudiantes.informacion') }}" class="btn btn-link">Volver</a>
+      </div>
+    </div>
+  @else
   <div class="main-container d-flex">
+
     <!-- Panel izquierdo -->
     <div class="left-panel d-flex flex-column align-items-center">
-      
+
       <!-- Perfil del estudiante -->
       <div class="card estudiante-card text-center mb-3">
-        <img src="img/FotoEstudiante.webp" class="estudiante-avatar" alt="Avatar del estudiante" />
+        <img src="{{ asset($persona->estudiante->foto ?? 'img/FotoEstudiante.webp') }}"
+             class="estudiante-avatar"
+             alt="Avatar del estudiante" />
         <div class="card-body">
-          <h5 class="card-title" id="nombreEstudiante">Nombre del estudiante</h5>
-          <p class="card-text" id="cedulaEstudiante">Cédula</p>
+          <h5 class="card-title">
+            {{ $persona->Nombre }} {{ $persona->PrimerApellido }} {{ $persona->SegundoApellido }}
+          </h5>
+          <p class="card-text">{{ $persona->Cedula }}</p>
         </div>
       </div>
 
@@ -26,69 +39,71 @@
       <div class="card tipo-beca-card text-center">
         <div class="card-header fw-bold">Tipo de beca asignada</div>
         <div class="card-body">
+          @php
+            $beca = $persona->estudiante->tipoBeca->propiedade->nombre ?? '';
+          @endphp
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="desayuno" id="becaDesayuno" disabled>
-            <label class="form-check-label" for="becaDesayuno">Beca de Desayuno</label>
+            <input class="form-check-input" type="checkbox" disabled
+                   {{ in_array($beca, ['Desayuno', 'Desayuno - Almuerzo']) ? 'checked' : '' }}>
+            <label class="form-check-label">Beca de Desayuno</label>
           </div>
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="almuerzo" id="becaAlmuerzo" disabled>
-            <label class="form-check-label" for="becaAlmuerzo">Beca de Almuerzo</label>
+            <input class="form-check-input" type="checkbox" disabled
+                   {{ in_array($beca, ['Almuerzo', 'Desayuno - Almuerzo']) ? 'checked' : '' }}>
+            <label class="form-check-label">Beca de Almuerzo</label>
           </div>
         </div>
-        <img src="img/LogoCovao.webp" alt="COVAO logo" class="logo-covao" />
+        <img src="{{ asset('img/LogoCovao.webp') }}" alt="COVAO logo" class="logo-covao" />
       </div>
     </div>
 
     <!-- Panel derecho -->
-    <div class="right-panel card">
+    <div class="right-panel card flex-grow-1">
       <div class="card-body">
-        <h5 class="mb-3 fw-bold">Seleccione un rango de fechas</h5>
+        <h5 class="mb-3 fw-bold">Rango de fechas</h5>
         <div class="row mb-4">
           <div class="col">
             <label for="fechaInicio" class="form-label">Fecha de inicio</label>
-            <input type="date" id="fechaInicio" class="form-control" />
+            <input type="date" id="fechaInicio" class="form-control">
           </div>
           <div class="col">
             <label for="fechaFinal" class="form-label">Fecha final</label>
-            <input type="date" id="fechaFinal" class="form-control" />
+            <input type="date" id="fechaFinal" class="form-control">
           </div>
         </div>
 
         <div class="table-responsive">
-          <table class="table table-bordered text-center align-middle" id="tablaAsistencia">
+          <table class="table table-bordered text-center align-middle">
             <thead class="table-light">
-              <tr id="encabezadoTabla">
+              <tr>
                 <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Estado</th>
               </tr>
             </thead>
-            <tbody id="cuerpoTabla"></tbody>
+            <tbody>
+              @if(isset($listados) && $listados->count())
+                @foreach($listados as $listado)
+                  <tr>
+                    <td>{{ \Carbon\Carbon::parse($listado->asistencia->fecha_hora)->format('d/m/Y') }}</td>
+                    <td>{{ ucfirst($listado->asistencia->tipo_asistencia) }}</td>
+                    <td>{{ ucfirst($listado->asistencia->estado) }}</td>
+                  </tr>
+                @endforeach
+              @else
+                <tr>
+                  <td colspan="3" class="text-muted">No hay registros de asistencia.</td>
+                </tr>
+              @endif
+            </tbody>
           </table>
-        </div>
-
-        <!-- Botones estilo personalizado -->
-        <div class="d-flex justify-content-around mt-3">
-          <button class="custom-btn" id="btnEditar">
-            <span class="icon-section">
-              <i class="bi bi-pencil-fill small-icon"></i>
-            </span>
-            <div class="divider"></div>
-            <span class="text-section">Editar marca</span>
-          </button>
-
-          <button class="custom-btn" id="btnFinalizar">
-            <span class="icon-section">
-              <i class="bi bi-check-circle-fill"></i>
-            </span>
-            <div class="divider"></div>
-            <span class="text-section">Finalizar</span>
-          </button>
         </div>
 
       </div>
     </div>
   </div>
+  @endif
 
-  <script src="Asistencia.js"></script>
+  <script src="{{ asset('js/Asistencia.js') }}"></script>
 </body>
 </html>
-

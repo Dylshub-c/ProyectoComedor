@@ -37,6 +37,10 @@ Route::get('/reporte/asistencia/pdf', [ReporteController::class, 'mensualPdf'])
 
 Route::get('/reporte/asistencia/pdf', [ReporteController::class, 'pdf'])->name('reporte.asistencia.pdf');
 
+Route::get('/asistencia/revisar/{persona_id?}', [AsistenciaController::class, 'revisarAsistencia'])
+    ->name('asistencia.revisar');
+
+Route::post('/estudiantes/informacion', [EstudianteController::class, 'informacion'])->name('estudiantes.informacion');
 
 
 

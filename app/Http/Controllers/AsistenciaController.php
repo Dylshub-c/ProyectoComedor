@@ -172,4 +172,30 @@ public function guardarAsistenciaRapida(Request $request)
     {
         return view('AsistenciaRapida.asistenciaRapida');
     }
+public function revisarAsistencia(Request $request, $persona_id = null)
+    {
+        // Prioridad: parámetro de ruta > querystring > sesión
+        $id = $persona_id ?? $request->query('persona_id') ?? session('persona_id');
+
+        if (!$id) {
+            return redirect()->route('estudiantes.informacion')
+                ->with('warning', 'Primero selecciona/busca un estudiante.');
+        }
+
+        $persona = Persona::with([
+            'estudiante.tipoBeca.propiedade',
+            'estudiante.listadosAsistencia.asistencia'
+        ])->find($id);
+
+        if (!$persona) {
+            return redirect()->route('estudiantes.informacion')
+                ->with('warning', 'Estudiante no encontrado.');
+        }
+
+        // Si quieres listar asistencias en la vista:
+        $listados = $persona->estudiante->listadosAsistencia
+            ->sortByDesc(fn($l) => $l->asistencia->fecha_hora);
+
+        return view('Asistencia.Asistenciass', compact('persona', 'listados'));
+    }
 }

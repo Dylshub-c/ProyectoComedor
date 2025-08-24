@@ -90,122 +90,58 @@
 
 <!------------------------------------------------------------------------------------------------------------------------->
 <!-----------------------------------------------------CONTENIDO----------------------------------------------------------->
-
-<body class="d-flex flex-column min-vh-100">
+<body class="d-flex flex-column min-vh-100 bg-light">
   <main class="flex-grow-1">
+    <div class="container py-5">
 
-    <div class="main-wrapper">
-      <div class="cuadro-principal">
-        <div class="titulo-reporte mt-3">Reporte de Asistencia</div>
-        <div class="d-flex flex-wrap gap-4 justify-content-between align-items-start">
+      <div class="row justify-content-center">
+        <div class="col-lg-6">
 
-          <!-- opciones -->
-          <div class="sidebar">
-            
-            <!-- Sección para fecha -->
-            <div class="p-3 mb-5 mt-5 bg-light rounded shadow-sm">
-    <label for="fecha" class="form-label fw-bold">Seleccione la fecha a consultar:</label>
-    <div class="input-group">
-        <input type="month" id="fecha" name="fecha" class="form-control fs-5">
-        <span class="input-group-text"><i class="bi bi-calendar"></i></span>
-        <a id="pdfLink" href="/reporte/asistencia/pdf" class="btn btn-primary ms-2">Descargar PDF</a>
-    </div>
-</div>
-              <!-- Mensaje de error -->
-              <div class="mensaje-error mt-2 text-danger d-none" id="errorFecha">
-                <i class="bi bi-exclamation-circle-fill me-1 fs-5"></i>Seleccione una fecha
-              </div>
+          <!-- Card principal -->
+          <div class="card shadow-sm p-4">
+
+            <!-- Título dentro del recuadro blanco -->
+            <h2 class="text-center fw-bold mb-4">Reporte de Asistencia</h2>
+
+            <!-- Selección de fecha -->
+            <label for="fecha" class="form-label fw-bold">Seleccione la fecha a consultar:</label>
+            <div class="input-group mb-3">
+              <input type="month" id="fecha" name="fecha" class="form-control fs-5">
+              <span class="input-group-text"><i class="bi bi-calendar"></i></span>
             </div>
 
-            <!-- Botón para realizar la búsqueda -->
-           
-            <!-- Input para búsqueda por nombre -->
-            <input type="text" id="searchInput" class="form-control" placeholder="Buscar por nombre...">
-
-            <!-- Dropdown para opciones de descarga -->
-            <div class="dropdown w-100 mt-3">
-              <button class="btn btn-descargar dropdown-toggle w-100 fs-5" type="button" data-bs-toggle="dropdown">
-                <i class="bi bi-download ms-1"></i>
-                | Descargar
-              </button>
-              <ul class="dropdown-menu w-100 fs-5">
-                <li><a id="pdfLink" class="dropdown-item" href="#">PDF</a></li>
-                
-              </ul>
+            <!-- Mensaje de error -->
+            <div class="text-danger d-none" id="errorFecha">
+              <i class="bi bi-exclamation-circle-fill me-1"></i>Seleccione una fecha
             </div>
-          </div>
 
-          <!-- Contenedor principal -->
-          <div class="flex-grow-1">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <div>
-                <button class="btn-volver"><i class="bi bi-arrow-left"></i></button>
-                <span class="fw-bold fs-5">Asistencias - 5/02/2025</span>
-              </div>
-              <img src="../img/LogoCovao.webp" class="logo" alt="COVAO">
-            </div>
-            <div class="tabla-scroll">
-  <div class="overflow-auto">
-    <table class="table table-bordered align-middle text-center mb-0" id="tablaEstudiantes">
-      <thead class="table-light fs-5" style="background-color: #E9EBED;">
-        <tr>
-          <th>Cédula</th>
-          <th>Nombre</th>
-          <th>%Asistencia Total</th>
-          <th>%Desayuno</th>
-          <th>%Almuerzo</th>
-        </tr>
-      </thead>
-      <tbody>
-        @foreach($estudiantes as $estudiante)
-          @php
-              $listados = $estudiante->listadosAsistencia;
+            <!-- Búsqueda por nombre -->
+            <input type="text" id="searchInput" class="form-control mt-4" placeholder="Buscar por nombre...">
 
-              // Total de asistencias
-              $total = $listados->count();
-              $presentes = $listados->where('asistencia.estado', 'presente')->count();
-              $porcentajeTotal = $total > 0 ? round(($presentes / $total) * 100, 2) : 0;
+            <!-- Botón para descargar PDF -->
+            <button id="pdfButton" class="btn btn-secondary w-100 fs-5 mt-4" disabled>
+              <i class="bi bi-download me-1"></i> Descargar PDF
+            </button>
 
-              // Desayuno
-              $desayunoTotal = $listados->where('asistencia.tipo_asistencia', 'desayuno')->count();
-              $desayunoPresente = $listados->where('asistencia.tipo_asistencia', 'desayuno')
-                                           ->where('asistencia.estado', 'presente')
-                                           ->count();
-              $porcentajeDesayuno = $desayunoTotal > 0 ? round(($desayunoPresente / $desayunoTotal) * 100, 2) : 0;
+            <!-- Mensaje informativo -->
+            <p class="text-center text-muted mt-4 mb-0">
+              Seleccione la fecha para ver y descargar el reporte.
+            </p>
 
-              // Almuerzo
-              $almuerzoTotal = $listados->where('asistencia.tipo_asistencia', 'almuerzo')->count();
-              $almuerzoPresente = $listados->where('asistencia.tipo_asistencia', 'almuerzo')
-                                          ->where('asistencia.estado', 'presente')
-                                          ->count();
-              $porcentajeAlmuerzo = $almuerzoTotal > 0 ? round(($almuerzoPresente / $almuerzoTotal) * 100, 2) : 0;
-
-              // Nombre completo
-              $persona = $estudiante->persona;
-              $nombreCompleto = $persona ? $persona->Nombre.' '.$persona->PrimerApellido.' '.$persona->SegundoApellido : 'N/A';
-          @endphp
-          <tr>
-            <td>{{ $persona ? $persona->Cedula : 'N/A' }}</td>
-            <td>{{ $nombreCompleto }}</td>
-            <td>{{ $porcentajeTotal }}%</td>
-            <td>{{ $porcentajeDesayuno }}%</td>
-            <td>{{ $porcentajeAlmuerzo }}%</td>
-          </tr>
-        @endforeach
-      </tbody>
-    </table>
-  </div>
-</div>
-
-
-            
           </div>
 
         </div>
       </div>
+
     </div>
   </main>
-  
+
+</body>
+
+
+
+
+
 <!------------------------------------------------------------------------------------------------------------------------->
 <!-------------------------------------------------------FOOTER------------------------------------------------------------>   
 
@@ -228,20 +164,25 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/locales/bootstrap-datepicker.es.min.js"></script>
   <script src="https://kit.fontawesome.com/1e23feddae.js" crossorigin="anonymous"></script>
   <script src="AñadirEstudiantesM.js"></script>
-  <script>
-const fechaInput = document.getElementById("fecha");
-const pdfLink = document.getElementById("pdfLink");
 
-// Cuando cambia la fecha, actualizar el link del PDF
-fechaInput.addEventListener("change", function() {
-    const fecha = this.value; // formato "YYYY-MM"
-    if (fecha) {
-        pdfLink.href = "/reporte/asistencia/pdf?fecha=" + fecha;
-    } else {
-        pdfLink.href = "/reporte/asistencia/pdf";
-    }
-});
-</script>
+  <script>
+    const fechaInput = document.getElementById("fecha");
+    const pdfButton = document.getElementById("pdfButton");
+
+    // Actualiza el link y habilita el botón según la fecha seleccionada
+    fechaInput.addEventListener("change", function() {
+      const fecha = this.value;
+      if (fecha) {
+        pdfButton.disabled = false;
+        pdfButton.onclick = () => {
+          window.location.href = `/reporte/asistencia/pdf?fecha=${fecha}`;
+        };
+      } else {
+        pdfButton.disabled = true;
+        pdfButton.onclick = null;
+      }
+    });
+  </script>
 
 <!------------------------------------------------------------------------------------------------------------------------->
 </body>

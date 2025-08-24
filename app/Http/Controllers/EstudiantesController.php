@@ -343,7 +343,28 @@ class EstudiantesController extends Controller
 
         if ($persona && $persona->estudiante) {
 
-            $tipoAsistencia = strtolower($request->input('tipo_asistencia')); // 'desayuno' o 'almuerzo'
+            $tipoAsistencia = strtolower($request->input('tipo_asistencia'));
+
+            // Validación según tipo de beca
+            $tipoBecaRaw = $persona->estudiante->tipoBeca->propiedade->nombre;
+            $tipoBeca = strtolower(str_replace([' ', '-'], ['','_'], $tipoBecaRaw));
+            $permitidos = [];
+
+            switch ($tipoBeca) {
+                case 'desayuno':
+                    $permitidos = ['desayuno'];
+                    break;
+                case 'almuerzo':
+                    $permitidos = ['almuerzo'];
+                    break;
+                case 'desayuno_almuerzo':
+                    $permitidos = ['desayuno', 'almuerzo'];
+                    break;
+            }
+
+            if (!in_array($tipoAsistencia, $permitidos)) {
+                return redirect()->back()->with('error', 'El estudiante no cuenta con este tipo de beca.');
+            }
 
             // Buscar asistencia del día actual para el tipo seleccionado
             $asistencia = Asistencia::whereDate('fecha_hora', \Illuminate\Support\Carbon::today())
@@ -386,7 +407,6 @@ class EstudiantesController extends Controller
 
     return view('IngresoCom.IngresoComedor', compact('persona', 'asistencias'));
 }
-
 
 
 

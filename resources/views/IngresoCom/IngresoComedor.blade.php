@@ -29,6 +29,11 @@
 
     <main class="flex-grow-1">
     <div class="container-fluid">
+      @if(session('error'))
+    <div class="alert alert-danger fs-5">
+        {{ session('error') }}
+    </div>
+@endif
     <div class="row">
         <div class="col-3 mb-4 mt-5">
           <select class="form-select mb-3 fs-5" id="TipoAsistencia" name="tipo_asistencia">

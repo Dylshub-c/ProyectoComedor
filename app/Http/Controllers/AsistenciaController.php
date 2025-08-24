@@ -11,26 +11,60 @@ use App\Models\Estudiante;
 
 class AsistenciaController extends Controller
 {
-    public function index()
-    {
-        $fecha = Carbon::today(); // Fecha actual sin hora
 
+public function index()
+    {
+        $fechaHoy = Carbon::today();
         $tipos = ['desayuno', 'almuerzo'];
         $estados = ['presente', 'ausente'];
 
+        // Crear todas las combinaciones tipo + estado para el día si no existen
         foreach ($tipos as $tipo) {
             foreach ($estados as $estado) {
-                $yaExiste = Asistencia::whereDate('fecha_hora', $fecha)
-                    ->where('tipo_asistencia', $tipo)
-                    ->where('estado', $estado)
-                    ->exists();
-
-                if (!$yaExiste) {
-                    Asistencia::create([
-                        'fecha_hora' => Carbon::now(),
+                Asistencia::firstOrCreate(
+                    [
+                        'fecha_hora' => $fechaHoy,
                         'tipo_asistencia' => $tipo,
-                        'estado' => $estado,
-                    ]);
+                        'estado' => $estado
+                    ]
+                );
+            }
+        }
+
+        // Obtener todos los estudiantes con su beca
+        $estudiantes = Estudiante::with('tipoBeca.propiedade')->get();
+
+        foreach ($estudiantes as $estudiante) {
+            // Normalizar el nombre de la beca
+            $becaRaw = strtolower($estudiante->tipoBeca->propiedade->nombre ?? '');
+            $becaRaw = preg_replace('/\s*[-–]\s*/u', '-', $becaRaw); // unifica guiones
+            $becaRaw = preg_replace('/\s+/', '', $becaRaw); // elimina espacios
+
+            // Determinar tipos permitidos
+            $tiposPermitidos = [];
+            if ($becaRaw === 'desayuno') $tiposPermitidos = ['desayuno'];
+            elseif ($becaRaw === 'almuerzo') $tiposPermitidos = ['almuerzo'];
+            elseif ($becaRaw === 'desayuno-almuerzo') $tiposPermitidos = ['desayuno', 'almuerzo'];
+
+            foreach ($tipos as $tipo) {
+                // Saltar tipos que el estudiante no tiene permitido
+                if (!in_array($tipo, $tiposPermitidos)) continue;
+
+                // Buscar asistencia "ausente" para este tipo y fecha
+                $asistenciaAusente = Asistencia::whereDate('fecha_hora', $fechaHoy)
+                    ->where('tipo_asistencia', $tipo)
+                    ->where('estado', 'ausente')
+                    ->first();
+
+                // Crear listado si no existe
+                if ($asistenciaAusente) {
+                    ListadoAsistencia::firstOrCreate(
+                        [
+                            'estudiante_id' => $estudiante->id,
+                            'asistencia_id' => $asistenciaAusente->id
+                        ],
+                        ['observaciones' => null]
+                    );
                 }
             }
         }
@@ -38,16 +72,83 @@ class AsistenciaController extends Controller
         return view('IngresoCom.IngresoComedor');
     }
 
-    public function buscarEstudiante(Request $request)
-    {
-        $cedula = $request->input('cedula');
+    // BUSCAR ESTUDIANTE: Marca presente según tipo de comida y beca
+  public function buscarEstudiante(Request $request)
+{
+$cedula = $request->input('cedula');
+    $fechaHoy = Carbon::today();
+    $horaActual = Carbon::now()->format('H:i');
 
-        $estudiante = Estudiante::whereHas('persona', function ($query) use ($cedula) {
-            $query->where('cedula', $cedula);
-        })->with(['persona', 'especialidade', 'tipoBeca'])->first();
+    // Definir rangos de hora para cada turno
+    $turnos = [
+        'desayuno' => ['inicio' => '06:00', 'fin' => '10:00'],
+        'almuerzo' => ['inicio' => '11:00', 'fin' => '15:00']
+    ];
 
-        return view('IngresoCom.IngresoComedor', compact('estudiante'));
+    // Detectar el turno actual
+    $turnoActual = null;
+    foreach ($turnos as $tipo => $rango) {
+        if ($horaActual >= $rango['inicio'] && $horaActual <= $rango['fin']) {
+            $turnoActual = $tipo;
+            break;
+        }
     }
+
+    if (!$turnoActual) {
+        return response()->json(['error' => 'No es hora de ningún turno de comida'], 400);
+    }
+
+    // Buscar estudiante por cédula
+    $estudiante = Estudiante::whereHas('persona', function($q) use ($cedula) {
+        $q->where('cedula', $cedula);
+    })->with('tipoBeca.propiedade')->first();
+
+    if (!$estudiante) {
+        return response()->json(['error' => 'Estudiante no encontrado'], 404);
+    }
+
+    // Obtener nombre de la beca de manera exacta
+    $nombreBeca = $estudiante->tipoBeca->propiedade->nombre ?? '';
+
+    // Mapear nombres exactos de la base de datos a tipos permitidos
+    $mapBecaATipo = [
+        'Desayuno' => ['desayuno'],
+        'Almuerzo' => ['almuerzo'],
+        'Desayuno - Almuerzo' => ['desayuno', 'almuerzo']
+    ];
+
+    $tiposPermitidos = $mapBecaATipo[$nombreBeca] ?? [];
+
+    // Verificar que el turno actual esté permitido
+    if (!in_array($turnoActual, $tiposPermitidos)) {
+        return response()->json(['error' => "El estudiante no tiene beca para el turno de $turnoActual"], 403);
+    }
+
+    // Buscar asistencia existente para este turno y fecha (sin importar estado)
+    $asistencia = Asistencia::whereDate('fecha_hora', $fechaHoy)
+        ->where('tipo_asistencia', $turnoActual)
+        ->first();
+
+    // Crear asistencia si no existe
+    if (!$asistencia) {
+        $asistencia = Asistencia::create([
+            'fecha_hora' => $fechaHoy,
+            'tipo_asistencia' => $turnoActual,
+            'estado' => 'ausente'
+        ]);
+    }
+
+    // Crear listado de asistencia si no existe
+    ListadoAsistencia::firstOrCreate(
+        [
+            'estudiante_id' => $estudiante->id,
+            'asistencia_id' => $asistencia->id
+        ],
+        ['observaciones' => null]
+    );
+
+    return response()->json(['success' => "Asistencia de $turnoActual agregada correctamente"]);
+}
 
 public function guardarAsistenciaRapida(Request $request)
 {

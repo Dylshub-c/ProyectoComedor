@@ -141,13 +141,14 @@ public function mensualPdf(Request $request)
 
 public function pdf(Request $request)
 {
-    $mes = $request->input('mes', Carbon::now()->month);
-    $anio = $request->input('anio', Carbon::now()->year);
+ // Recibir fecha en formato YYYY-MM
+    $fechaInput = $request->input('fecha', Carbon::now()->format('Y-m'));
+    [$anio, $mes] = explode('-', $fechaInput);
 
     $inicioMes = Carbon::create($anio, $mes, 1)->startOfMonth();
     $finMes = Carbon::create($anio, $mes, 1)->endOfMonth();
 
-    // Obtener todos los estudiantes con sus relaciones necesarias
+    // Tu código para obtener estudiantes, asistencias y generar $resumenGeneral...
     $estudiantes = Estudiante::with([
         'persona',
         'tipoBeca.propiedade',
@@ -156,7 +157,6 @@ public function pdf(Request $request)
         }
     ])->get();
 
-    // Inicializar resumen
     $resumenGeneral = [
         'Almuerzo' => [],
         'Desayuno' => [],
@@ -166,20 +166,14 @@ public function pdf(Request $request)
     foreach ($estudiantes as $estudiante) {
         $persona = $estudiante->persona;
         $nombre = $persona ? trim("{$persona->Nombre} {$persona->PrimerApellido} {$persona->SegundoApellido}") : 'Sin Nombre';
-
-        // Obtener nombre de la beca y normalizarlo
+        
         $tipoBecaNombre = optional($estudiante->tipoBeca->propiedade)->nombre ?? 'Sin Beca';
-        if ($tipoBecaNombre == 'Almuerzo') {
-            $tipoBeca = 'Almuerzo';
-        } elseif ($tipoBecaNombre == 'Desayuno') {
-            $tipoBeca = 'Desayuno';
-        } else {
-            $tipoBeca = 'Desayuno - Almuerzo';
-        }
+        if ($tipoBecaNombre == 'Almuerzo') $tipoBeca = 'Almuerzo';
+        elseif ($tipoBecaNombre == 'Desayuno') $tipoBeca = 'Desayuno';
+        else $tipoBeca = 'Desayuno - Almuerzo';
 
         $semanas = [];
 
-        // Contar asistencias por semana
         foreach ($estudiante->listadosAsistencia as $listado) {
             $asistencia = $listado->asistencia;
             if (!$asistencia) continue;
@@ -196,17 +190,12 @@ public function pdf(Request $request)
             }
 
             if ($asistencia->tipo_asistencia == 'desayuno') {
-                $asistencia->estado == 'presente' 
-                    ? $semanas[$semana]['desayuno_asist']++ 
-                    : $semanas[$semana]['desayuno_ausente']++;
+                $asistencia->estado == 'presente' ? $semanas[$semana]['desayuno_asist']++ : $semanas[$semana]['desayuno_ausente']++;
             } elseif ($asistencia->tipo_asistencia == 'almuerzo') {
-                $asistencia->estado == 'presente' 
-                    ? $semanas[$semana]['almuerzo_asist']++ 
-                    : $semanas[$semana]['almuerzo_ausente']++;
+                $asistencia->estado == 'presente' ? $semanas[$semana]['almuerzo_asist']++ : $semanas[$semana]['almuerzo_ausente']++;
             }
         }
 
-        // Solo agregar si hubo asistencias en el mes
         if (count($semanas) > 0) {
             $resumenGeneral[$tipoBeca][] = [
                 'nombre' => $nombre,
@@ -215,16 +204,6 @@ public function pdf(Request $request)
         }
     }
 
-    // Asegurarse que siempre se pase la variable aunque esté vacía
-    if (!isset($resumenGeneral)) {
-        $resumenGeneral = [
-            'Almuerzo' => [],
-            'Desayuno' => [],
-            'Desayuno - Almuerzo' => []
-        ];
-    }
-
-    // Generar PDF
     $pdf = Pdf::loadView('PdfReporte.ReportePdf', compact('resumenGeneral', 'mes', 'anio'));
 
     return $pdf->download("reporte_asistencia_{$mes}_{$anio}.pdf");

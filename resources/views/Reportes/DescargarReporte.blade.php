@@ -104,11 +104,13 @@
             
             <!-- Sección para fecha -->
             <div class="p-3 mb-5 mt-5 bg-light rounded shadow-sm">
-              <label for="fecha" class="form-label fw-bold">Seleccione la fecha a consultar:</label>
-              <div class="input-group">
-                <input type="month" id="fecha" name="fecha" class="form-control fs-5">
-                <span class="input-group-text"><i class="bi bi-calendar"></i></span>
-              </div>
+    <label for="fecha" class="form-label fw-bold">Seleccione la fecha a consultar:</label>
+    <div class="input-group">
+        <input type="month" id="fecha" name="fecha" class="form-control fs-5">
+        <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+        <a id="pdfLink" href="/reporte/asistencia/pdf" class="btn btn-primary ms-2">Descargar PDF</a>
+    </div>
+</div>
               <!-- Mensaje de error -->
               <div class="mensaje-error mt-2 text-danger d-none" id="errorFecha">
                 <i class="bi bi-exclamation-circle-fill me-1 fs-5"></i>Seleccione una fecha
@@ -230,10 +232,13 @@
 const fechaInput = document.getElementById("fecha");
 const pdfLink = document.getElementById("pdfLink");
 
+// Cuando cambia la fecha, actualizar el link del PDF
 fechaInput.addEventListener("change", function() {
-    const fecha = this.value;
+    const fecha = this.value; // formato "YYYY-MM"
     if (fecha) {
         pdfLink.href = "/reporte/asistencia/pdf?fecha=" + fecha;
+    } else {
+        pdfLink.href = "/reporte/asistencia/pdf";
     }
 });
 </script>

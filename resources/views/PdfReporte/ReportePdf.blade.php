@@ -13,6 +13,7 @@
         th { background-color: #eaeaea; }
         .semana-title { margin-top: 15px; font-weight: bold; }
         .total-row { font-weight: bold; background-color: #f2f2f2; }
+        .resumen-final { margin-top: 40px; }
     </style>
 </head>
 <body>
@@ -33,6 +34,11 @@
         @else
             @php
                 $semanasAgrupadas = [];
+                $mesTotalDesayunoAsist = 0;
+                $mesTotalDesayunoAus = 0;
+                $mesTotalAlmuerzoAsist = 0;
+                $mesTotalAlmuerzoAus = 0;
+
                 foreach($resumenGeneral[$tipoBeca] as $estudiante) {
                     foreach($estudiante['semanas'] as $numSemana => $datos) {
                         $semanasAgrupadas[$numSemana][] = [
@@ -42,6 +48,12 @@
                             'almuerzo_asist' => $datos['almuerzo_asist'],
                             'almuerzo_ausente' => $datos['almuerzo_ausente'],
                         ];
+
+                        // Totales mensuales
+                        $mesTotalDesayunoAsist += $datos['desayuno_asist'];
+                        $mesTotalDesayunoAus += $datos['desayuno_ausente'];
+                        $mesTotalAlmuerzoAsist += $datos['almuerzo_asist'];
+                        $mesTotalAlmuerzoAus += $datos['almuerzo_ausente'];
                     }
                 }
             @endphp
@@ -122,7 +134,7 @@
                             </tr>
                         @endforeach
 
-                        {{-- Fila de porcentaje general --}}
+                        {{-- Fila de porcentaje general por semana --}}
                         <tr class="total-row">
                             <td>Total / % General</td>
                             @if($tipoBeca == 'Almuerzo')
@@ -150,7 +162,7 @@
                                 @endphp
                                 <td>{{ $totalDesayunoAsist }}</td>
                                 <td>{{ $totalDesayunoAus }}</td>
-                                <td>{{ $porcGeneralDesayuno }}%</td>
+                                                                <td>{{ $porcGeneralDesayuno }}%</td>
                                 <td>{{ $totalAlmuerzoAsist }}</td>
                                 <td>{{ $totalAlmuerzoAus }}</td>
                                 <td>{{ $porcGeneralAlmuerzo }}%</td>
@@ -160,9 +172,56 @@
                     </tbody>
                 </table>
             @endforeach
+
+            {{-- Porcentaje mensual general por tipo de beca --}}
+            <div class="resumen-final">
+                <h3>Porcentaje Mensual General - {{ $tipoBeca }}</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            @if($tipoBeca != 'Almuerzo')
+                                <th>Desayuno (P)</th>
+                                <th>Desayuno (A)</th>
+                                <th>% Desayuno</th>
+                            @endif
+                            @if($tipoBeca != 'Desayuno')
+                                <th>Almuerzo (P)</th>
+                                <th>Almuerzo (A)</th>
+                                <th>% Almuerzo</th>
+                            @endif
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="total-row">
+                            @if($tipoBeca != 'Almuerzo')
+                                @php
+                                    $porcMensualDesayuno = ($mesTotalDesayunoAsist + $mesTotalDesayunoAus) > 0
+                                        ? round(($mesTotalDesayunoAsist / ($mesTotalDesayunoAsist + $mesTotalDesayunoAus)) * 100, 2)
+                                        : 0;
+                                @endphp
+                                <td>{{ $mesTotalDesayunoAsist }}</td>
+                                <td>{{ $mesTotalDesayunoAus }}</td>
+                                <td>{{ $porcMensualDesayuno }}%</td>
+                            @endif
+                            @if($tipoBeca != 'Desayuno')
+                                @php
+                                    $porcMensualAlmuerzo = ($mesTotalAlmuerzoAsist + $mesTotalAlmuerzoAus) > 0
+                                        ? round(($mesTotalAlmuerzoAsist / ($mesTotalAlmuerzoAsist + $mesTotalAlmuerzoAus)) * 100, 2)
+                                        : 0;
+                                @endphp
+                                <td>{{ $mesTotalAlmuerzoAsist }}</td>
+                                <td>{{ $mesTotalAlmuerzoAus }}</td>
+                                <td>{{ $porcMensualAlmuerzo }}%</td>
+                            @endif
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
         @endif
     </div>
 @endforeach
 
 </body>
 </html>
+

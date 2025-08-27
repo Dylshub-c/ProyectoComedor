@@ -30,17 +30,17 @@
                     <i class="fa-solid fa-house-chimney fa-lg" id="icono-menu" ></i>
                     | Home
                 </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('IngresoCom.IngresoComedor') }}'">
                     <i class="fa-solid fa-clipboard-list fa-lg" id="icono-menu"></i>
                     | Ingreso al comedor
                 </button>
                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('estudiantes.importar.form') }}'">
                     <i class="fa-solid fa-street-view fa-lg" id="icono-menu"></i>
-                    | Agregar estudiantes
+                    | Agregar Usuarios
                 </button>
                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('estudiantes.informacion') }}'">
                     <i class="fa-solid fa-address-card fa-lg" id="icono-menu"></i>
-                    | Ver lista de estudiantes
+                    | Ver lista de usuarios
                 </button>
                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
                     <i class="fa-solid fa-download fa-lg" id="icono-menu"></i>
@@ -62,10 +62,13 @@
             </div>
         </div>
         <div class="offcanvas-footer p-3 border-top">
-            <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
                 <i class="fa-solid fa-arrow-right-to-bracket fa-lg" id="icono-menu"></i>
                 | Cerrar sesión
-            </button>
+                </button>
+            </form>
             </div>
         </div>
 
@@ -121,18 +124,27 @@
                 @endif
 
                 {{-- Formulario oculto para editar (puedes mostrarlo con JS) --}}
-                <div id="formEditar" style="display:none;">
-                    <form method="POST" id="formEditarTipoBeca" action="">
-                        @csrf
-                        @method('PUT')
-                        <div class="mb-3">
-                            <label for="nombreEditar" class="form-label">Editar nombre</label>
-                            <input type="text" id="nombreEditar" name="nombre" class="form-control fs-5" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary fs-5">Guardar Cambios</button>
-                        <button type="button" class="btn btn-secondary fs-5" onclick="ocultarEditar()">Cancelar</button>
-                    </form>
-                </div>
+                <div id="formEditar" class="form-editar">
+                <form method="POST" id="formEditarTipoBeca" action="">
+                    @csrf
+                    @method('PUT')
+                    <div class="mb-3">
+                        <label for="nombreEditar" class="form-label">Editar nombre</label>
+                        <input type="text" id="nombreEditar" name="nombre" class="form-control inputColor sin-borde-focus fs-5" required>
+                    </div>
+
+                    <div class="botones-editar d-flex gap-3">
+                        <button type="submit" class="btnPrimario btnEditar fs-5">
+                            <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
+                        </button>
+                        <button type="button" class="btnPrimario btnEditar fs-5" onclick="ocultarEditar()">
+                            <i class="fa-solid fa-xmark"></i> Cancelar
+                        </button>
+                    </div>
+                </form>
+
+</div>
+
 
                 {{-- Listado de tipos de beca existentes --}}
                 @foreach($tiposBeca as $tipo)
@@ -153,22 +165,23 @@
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title text-danger" id="modalLabel{{ $tipo->id }}">Confirmar eliminación</h5>
+                                    <h5 class="modal-title" id="modalLabel{{ $tipo->id }}">Confirmar eliminación</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                                 </div>
                                 <div class="modal-body">
                                     ¿Estás seguro de que deseas eliminar este registro? Esta acción no se puede deshacer.
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn btnPrimario btnCancelar" data-bs-dismiss="modal">Cancelar</button>
 
                                     {{-- Formulario de eliminación --}}
                                     <form method="POST" action="{{ route('tipobeca.destroy', $tipo->id) }}">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                                        <button type="submit" class="btn btnPrimario">Eliminar</button>
                                     </form>
                                 </div>
+
                             </div>
                         </div>
                     </div>

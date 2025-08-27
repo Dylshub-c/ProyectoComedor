@@ -26,7 +26,6 @@ class PasswordResetController extends Controller
 
         $user = User::with('persona')->where('email', $request->email)->first();
 
-
         if (!$user || $user->persona->TipoUsuario !== 'admin') {
             return back()->withErrors(['email' => 'Este correo no pertenece a un administrador.']);
         }
@@ -35,7 +34,7 @@ class PasswordResetController extends Controller
         $cacheKey = 'admin_reset_attempts:' . $user->email;
         $attempts = Cache::get($cacheKey, 0);
 
-        if ($attempts >= 8) {
+        if ($attempts >= 3) {
             return back()->withErrors(['email' => 'Has alcanzado el límite de 3 restablecimientos por hora.']);
         }
 
@@ -44,8 +43,11 @@ class PasswordResetController extends Controller
             'admin.password.confirm', now()->addMinutes(60), ['email' => $user->email]
         );
 
+        // Obtener el nombre para el correo
+        $nombre = $user->persona->Nombre ?? $user->name ?? 'Usuario';
+
         // Enviar correo con el enlace (sin cambiar contraseña todavía)
-        Mail::to($user->email)->send(new ConfirmarNuevaContrasena($user, $url));
+        Mail::to($user->email)->send(new ConfirmarNuevaContrasena($user, $url, $nombre));
 
         // Incrementar intentos
         Cache::put($cacheKey, $attempts + 1, now()->addHour());
@@ -72,7 +74,7 @@ class PasswordResetController extends Controller
         // Enviar la nueva contraseña al correo
         Mail::to($user->email)->send(new AdminPasswordMail($user->email, $newPassword));
 
-        return view('auth.cambio-contra'); 
+        return view('auth.cambio-contra');
     }
 
 }

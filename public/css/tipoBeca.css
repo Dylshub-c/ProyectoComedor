@@ -70,10 +70,50 @@
   border: none;
   border-radius: 13px;
   font-size: 14px;
-  padding: 6px 16px; /* padding reducido para que no se salga */
-  width: 100%; /* ancho completo para que no se salga */
-  max-width: 300px; /* limita ancho máximo para no ser gigante */
+  padding: 6px 16px;
+  width: 100%;
+  max-width: 300px;
   box-sizing: border-box;
+
+  /* Alineación horizontal y vertical del ícono + texto */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* Espacio entre ícono y texto */
+}
+.btnPrimario i {
+  margin: 0;
+}
+/* Contenedor de botones alineados horizontalmente */
+.botones-editar {
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 12px; /* espacio entre botones */
+}
+
+/* Nuevo estilo adicional para botones más pequeños y no tan anchos */
+.btnEditar {
+  width: auto !important;      /* sobrescribe el width: 100% de btnPrimario */
+  max-width: none !important;  /* permite que el botón se ajuste al contenido */
+  padding: 6px 14px;           /* un poco más compacto */
+  font-size: 14px;
+}
+.alert-success {
+  background-color: #1F73AA; /* tu color personalizado */
+  color: white;
+  border: none;
+}
+.btnCancelar {
+  width: auto !important;
+  max-width: none !important;
+  padding: 6px 14px; /* ligeramente más compacto */
+  white-space: nowrap;
+}
+
+
+.form-editar {
+  display: none;
 }
 
 /* Etiquetas */

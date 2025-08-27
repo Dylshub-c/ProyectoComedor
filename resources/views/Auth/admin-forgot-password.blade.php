@@ -20,7 +20,7 @@
                     <label for="correo" class="form-label">Correo electrónico</label>
                     <input type="email" class="form-control" id="correo" name="email" placeholder="ejemplo@correo.com" required/>
                 </div>
-                <button id="btnEnviar" type="submit" class="btn btn-primary w-100">Enviar instrucciones</button>
+                <button id="btnEnviar" type="submit" class="btn btn-enviar w-100 " style="background-color: #0a5386; color: white;">Enviar instrucciones</button>
             </form>
 
 

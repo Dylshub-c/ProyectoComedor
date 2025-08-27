@@ -15,24 +15,25 @@ class LoginController extends Controller
     }
 
     public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+{
+    $credentials = $request->validate([
+        'email' => ['required', 'email'],
+        'password' => ['required'],
+    ]);
 
-        if (Auth::attempt($credentials)) {
-            $user = Auth::user();
-            if ($user->persona->TipoUsuario !== 'admin') {
-                Auth::logout();
-                return back()->withErrors(['email' => 'No tienes permisos para acceder.']);
-            }
+    if (Auth::attempt($credentials)) {
+        $user = Auth::user();
+
+        if ($user->hasPermissionTo('administrar usuarios')) {
             return redirect()->route('admin.home');
         }
 
-        return back()->withErrors(['email' => 'Credenciales incorrectas.']);
+        Auth::logout();
+        return back()->withErrors(['email' => 'No tienes permisos para acceder.']);
     }
 
+    return back()->withErrors(['email' => 'Credenciales incorrectas.']);
+}
     public function logout(Request $request)
     {
         Auth::logout();

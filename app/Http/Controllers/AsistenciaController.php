@@ -96,77 +96,84 @@ class AsistenciaController extends Controller
 
         return view('IngresoCom.IngresoComedor', compact('estudiante'));
     }
-
 public function guardarAsistenciaRapida(Request $request)
 {
     $validated = $request->validate([
         'fecha_hora' => 'required|date',
-        'tipo_asistencia' => 'required|string',
-        'estado' => 'required|string',
+        'tipo_asistencia' => 'required|string|in:Desayuno,Almuerzo,Desayuno - Almuerzo',
+        'estado' => 'required|string|in:Presente,Ausente',
         'observaciones' => 'nullable|string',
     ]);
 
     try {
         $fecha = $request->input('fecha_hora');
-        $tipo = $request->input('tipo_asistencia');
-        $estado = strtolower($request->input('estado'));
+        $tipoSeleccionado = $request->input('tipo_asistencia');
+        $estado = $request->input('estado');
         $observaciones = $request->input('observaciones');
 
-        // Traer todos los estudiantes
-        $estudiantes = Estudiante::all();
+        // Traer todos los estudiantes con su tipo de beca y propiedad
+        $estudiantes = Estudiante::with('tipoBeca.propiedade')->get();
 
-        foreach ($estudiantes as $estudiante) {
-            // Tipos a procesar
-            $tiposProcesar = $tipo === 'desayuno_almuerzo' ? ['desayuno', 'almuerzo'] : [$tipo];
+        // Determinar tipos de asistencia a crear
+        $tiposCrear = $tipoSeleccionado === 'Desayuno - Almuerzo' ? ['Desayuno', 'Almuerzo'] : [$tipoSeleccionado];
 
-            foreach ($tiposProcesar as $tipoProc) {
-                // Buscar asistencia existente
-                $asistencia = Asistencia::whereDate('fecha_hora', $fecha)
-                    ->where('tipo_asistencia', $tipoProc)
-                    ->first();
+        foreach ($tiposCrear as $tipoProc) {
 
-                if ($asistencia) {
-                    // Actualizar datos existentes
-                    $asistencia->update([
-                        'estado' => $estado,
-                        'observaciones' => $observaciones
-                    ]);
-                } else {
-                    // Crear nueva asistencia
-                    $asistencia = Asistencia::create([
-                        'fecha_hora' => $fecha,
-                        'tipo_asistencia' => $tipoProc,
-                        'estado' => $estado,
-                        'observaciones' => $observaciones
-                    ]);
+            // Eliminar cualquier asistencia existente para esa fecha y tipo
+            Asistencia::whereDate('fecha_hora', $fecha)
+                ->where('tipo_asistencia', $tipoProc)
+                ->delete();
+
+            // Crear nueva asistencia
+            $asistencia = Asistencia::create([
+                'fecha_hora' => $fecha,
+                'tipo_asistencia' => $tipoProc,
+                'estado' => $estado,
+                'observaciones' => $observaciones
+            ]);
+
+            foreach ($estudiantes as $estudiante) {
+
+                // Obtener el nombre de la beca desde la propiedad
+                $beca = $estudiante->tipoBeca && $estudiante->tipoBeca->propiedade
+                        ? $estudiante->tipoBeca->propiedade->nombre
+                        : null;
+
+                if (!$beca) continue; // saltar estudiantes sin beca o propiedad
+
+                $asignar = false;
+
+                if ($tipoProc === 'Desayuno') {
+                    $asignar = in_array($beca, ['Desayuno', 'Desayuno - Almuerzo']);
+                } elseif ($tipoProc === 'Almuerzo') {
+                    $asignar = in_array($beca, ['Almuerzo', 'Desayuno - Almuerzo']);
                 }
 
-                // Crear o actualizar listado para el estudiante
-                $listado = ListadoAsistencia::where('estudiante_id', $estudiante->id)
-                    ->where('asistencia_id', $asistencia->id)
-                    ->first();
-
-                if ($listado) {
-                    $listado->update([
-                        'observaciones' => $observaciones
-                    ]);
-                } else {
-                    ListadoAsistencia::create([
-                        'estudiante_id' => $estudiante->id,
-                        'asistencia_id' => $asistencia->id,
-                        'observaciones' => $observaciones
-                    ]);
+                if ($asignar) {
+                    // Crear o actualizar ListadoAsistencia
+                    ListadoAsistencia::updateOrCreate(
+                        [
+                            'estudiante_id' => $estudiante->id,
+                            'asistencia_id' => $asistencia->id
+                        ],
+                        [
+                            'observaciones' => $observaciones
+                        ]
+                    );
                 }
             }
         }
 
-        return response()->json(['message' => 'Asistencias creadas/actualizadas correctamente'], 200);
+        return response()->json(['message' => 'Asistencias creadas y asignadas correctamente'], 200);
 
     } catch (\Exception $e) {
         \Log::error('Error al guardar asistencia rápida: ' . $e->getMessage());
         return response()->json(['error' => $e->getMessage()], 500);
     }
 }
+
+
+
 
     public function asistenciaRapidaIndex(Request $request)
     {

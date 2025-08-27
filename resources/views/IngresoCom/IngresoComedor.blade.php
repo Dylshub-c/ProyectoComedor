@@ -202,7 +202,7 @@
 <script>
   document.getElementById('formBuscar').addEventListener('submit', function(e){
     const select = document.getElementById('TipoAsistencia');
-    // Crear un input hidden con el valor del select
+   
     let input = document.createElement('input');
     input.type = 'hidden';
     input.name = 'tipo_asistencia';

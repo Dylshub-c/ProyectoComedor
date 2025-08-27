@@ -84,8 +84,18 @@
         </div>
     <main class="flex-grow-1">
     <div class="container-fluid">
+      @if(session('error'))
+    <div class="alert alert-danger fs-5">
+        {{ session('error') }}
+    </div>
+@endif
     <div class="row">
         <div class="col-3 mb-4 mt-5">
+          <select class="form-select mb-3 fs-5" id="TipoAsistencia" name="tipo_asistencia">
+              <option value="desayuno">Desayuno</option>
+              <option value="almuerzo">Almuerzo</option>
+          </select>
+
             <div id="PrimerModulo" class="container-fluid text-center mt-5">
               @php
     $foto = isset($persona) && $persona?->estudiante?->foto
@@ -155,7 +165,7 @@
                               <i class="fa-regular fa-address-card fa-lg me-1" style="color: #f7f7f7;"></i>
                               | Buscar por cédula
                             </button>
-                            <form action="{{ route('comedor.buscar') }}" method="GET">
+                            <form id="formBuscar" action="{{ route('comedor.buscar') }}" method="GET">
                             @csrf
                             <div class="modal fade" id="modalBuscar" tabindex="-1" aria-labelledby="modalBuscarLabel" aria-hidden="true">
                               <div class="modal-dialog modal-dialog-centered">
@@ -244,6 +254,33 @@
     <script>
         const asistenciasEstudiante = @json($asistencias ?? []);
     </script>
+<script>
+  document.getElementById('formBuscar').addEventListener('submit', function(e){
+    const select = document.getElementById('TipoAsistencia');
+   
+    let input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'tipo_asistencia';
+    input.value = select.value;
+    this.appendChild(input);
+});
+
+</script>
+<script>
+    // Seleccionamos el dropdown
+    const select = document.getElementById('TipoAsistencia');
+
+    // Restaurar la selección anterior al cargar la página
+    const valorGuardado = localStorage.getItem('tipo_asistencia');
+    if(valorGuardado) {
+        select.value = valorGuardado;
+    }
+
+    // Guardar la opción seleccionada cada vez que cambie
+    select.addEventListener('change', () => {
+        localStorage.setItem('tipo_asistencia', select.value);
+    });
+</script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src={{ asset('js/IngresoComedor.js') }}></script>

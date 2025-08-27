@@ -47,6 +47,9 @@ class Estudiante extends Model
     public function persona(){
         return $this->belongsTo(Persona::class);
     }
-
+public function listadosAsistencia()
+{
+    return $this->hasMany(ListadoAsistencia::class);
+}
 
 }

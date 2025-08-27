@@ -9,6 +9,8 @@ use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\TipoBecaController;
 use App\Http\Controllers\AsistenciaController;
+
+use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use Spatie\Permission\Models\Role;
@@ -20,7 +22,6 @@ use Spatie\Permission\Middleware\PermissionMiddleware;
 Route::get('/admin', function() {
     return 'Área admin';
 })->middleware('permission:ver admin');
-
 
 Route::get('/', function () {
     return view('Auth/login'); // Make sure you have a 'login.blade.php' view
@@ -34,6 +35,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 //------------------------------------------
+Route::post('/asistencia-rapida', [AsistenciaController::class, 'guardarAsistenciaRapida'])->name('asistencia.rapida');
 
 // Rutas para ingreso al comedor
 Route::get('/ingreso-comedor', [AsistenciaController::class, 'index'])
@@ -44,9 +46,18 @@ Route::get('/asistencia/buscar', [AsistenciaController::class, 'buscarEstudiante
     ->name('buscar.estudiante')
     ->middleware('permission:ver ingreso comedor');
 
+
+Route::get('/asistencia-rapida', [AsistenciaController::class, 'asistenciaRapidaIndex'])->name('AsistenciaRapida.asistenciaRapida');
+Route::post('/asistencia-rapida', [AsistenciaController::class, 'guardarAsistenciaRapida'])->name('asistencia.rapida.guardar');
+
+Route::get('/ingreso-comedor', [AsistenciaController::class, 'index'])->name('IngresoCom.IngresoComedor');
+Route::get('/asistencia/buscar', [AsistenciaController::class, 'buscarEstudiante'])->name('buscar.estudiante');
+Route::get('/comedor/buscar', [EstudiantesController::class, 'mostrarEnComedor'])->name('comedor.buscar');
+
 Route::get('/comedor/buscar', [EstudiantesController::class, 'mostrarEnComedor'])
     ->name('comedor.buscar')
     ->middleware('permission:ver ingreso comedor');
+
 
 
 // Estudiantes
@@ -54,10 +65,37 @@ Route::get('/estudiantes', [EstudiantesController::class, 'index'])
     ->name('estudiantes.index')
     ->middleware('permission:ver estudiantes');
 
+Route::get('/reporte/descargar', [ReporteController::class, 'descargar'])
+    ->name('Reportes.DescargarReporte');
+
+
+Route::get('/reporte/asistencia/pdf', [ReporteController::class, 'mensualPdf'])
+    ->name('reporte.asistencia.pdf');
+
+Route::get('/reporte/asistencia/pdf', [ReporteController::class, 'pdf'])->name('reporte.asistencia.pdf');
+
+Route::get('/asistencia/revisar/{persona_id?}', [AsistenciaController::class, 'revisarAsistencia'])
+    ->name('asistencia.revisar');
+
+Route::post('/estudiantes/informacion', [EstudianteController::class, 'informacion'])->name('estudiantes.informacion');
+
+
+Route::post('/asistencia/guardar-estudiante', [AsistenciaController::class, 'guardarAsistenciaEstudiante'])
+     ->name('asistencia.guardarEstudiante');
+
+     Route::post('/asistencia/guardar', [AsistenciaController::class, 'guardarAsistenciaEstudiante'])
+    ->name('asistencia.guardar');
+
+//-------------------
+Route::get('/estudiantes', [EstudiantesController::class, 'index'])->name('estudiantes.index');
+// Mostrar el formulario
+Route::get('estudiantes/importar', [EstudiantesController::class, 'formImportar'])->name('estudiantes.importar.form');
+
 // Mostrar el formulario importar estudiantes
 Route::get('estudiantes/importar', [EstudiantesController::class, 'formImportar'])
     ->name('estudiantes.importar.form')
     ->middleware('permission:importar estudiantes');
+
 
 // Procesar la importación
 Route::post('estudiantes/importar', [EstudiantesController::class, 'importar'])

@@ -198,4 +198,57 @@ public function revisarAsistencia(Request $request, $persona_id = null)
 
         return view('Asistencia.Asistenciass', compact('persona', 'listados'));
     }
+
+public function guardarAsistenciaEstudiante(Request $request)
+{
+    $request->validate([
+        'estudiante_id' => 'required|exists:estudiantes,id',
+        'fecha_hora' => 'required|date',
+        'estado' => 'required|in:presente,ausente',
+        'tipo_asistencia' => 'required|array',
+        'tipo_asistencia.*' => 'in:desayuno,almuerzo',
+    ]);
+
+    $estudiante = Estudiante::with('tipoBeca.propiedade')->findOrFail($request->estudiante_id);
+    $beca = $estudiante->tipoBeca->propiedade->nombre ?? '';
+
+    foreach ($request->tipo_asistencia as $tipo) {
+        // Validar que la beca del estudiante incluya el tipo seleccionado
+        if (!in_array($tipo, ['desayuno', 'almuerzo']) || 
+            ($tipo === 'desayuno' && !str_contains(strtolower($beca), 'desayuno')) ||
+            ($tipo === 'almuerzo' && !str_contains(strtolower($beca), 'almuerzo'))
+        ) {
+            return back()->with('error', "El estudiante no tiene la beca correspondiente para: $tipo");
+        }
+
+        // Borrar asistencia del día para ese estudiante y tipo
+        $asistencia = Asistencia::whereDate('fecha_hora', $request->fecha_hora)
+            ->where('tipo_asistencia', $tipo)
+            ->first();
+
+        if ($asistencia) {
+            ListadoAsistencia::where('estudiante_id', $estudiante->id)
+                ->where('asistencia_id', $asistencia->id)
+                ->delete();
+        } else {
+            $asistencia = Asistencia::create([
+                'fecha_hora' => $request->fecha_hora,
+                'tipo_asistencia' => $tipo,
+                'estado' => $request->estado
+            ]);
+        }
+
+        // Crear nueva asistencia para el estudiante
+        ListadoAsistencia::create([
+            'estudiante_id' => $estudiante->id,
+            'asistencia_id' => $asistencia->id
+        ]);
+    }
+
+    return back()->with('success', 'Asistencia guardada correctamente.');
+}
+
+
+
+
 }

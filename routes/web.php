@@ -43,7 +43,11 @@ Route::get('/asistencia/revisar/{persona_id?}', [AsistenciaController::class, 'r
 Route::post('/estudiantes/informacion', [EstudianteController::class, 'informacion'])->name('estudiantes.informacion');
 
 
+Route::post('/asistencia/guardar-estudiante', [AsistenciaController::class, 'guardarAsistenciaEstudiante'])
+     ->name('asistencia.guardarEstudiante');
 
+     Route::post('/asistencia/guardar', [AsistenciaController::class, 'guardarAsistenciaEstudiante'])
+    ->name('asistencia.guardar');
 
 //-------------------
 Route::get('/estudiantes', [EstudiantesController::class, 'index'])->name('estudiantes.index');

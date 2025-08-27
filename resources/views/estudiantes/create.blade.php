@@ -7,7 +7,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
   <link rel="stylesheet" href="{{ asset('css/AnadirEstudiante.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/MenuLateral.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/MenuLateral.css') }}">
 </head>
 <body>
 
@@ -15,60 +15,33 @@
   <div class="position-fixed top-0 start-0 w-100 h-100 z-n1">
     <img src="{{ asset('img/FondoPrincipal.webp') }}" class="w-100 h-100" alt="Fondo">
   </div>
-  <button id="btn-Menu" class="btn ms-3 mb-3 fs-5 py-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
-        <i class="fa-solid fa-bars fa-xl" style="color: #f7f7f7;"></i>
-    </button>
-     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
-        <div class="offcanvas-header justify-content-end">
-            <button type="button" class="btn" data-bs-dismiss="offcanvas" aria-label="Close"> <i class="fa-solid fa-xmark fa-2xl" style="color: #f7f7f7;"></i> </button>
-        </div>
-        <div class="offcanvas-body">
-            <div class="d-grid gap-3">
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location.href='{{ route('admin.home') }}'">
-                    <i class="fa-solid fa-house-chimney fa-lg" id="icono-menu" ></i>
-                    | Home
-                </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('IngresoCom.IngresoComedor') }}'">
-                    <i class="fa-solid fa-clipboard-list fa-lg" id="icono-menu"></i>
-                    | Ingreso al comedor
-                </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('estudiantes.importar.form') }}'">
-                    <i class="fa-solid fa-street-view fa-lg" id="icono-menu"></i>
-                    | Agregar estudiantes
-                </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('estudiantes.informacion') }}'">
-                    <i class="fa-solid fa-address-card fa-lg" id="icono-menu"></i>
-                    | Ver lista de estudiantes
-                </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
-                    <i class="fa-solid fa-download fa-lg" id="icono-menu"></i>
-                    | Descargar reportes
-                </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
-                    <i class="fa-solid fa-calendar-check fa-lg" id="icono-menu"></i>
-                    | Gestionar asistencias
-                </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('tipobeca.index') }}'">
-                    <i class="fa-solid fa-hand-holding-medical fa-lg" id="icono-menu"></i>
-                    | Becas
-                </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
-                    <i class="fa-solid fa-star-half-stroke fa-lg" id="icono-menu"></i>
-                    | Asistencia rápida
-                </button>
 
-            </div>
-        </div>
-        <div class="offcanvas-footer p-3 border-top">
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
-                <i class="fa-solid fa-arrow-right-to-bracket fa-lg" id="icono-menu"></i>
-                | Cerrar sesión
-                </button>
-            </form>
-            </div>
-        </div>
+  <!-- Botón y menú lateral -->
+  <button id="btn-Menu" class="btn ms-3 mb-3 fs-5 py-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample" aria-label="Abrir menú">
+    <i class="fa-solid fa-bars fa-xl" style="color: #f7f7f7;"></i>
+  </button>
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+    <div class="offcanvas-header justify-content-end">
+      <button type="button" class="btn" data-bs-dismiss="offcanvas" aria-label="Cerrar menú">
+        <i class="fa-solid fa-xmark fa-2xl" style="color: #f7f7f7;"></i>
+      </button>
+    </div>
+    <div class="offcanvas-body">
+      <div class="d-grid gap-3">
+        <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location.href='{{ route('admin.home') }}'">
+          <i class="fa-solid fa-house-chimney fa-lg" id="icono-menu"></i> | Home
+        </button>
+      </div>
+    </div>
+    <div class="offcanvas-footer p-3 border-top">
+      <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+          <i class="fa-solid fa-arrow-right-to-bracket fa-lg" id="icono-menu"></i> | Cerrar sesión
+        </button>
+      </form>
+    </div>
+  </div>
 
   <!-- Header -->
   <div class="container-fluid mb-5">
@@ -82,71 +55,97 @@
       </div>
     </div>
   </div>
+
   @if ($errors->any())
     <div class="alert alert-danger">
-        <ul class="mb-0">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
+      <ul class="mb-0">
+        @foreach ($errors->all() as $error)
+          <li>{{ $error }}</li>
+        @endforeach
+      </ul>
     </div>
-@endif
+  @endif
 
   <!-- Formulario -->
   <div class="container-fluid h-100 overflow-hidden d-flex justify-content-center align-items-center p-5 pt-0 mb-4">
     <div class="card rounded-4 shadow p-4 w-100">
       <div class="row g-3 align-items-center">
-        <!-- Columna izquierda -->
+
+        <!-- Formulario (8 columnas) -->
         <div class="col-md-8">
           <h1 class="fw-bold color4 mb-4 ps-3">Crear Estudiante</h1>
 
-          <form action="{{ route('estudiantes.store') }}" method="POST" enctype="multipart/form-data">
+          <form action="{{ route('estudiantes.store') }}" method="POST" enctype="multipart/form-data" id="form-estudiante">
             @csrf
 
-            <div class="mb-4 row align-items-start">
-              <label for="nombre" class="col-sm-3 col-form-label text-end color1 fs-5"><strong>Nombre completo</strong></label>
+            <!-- Select rol -->
+            <div class="mb-4 row align-items-center">
+              <label for="rol" class="col-sm-3 col-form-label text-end color1 fs-5"><strong>Rol</strong></label>
               <div class="col-sm-9">
-                <input type="text" id="nombre" name="nombre" class="form-input-flex inputColor fs-5" placeholder="Ingrese nombre completo" required>
-              </div>
-            </div>
-
-            <div class="mb-4 row align-items-start">
-              <label for="cedula" class="col-sm-3 col-form-label text-end color1 fs-5"><strong>Cédula</strong></label>
-              <div class="col-sm-9">
-                <input type="text" id="cedula" name="cedula" class="form-input-flex inputColor fs-5" placeholder="Ingrese la cédula" required>
-              </div>
-            </div>
-
-            <div class="mb-4 row align-items-start">
-              <label for="seccion" class="col-sm-3 col-form-label text-end color1 fs-5"><strong>Sección</strong></label>
-              <div class="col-sm-9">
-                <input type="text" id="seccion" name="seccion" class="form-input-flex inputColor fs-5" placeholder="Ingrese la sección" required>
-              </div>
-            </div>
-
-            <div class="mb-4 row align-items-start">
-              <label for="especialidad" class="col-sm-3 col-form-label text-end color1 fs-5 text-end"><strong>Especialidad</strong></label>
-              <div class="col-sm-9">
-                <input type="text" id="especialidad" name="especialidad" class="form-input-flex inputColor fs-5" placeholder="Ingrese la especialidad" required>
-              </div>
-            </div>
-
-            <div class="mb-2 row align-items-start">
-              <label for="tipo_beca_id" class="col-sm-3 col-form-label text-end color1 fs-5"><strong>Tipo de beca</strong></label>
-              <div class="col-sm-9">
-                <select id="tipo_beca_id" name="tipo_beca_id" class="form-select inputColor fs-5" required>
-                  <option disabled selected value="">Seleccione una opción</option>
-                  @foreach ($tiposBeca as $beca)
-                    <option value="{{ $beca->id }}">{{ $beca->propiedade->nombre }}</option>
+                <select id="rol" name="rol" class="form-select inputColor fs-5" required>
+                  <option value="" selected disabled>Seleccione un rol</option>
+                  @foreach ($roles as $rol)
+                    <option value="{{ $rol->name }}">{{ ucfirst($rol->name) }}</option>
                   @endforeach
                 </select>
               </div>
             </div>
 
-            <div id="mensajeError" class="text-danger ms-5 mt-1 d-none">
-              <i class="bi bi-exclamation-circle-fill fs-5"></i> Llene todos los campos para continuar
+            <!-- Campos comunes (nombre, cedula) -->
+            <div id="campos-comunes" style="display:none;">
+              <div class="mb-4 row align-items-center">
+                <label for="nombre" class="col-sm-3 col-form-label text-end color1 fs-5"><strong>Nombre completo</strong></label>
+                <div class="col-sm-9">
+                  <input type="text" id="nombre" name="nombre" class="form-input-flex inputColor fs-5" placeholder="Ingrese nombre completo" >
+                </div>
+              </div>
+
+              <div class="mb-4 row align-items-center">
+                <label for="cedula" class="col-sm-3 col-form-label text-end color1 fs-5"><strong>Cédula</strong></label>
+                <div class="col-sm-9">
+                  <input type="text" id="cedula" name="cedula" class="form-input-flex inputColor fs-5" placeholder="Ingrese la cédula" >
+                </div>
+              </div>
             </div>
 
+            <!-- Campo correo (solo para roles que no sean estudiante) -->
+            <div id="campo-correo" style="display:none;" class="mb-4 row align-items-center">
+              <label for="correo" class="col-sm-3 col-form-label text-end color1 fs-5"><strong>Correo electrónico</strong></label>
+              <div class="col-sm-9">
+                <input type="email" id="correo" name="correo" class="form-input-flex inputColor fs-5" placeholder="Ingrese correo electrónico" >
+              </div>
+            </div>
+
+            <!-- Campos estudiante -->
+            <div id="campos-estudiante" style="display:none;">
+              <div class="mb-4 row align-items-center">
+                <label for="seccion" class="col-sm-3 col-form-label text-end color1 fs-5"><strong>Sección</strong></label>
+                <div class="col-sm-9">
+                  <input type="text" id="seccion" name="seccion" class="form-input-flex inputColor fs-5" placeholder="Ingrese la sección" >
+                </div>
+              </div>
+
+              <div class="mb-4 row align-items-center">
+                <label for="especialidad" class="col-sm-3 col-form-label text-end color1 fs-5"><strong>Especialidad</strong></label>
+                <div class="col-sm-9">
+                  <input type="text" id="especialidad" name="especialidad" class="form-input-flex inputColor fs-5" placeholder="Ingrese la especialidad" >
+                </div>
+              </div>
+
+              <div class="mb-4 row align-items-center">
+                <label for="tipo_beca_id" class="col-sm-3 col-form-label text-end color1 fs-5"><strong>Tipo de beca</strong></label>
+                <div class="col-sm-9">
+                  <select id="tipo_beca_id" name="tipo_beca_id" class="form-select inputColor fs-5" >
+                    <option disabled selected value="">Seleccione una opción</option>
+                    @foreach ($tiposBeca as $beca)
+                      <option value="{{ $beca->id }}">{{ $beca->propiedade->nombre }}</option>
+                    @endforeach
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botones -->
             <div class="d-flex justify-content-start gap-3 mt-4 pe-5 ms-5">
               <button type="submit" class="btnPrimario fs-5 ms-5">
                 <i class="bi bi-save2-fill"></i> Guardar
@@ -155,54 +154,100 @@
                 <i class="bi bi-x-circle-fill"></i> Cancelar
               </button>
             </div>
-            <input type="file" id="foto" name="foto" accept="image/*" style="display:none" />
+
+            <!-- Input oculto para la foto -->
+            <input type="file" id="foto" name="foto" accept="image/*" hidden />
           </form>
         </div>
 
-        <div class="col-md-4 text-center mb-4">
-  <div class="foto-estudiante-wrapper">
-    <!-- Imagen redonda -->
-    <img
-      id="previewFoto"
-      src="{{ asset('img/FotoEstudiante.webp') }}"
-      alt="Previsualización Foto"
-      class="foto-estudiante"
-    />
+        <!-- Foto (4 columnas) alineada verticalmente -->
+        <div class="col-md-4 d-flex align-items-center" id="foto-wrapper" style="display:none;">
+          <div class="foto-estudiante-wrapper">
+            <img
+              id="previewFoto"
+              src="{{ asset('img/FotoEstudiante.webp') }}"
+              alt="Previsualización Foto"
+              class="foto-estudiante"
+            />
 
-    <!-- Botón para subir imagen -->
-    <button
-      class="btn-agregar-foto"
-      type="button"
-      title="Agregar imagen"
-      onclick="document.getElementById('foto').click()"
-    >
-      <i class="bi bi-plus fs-4"></i>
-    </button>
-  </div>
-
-  <!-- Input de archivo oculto -->
-  <input type="file" id="foto" name="foto" accept="image/*" hidden />
-</div>
-
-
-
-
+            <button
+              class="btn-agregar-foto"
+              type="button"
+              title="Agregar imagen"
+              onclick="document.getElementById('foto').click()"
+            >
+              <i class="bi bi-plus fs-4"></i>
+            </button>
+          </div>
+        </div>
 
       </div>
     </div>
   </div>
-  <script>
-    document.getElementById('foto').addEventListener('change', function(event) {
-  const [file] = this.files;
-  if (file) {
-    const preview = document.getElementById('previewFoto');
-    preview.src = URL.createObjectURL(file);
-    // Ocultamos el icono persona porque ya mostramos la imagen
-    const icono = document.querySelector('.icono-avatar');
-    if(icono) icono.style.display = 'none';
+
+<script>
+  const rolSelect = document.getElementById('rol');
+  const camposComunes = document.getElementById('campos-comunes');
+  const camposEstudiante = document.getElementById('campos-estudiante');
+  const fotoWrapper = document.getElementById('foto-wrapper');
+  const campoCorreo = document.getElementById('campo-correo');
+
+  function actualizarCampos() {
+    const rol = rolSelect.value?.toLowerCase() || '';
+
+    // Ocultar todo por defecto usando !important
+    camposComunes.style.setProperty('display', 'none', 'important');
+    camposEstudiante.style.setProperty('display', 'none', 'important');
+    fotoWrapper.style.setProperty('display', 'none', 'important');
+    campoCorreo.style.setProperty('display', 'none', 'important');
+
+    // Resetear required
+    ['nombre', 'cedula', 'correo', 'seccion', 'especialidad', 'tipo_beca_id', 'foto'].forEach(id => {
+      const el = document.getElementById(id);
+      if(el) el.required = false;
+    });
+
+    if (!rol) return;
+
+    // Campos comunes visibles
+    camposComunes.style.setProperty('display', 'block', 'important');
+    ['nombre', 'cedula'].forEach(id => {
+      const el = document.getElementById(id);
+      if(el) el.required = true;
+    });
+
+    if (rol === 'estudiante') {
+      camposEstudiante.style.setProperty('display', 'block', 'important');
+      fotoWrapper.style.setProperty('display', 'flex', 'important'); // foto visible solo para estudiante
+      campoCorreo.style.setProperty('display', 'none', 'important');
+
+      ['seccion', 'especialidad'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.required = true;
+      });
+
+    } else {
+      // Para otros roles
+      campoCorreo.style.setProperty('display', 'flex', 'important');
+      const correo = document.getElementById('correo');
+      if(correo) correo.required = true;
+    }
   }
-});
-  </script>
+
+  // Ejecutar al cambiar rol
+  rolSelect.addEventListener('change', actualizarCampos);
+
+  // Ejecutar al cargar la página
+  window.addEventListener('DOMContentLoaded', actualizarCampos);
+
+  // Previsualización de foto
+  document.getElementById('foto').addEventListener('change', function() {
+    const [file] = this.files;
+    if(file) {
+      document.getElementById('previewFoto').src = URL.createObjectURL(file);
+    }
+  });
+</script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>

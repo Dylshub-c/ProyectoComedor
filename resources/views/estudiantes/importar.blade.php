@@ -41,11 +41,11 @@
                 </button>
                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('estudiantes.importar.form') }}'">
                     <i class="fa-solid fa-street-view fa-lg" id="icono-menu"></i>
-                    | Agregar estudiantes
+                    | Agregar usuarios
                 </button>
                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('estudiantes.informacion') }}'">
                     <i class="fa-solid fa-address-card fa-lg" id="icono-menu"></i>
-                    | Ver lista de estudiantes
+                    | Ver lista de usuarios
                 </button>
                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
                     <i class="fa-solid fa-download fa-lg" id="icono-menu"></i>
@@ -96,9 +96,9 @@
                 </div>
 
                 <div class="col-5 px-5">
-                    <h2 class="mt-3">Subir estudiantes desde la aplicación (individualmente):</h2>
+                    <h2 class="mt-3">Subir usuarios desde la aplicación (individualmente):</h2>
                     <button type="btn btn-success" id="btnIndividual" class="btn fs-5 mb-4 mt-4 px-4 py-2" onclick="window.location='{{ route('estudiantes.create') }}'">
-                        <i class="fa-solid fa-user-plus fa-lg" style="color: #f7f7f7;"></i> | Nuevo estudiante
+                        <i class="fa-solid fa-user-plus fa-lg" style="color: #f7f7f7;"></i> | Nuevo usuario
                     </button>
                 </div>
 

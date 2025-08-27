@@ -9,60 +9,134 @@ use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\TipoBecaController;
 use App\Http\Controllers\AsistenciaController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\PermissionController;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use App\Http\Kernel;
+use Spatie\Permission\Middleware\PermissionMiddleware;
+
+
+Route::get('/admin', function() {
+    return 'Área admin';
+})->middleware('permission:ver admin');
+
 
 Route::get('/', function () {
     return view('Auth/login'); // Make sure you have a 'login.blade.php' view
 
 });
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::resource('roles', RoleController::class);
+    Route::resource('permissions', PermissionController::class);
+});
+
 //------------------------------------------
 
+// Rutas para ingreso al comedor
+Route::get('/ingreso-comedor', [AsistenciaController::class, 'index'])
+    ->name('IngresoCom.IngresoComedor')
+    ->middleware('permission:ver ingreso comedor');
 
-Route::get('/ingreso-comedor', [AsistenciaController::class, 'index'])->name('IngresoCom.IngresoComedor');
-Route::get('/asistencia/buscar', [AsistenciaController::class, 'buscarEstudiante'])->name('buscar.estudiante');
-Route::get('/comedor/buscar', [EstudiantesController::class, 'mostrarEnComedor'])->name('comedor.buscar');
+Route::get('/asistencia/buscar', [AsistenciaController::class, 'buscarEstudiante'])
+    ->name('buscar.estudiante')
+    ->middleware('permission:ver ingreso comedor');
+
+Route::get('/comedor/buscar', [EstudiantesController::class, 'mostrarEnComedor'])
+    ->name('comedor.buscar')
+    ->middleware('permission:ver ingreso comedor');
 
 
-//-------------------
+// Estudiantes
+Route::get('/estudiantes', [EstudiantesController::class, 'index'])
+    ->name('estudiantes.index')
+    ->middleware('permission:ver estudiantes');
 
-Route::get('/estudiantes', [EstudiantesController::class, 'index'])->name('estudiantes.index');
-// Mostrar el formulario
-Route::get('estudiantes/importar', [EstudiantesController::class, 'formImportar'])->name('estudiantes.importar.form');
+// Mostrar el formulario importar estudiantes
+Route::get('estudiantes/importar', [EstudiantesController::class, 'formImportar'])
+    ->name('estudiantes.importar.form')
+    ->middleware('permission:importar estudiantes');
 
 // Procesar la importación
-Route::post('estudiantes/importar', [EstudiantesController::class, 'importar'])->name('estudiantes.importar');
+Route::post('estudiantes/importar', [EstudiantesController::class, 'importar'])
+    ->name('estudiantes.importar')
+    ->middleware('permission:importar estudiantes');
 
-// Ruta para eliminar todos los estudiantes importados
-Route::delete('/estudiantes/eliminar-lista', [EstudiantesController::class, 'eliminarLista'])->name('estudiantes.eliminarLista');
+// Eliminar todos los estudiantes importados
+Route::delete('/estudiantes/eliminar-lista', [EstudiantesController::class, 'eliminarLista'])
+    ->name('estudiantes.eliminarLista')
+    ->middleware('permission:eliminar estudiantes');
 
-// Ruta para recargar lista (simplemente la vista sin estudiantes)
-Route::get('/estudiantes/recargar-lista', [EstudiantesController::class, 'recargarLista'])->name('estudiantes.recargarLista');
+// Recargar lista (vista sin estudiantes)
+Route::get('/estudiantes/recargar-lista', [EstudiantesController::class, 'recargarLista'])
+    ->name('estudiantes.recargarLista')
+    ->middleware('permission:ver estudiantes');
 
+// Información estudiantes
+Route::get('/estudiantes/informacion', [EstudiantesController::class, 'informacion'])
+    ->middleware('permission:ver estudiantes');
 
-// Rutas para el controlador de estudiantes
-Route::get('/estudiantes/informacion', [EstudiantesController::class, 'informacion']);
 Route::post('/estudiantes/informacion', [EstudiantesController::class, 'informacion'])
-    ->name('estudiantes.informacion');
+    ->name('estudiantes.informacion')
+    ->middleware('permission:ver estudiantes');
+
+// Actualizar estudiante
 Route::put('/estudiantes/{persona}', [EstudiantesController::class, 'update'])
-    ->name('estudiantes.update');
+    ->name('estudiantes.update')
+    ->middleware('permission:editar estudiantes');
+
+// Crear estudiante (formulario y guardar)
 Route::get('/estudiantes/create', [EstudiantesController::class, 'create'])
-    ->name('estudiantes.create');
+    ->name('estudiantes.create')
+    ->middleware('permission:crear estudiantes');
+
 Route::post('/estudiantes', [EstudiantesController::class, 'store'])
-    ->name('estudiantes.store');
+    ->name('estudiantes.store')
+    ->middleware('permission:crear estudiantes');
+
+// Eliminar estudiante
 Route::delete('/estudiantes/{persona}', [EstudiantesController::class, 'destroy'])
-    ->name('estudiantes.destroy');
+    ->name('estudiantes.destroy')
+    ->middleware('permission:eliminar estudiantes');
 
 
-//controlador de tipoBeca
-Route::get('/tipobeca', [TipoBecaController::class, 'index'])->name('tipobeca.index');
-Route::get('/tipobeca/create', [TipoBecaController::class, 'create'])->name('tipobeca.create');
-Route::post('/tipobeca', [TipoBecaController::class, 'store'])->name('tipobeca.store');
-Route::get('/tipobeca/{id}/edit', [TipoBecaController::class, 'edit'])->name('tipobeca.edit');
-Route::put('/tipobeca/{id}', [TipoBecaController::class, 'update'])->name('tipobeca.update');
-Route::delete('/tipobeca/{id}', [TipoBecaController::class, 'destroy'])->name('tipobeca.destroy');
+// Tipo Beca
+Route::get('/tipobeca', [TipoBecaController::class, 'index'])
+    ->name('tipobeca.index')
+    ->middleware('permission:ver tipo beca');
+
+Route::get('/tipobeca/create', [TipoBecaController::class, 'create'])
+    ->name('tipobeca.create')
+    ->middleware('permission:crear tipo beca');
+
+Route::post('/tipobeca', [TipoBecaController::class, 'store'])
+    ->name('tipobeca.store')
+    ->middleware('permission:crear tipo beca');
+
+Route::get('/tipobeca/{id}/edit', [TipoBecaController::class, 'edit'])
+    ->name('tipobeca.edit')
+    ->middleware('permission:editar tipo beca');
+
+Route::put('/tipobeca/{id}', [TipoBecaController::class, 'update'])
+    ->name('tipobeca.update')
+    ->middleware('permission:editar tipo beca');
+
+Route::delete('/tipobeca/{id}', [TipoBecaController::class, 'destroy'])
+    ->name('tipobeca.destroy')
+    ->middleware('permission:eliminar tipo beca');
 
 
-Route::get('/subir-fotos', [FotoController::class, 'showForm'])->name('subir-fotos.form');
-Route::post('/subir-fotos', [FotoController::class, 'importarFotos'])->name('subir-fotos.importar');
+// Fotos
+Route::get('/subir-fotos', [FotoController::class, 'showForm'])
+    ->name('subir-fotos.form')
+    ->middleware('permission:subir fotos');
+
+Route::post('/subir-fotos', [FotoController::class, 'importarFotos'])
+    ->name('subir-fotos.importar')
+    ->middleware('permission:subir fotos');
+
 
 
 Route::get('/admin/forgot-password', [PasswordResetController::class, 'showResetForm'])->name('admin.password.request');
@@ -79,7 +153,7 @@ Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Ruta protegida para el admin
-Route::middleware('auth')->group(function () {
+Route::prefix('admin')->middleware(['auth', 'permission:administrar usuarios'])->group(function () {
     Route::get('/home', function () {
         return view('home');
     })->name('admin.home');

@@ -21,7 +21,7 @@
           <div class="icon-box" role="button" data-bs-toggle="modal" data-bs-target="#userInfoModal">
             <i class="bi bi-person-circle" id="iconUser"></i>
           </div>
-          <span id="nombre-orientadora" class="fw-bold">Natalia</span>
+          <span id="nombre-orientadora" class="fw-bold">{{ auth()->user()->persona->Nombre }}</span>
         </div>
         <img class="logo" src="../img/LogoCovao.webp" alt="Logo">
       </div>
@@ -32,7 +32,7 @@
         <i class="bi bi-list fs-2"></i>
         </button>
       </div>
-      
+
     </div>
   </div>
 
@@ -56,7 +56,7 @@
             <div class="card-overlay"></div>
             <div class="card-content text-start">
               <i class="bi bi-people-fill card-icon"></i>
-              Información de estudiantes
+              Información de usuarios
             </div>
           </div>
         </a>
@@ -78,7 +78,7 @@
             <div class="card-overlay"></div>
             <div class="card-content text-start">
               <i class="bi bi-person-plus-fill card-icon"></i>
-              Agregar Estudiantes
+              Agregar usuarios
             </div>
           </div>
         </a>
@@ -118,7 +118,7 @@
           Opciones Adicionales
         </div>
         <div class="modal-footer d-flex justify-content-center gap-3 border-0 pb-4">
-          <button type="button" class="btn btn-modal-gestionar" href='#'>Gestionar Administradores</button>
+          <a href="{{ route('roles.index') }}" class="btn btn-modal-gestionar">Gestionar Roles</a>
 
           <form method="POST" action="{{ route('logout') }}">
             @csrf

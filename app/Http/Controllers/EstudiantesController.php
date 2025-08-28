@@ -40,13 +40,16 @@ class EstudiantesController extends Controller
      */
     public function index()
     {
-        $estudiantes = Estudiante::with(['persona', 'especialidade.propiedade', 'seccione.propiedade', 'tipoBeca.propiedade'])->get();
+        $estudiantes = Estudiante::with([
+            'persona',
+            'especialidade.propiedade',
+            'seccione.propiedade',
+            'tipoBecas.propiedade' // <- ahora plural
+        ])->get();
+
         return view('estudiantes.informacion', compact('estudiantes'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $tiposBeca = TipoBeca::with('propiedade')->get();
@@ -55,269 +58,252 @@ class EstudiantesController extends Controller
         return view('estudiantes.create', compact('tiposBeca', 'roles'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-public function store(Request $request)
-{
-    // Validación general
-    $request->validate([
-        'nombre' => 'required|string',
-        'cedula' => 'required|string|unique:personas,Cedula',
-        'rol' => 'required|exists:roles,name',
-        'seccion' => 'required_if:rol,Estudiante|string|nullable',
-        'especialidad' => 'required_if:rol,Estudiante|string|nullable',
-        'tipo_beca_id' => 'required_if:rol,Estudiante|nullable|exists:tipo_becas,id',
-        'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-    ]);
-
-    // Validar correo solo si no es estudiante
-    if (strtolower($request->rol) !== 'estudiante') {
+    public function store(Request $request)
+    {
+        // Validación general
         $request->validate([
-            'correo' => 'required|email'
-        ]);
-    }
-
-    // Dividir nombre completo
-    $partes = explode(' ', trim($request->nombre));
-    $nombre = '';
-    $primerApellido = '';
-    $segundoApellido = '';
-
-    if(count($partes) >= 3){
-        $segundoApellido = array_pop($partes);
-        $primerApellido = array_pop($partes);
-        $nombre = implode(' ', $partes);
-    } elseif(count($partes) == 2){
-        $primerApellido = array_pop($partes);
-        $nombre = $partes[0];
-    } elseif(count($partes) == 1){
-        $nombre = $partes[0];
-    }
-
-    DB::beginTransaction();
-    try {
-        // Crear persona
-        $persona = Persona::create([
-            'Nombre' => $nombre,
-            'PrimerApellido' => $primerApellido,
-            'SegundoApellido' => $segundoApellido,
-            'Cedula' => $request->cedula,
-            'TipoUsuario' => $request->rol,
+            'nombre' => 'required|string',
+            'cedula' => 'required|string|unique:personas,Cedula',
+            'rol' => 'required|exists:roles,name',
+            'seccion' => 'required_if:rol,Estudiante|string|nullable',
+            'especialidad' => 'required_if:rol,Estudiante|string|nullable',
+            'tipo_beca_id' => 'required_if:rol,Estudiante|array|nullable',
+            'tipo_beca_id.*' => 'exists:tipo_becas,id',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Si no es estudiante, crear usuario
-        if(strtolower($request->rol) !== 'estudiante'){
-            $password = Str::random(10);
-            $user = User::firstOrCreate(
-                ['email' => $request->correo],
-                [
-                    'persona_id' => $persona->id,
-                    'password' => bcrypt($password),
-                ]
-            );
-
-            // Asignar rol
-            $rol = Role::firstOrCreate(['name' => $request->rol]);
-            $user->syncRoles([$rol->id]);
-
-            // Sincronizar permisos del rol al usuario
-            $user->syncPermissions($rol->permissions);
-
-            // Enviar correo si se creó el usuario
-            if($user->wasRecentlyCreated){
-                Mail::to($user->email)->send(new \App\Mail\AdminRegisteredMail(
-                    $request->correo,
-                    $password,
-                    $persona->Nombre
-                ));
-            }
-        }
-
-        // Si es estudiante, crear registro en estudiantes
-        if(strtolower($request->rol) === 'estudiante'){
-            $fotoRuta = null;
-            if($request->hasFile('foto')){
-                $file = $request->file('foto');
-                $nombreArchivo = time() . '_' . $file->getClientOriginalName();
-                $rutaDestino = public_path('fotos');
-                if(!file_exists($rutaDestino)) mkdir($rutaDestino, 0755, true);
-                $file->move($rutaDestino, $nombreArchivo);
-                $fotoRuta = 'fotos/' . $nombreArchivo;
-            }
-
-            $especialidadProp = Propiedade::firstOrCreate(['nombre' => $request->especialidad]);
-            $seccionProp = Propiedade::firstOrCreate(['nombre' => $request->seccion]);
-
-            $especialidad = Especialidade::firstOrCreate(['propiedade_id' => $especialidadProp->id]);
-            $seccion = Seccione::firstOrCreate(['propiedade_id' => $seccionProp->id]);
-            $tipoBeca = TipoBeca::findOrFail($request->tipo_beca_id);
-
-            Estudiante::create([
-                'persona_id' => $persona->id,
-                'especialidade_id' => $especialidad->id,
-                'seccione_id' => $seccion->id,
-                'tipo_beca_id' => $tipoBeca->id,
-                'foto' => $fotoRuta,
+        // Validar correo solo si no es estudiante
+        if (strtolower($request->rol) !== 'estudiante') {
+            $request->validate([
+                'correo' => 'required|email'
             ]);
         }
 
-        DB::commit();
-        return redirect()->route('estudiantes.informacion')
-                         ->with('success', 'Registro completado correctamente.');
+        // Dividir nombre completo
+        $partes = explode(' ', trim($request->nombre));
+        $nombre = '';
+        $primerApellido = '';
+        $segundoApellido = '';
 
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return back()->withErrors(['error' => 'Error al guardar: '.$e->getMessage()])
-                     ->withInput();
+        if (count($partes) >= 3) {
+            $segundoApellido = array_pop($partes);
+            $primerApellido = array_pop($partes);
+            $nombre = implode(' ', $partes);
+        } elseif (count($partes) == 2) {
+            $primerApellido = array_pop($partes);
+            $nombre = $partes[0];
+        } elseif (count($partes) == 1) {
+            $nombre = $partes[0];
+        }
+
+        DB::beginTransaction();
+        try {
+            // Crear persona
+            $persona = Persona::create([
+                'Nombre' => $nombre,
+                'PrimerApellido' => $primerApellido,
+                'SegundoApellido' => $segundoApellido,
+                'Cedula' => $request->cedula,
+                'TipoUsuario' => $request->rol,
+            ]);
+
+            // Si no es estudiante, crear usuario
+            if (strtolower($request->rol) !== 'estudiante') {
+                $password = Str::random(10);
+                $user = User::firstOrCreate(
+                    ['email' => $request->correo],
+                    [
+                        'persona_id' => $persona->id,
+                        'password' => bcrypt($password),
+                    ]
+                );
+
+                // Asignar rol
+                $rol = Role::firstOrCreate(['name' => $request->rol]);
+                $user->syncRoles([$rol->id]);
+
+                // Sincronizar permisos del rol al usuario
+                $user->syncPermissions($rol->permissions);
+
+                // Enviar correo si se creó el usuario
+                if ($user->wasRecentlyCreated) {
+                    Mail::to($user->email)->send(new \App\Mail\AdminRegisteredMail(
+                        $request->correo,
+                        $password,
+                        $persona->Nombre
+                    ));
+                }
+            }
+
+            // Si es estudiante, crear registro en estudiantes
+            if (strtolower($request->rol) === 'estudiante') {
+                $fotoRuta = null;
+                if ($request->hasFile('foto')) {
+                    $file = $request->file('foto');
+                    $nombreArchivo = time() . '_' . $file->getClientOriginalName();
+                    $rutaDestino = public_path('fotos');
+                    if (!file_exists($rutaDestino)) mkdir($rutaDestino, 0755, true);
+                    $file->move($rutaDestino, $nombreArchivo);
+                    $fotoRuta = 'fotos/' . $nombreArchivo;
+                }
+
+                $especialidadProp = Propiedade::firstOrCreate(['nombre' => $request->especialidad]);
+                $seccionProp = Propiedade::firstOrCreate(['nombre' => $request->seccion]);
+
+                $especialidad = Especialidade::firstOrCreate(['propiedade_id' => $especialidadProp->id]);
+                $seccion = Seccione::firstOrCreate(['propiedade_id' => $seccionProp->id]);
+
+                $estudiante = Estudiante::create([
+                    'persona_id' => $persona->id,
+                    'especialidade_id' => $especialidad->id,
+                    'seccione_id' => $seccion->id,
+                    'foto' => $fotoRuta,
+                ]);
+
+                // Asignar becas (array)
+                if ($request->has('tipo_beca_id')) {
+                    $estudiante->tipoBecas()->attach($request->tipo_beca_id);
+                }
+            }
+
+            DB::commit();
+            return redirect()->route('estudiantes.informacion')
+                ->with('success', 'Registro completado correctamente.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors(['error' => 'Error al guardar: ' . $e->getMessage()])
+                ->withInput();
+        }
     }
-}
 
-
-
-
-
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-   public function informacion(Request $request)
-{
-    $editar = $request->input('editar') == 1;
-    $persona = null;
+    public function informacion(Request $request)
+    {
+        $editar = $request->input('editar') == 1;
+        $persona = null;
 
-    // Obtener todos los roles para el select
-    $roles = Role::all();
+        $roles = Role::all();
 
-    // Primero revisa si tienes persona guardada en sesión
-    if (session()->has('persona_id')) {
-        $persona = Persona::with([
-            'estudiante.seccione.propiedade',
-            'estudiante.especialidade.propiedade',
-            'estudiante.tipoBeca.propiedade',
-            'usuario.roles' // Cambiado de user.roles a usuario.roles
-        ])->find(session('persona_id'));
+        if (session()->has('persona_id')) {
+            $persona = Persona::with([
+                'estudiante.seccione.propiedade',
+                'estudiante.especialidade.propiedade',
+                'estudiante.tipoBecas.propiedade',
+                'usuario.roles'
+            ])->find(session('persona_id'));
+        }
+
+        if ($request->isMethod('post') && ($request->filled('cedula') || $request->filled('nombre') || $request->filled('rol'))) {
+            $query = Persona::with([
+                'estudiante.seccione.propiedade',
+                'estudiante.especialidade.propiedade',
+                'estudiante.tipoBecas.propiedade',
+                'usuario.roles'
+            ])->where('TipoUsuario', 'Estudiante');
+
+            if ($request->filled('cedula')) {
+                $query->where('Cedula', $request->cedula);
+            }
+
+            if ($request->filled('nombre')) {
+                $nombre = $request->nombre;
+                $query->whereRaw("CONCAT(Nombre, ' ', PrimerApellido, ' ', SegundoApellido) LIKE ?", ["%{$nombre}%"]);
+            }
+
+            if ($request->filled('rol')) {
+                $rol = $request->rol;
+                $query->whereHas('usuario.roles', function ($q) use ($rol) {
+                    $q->where('name', $rol);
+                });
+            }
+
+            $persona = $query->first();
+
+            if ($persona) {
+                session(['persona_id' => $persona->id]);
+            }
+        }
+
+        if (!$persona) {
+            session()->forget('persona_id');
+        }
+
+        $secciones = Seccione::all();
+        $especialidades = Especialidade::all();
+        $tiposBeca = TipoBeca::all();
+
+        return view('estudiantes.informacion', compact('persona', 'editar', 'secciones', 'especialidades', 'tiposBeca', 'roles'));
     }
-
-    // Si no hay persona en sesión, buscar por cédula, nombre o rol (solo en POST)
-    if ($request->isMethod('post') && ($request->filled('cedula') || $request->filled('nombre') || $request->filled('rol'))) {
-        $query = Persona::with([
-            'estudiante.seccione.propiedade',
-            'estudiante.especialidade.propiedade',
-            'estudiante.tipoBeca.propiedade',
-            'usuario.roles'
-        ])->where('TipoUsuario', 'Estudiante');
-
-        if ($request->filled('cedula')) {
-            $query->where('Cedula', $request->cedula);
-        }
-
-        if ($request->filled('nombre')) {
-            $nombre = $request->nombre;
-            $query->whereRaw("CONCAT(Nombre, ' ', PrimerApellido, ' ', SegundoApellido) LIKE ?", ["%{$nombre}%"]);
-        }
-
-        if ($request->filled('rol')) {
-            $rol = $request->rol;
-            $query->whereHas('usuario.roles', function($q) use ($rol) {
-                $q->where('name', $rol);
-            });
-        }
-
-        $persona = $query->first();
-
-        if ($persona) {
-            // Guarda el id en sesión para futuras vistas
-            session(['persona_id' => $persona->id]);
-        }
-    }
-
-    // Si no hay persona, limpia la sesión para evitar mostrar info vieja
-    if (!$persona) {
-        session()->forget('persona_id');
-    }
-
-    $secciones = Seccione::all();
-    $especialidades = Especialidade::all();
-    $tiposBeca = TipoBeca::all();
-
-    return view('estudiantes.informacion', compact('persona', 'editar', 'secciones', 'especialidades', 'tiposBeca', 'roles'));
-}
-
-
 
     public function update(Request $request, $id)
-    {
-        $persona = Persona::findOrFail($id);
+{
+    $persona = Persona::findOrFail($id);
 
-        $validator = Validator::make($request->all(), [
-            'Nombre' => 'required|string|max:255',
-            'PrimerApellido' => 'required|string|max:255',
-            'SegundoApellido' => 'nullable|string|max:255',
-            'Cedula' => 'required|string|max:20',
-            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'especialidade_input' => 'required|string|max:255',
-            'seccione_input' => 'required|string|max:255',
-            'tipo_beca_id' => 'required|exists:tipo_becas,id',
-        ]);
-        if ($validator->fails()) {
+    // Validación
+    $validator = Validator::make($request->all(), [
+        'Nombre' => 'required|string|max:255',
+        'PrimerApellido' => 'required|string|max:255',
+        'SegundoApellido' => 'nullable|string|max:255',
+        'Cedula' => 'required|string|max:20',
+        'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        'especialidade_input' => 'required|string|max:255',
+        'seccione_input' => 'required|string|max:255',
+        'tipo_beca_id' => 'required|array',
+        'tipo_beca_id.*' => 'exists:tipo_becas,id',
+    ]);
+
+    if ($validator->fails()) {
         return redirect()->route('estudiantes.informacion', ['cedula' => $persona->Cedula, 'editar' => 1])
-                         ->withErrors($validator)
-                         ->withInput();
+            ->withErrors($validator)
+            ->withInput();
     }
 
-        // Actualizar datos personales
-        $persona->update([
-            'Nombre' => $request->Nombre,
-            'PrimerApellido' => $request->PrimerApellido,
-            'SegundoApellido' => $request->SegundoApellido,
-            'Cedula' => $request->Cedula,
-        ]);
+    // Actualizar datos personales
+    $persona->update([
+        'Nombre' => $request->Nombre,
+        'PrimerApellido' => $request->PrimerApellido,
+        'SegundoApellido' => $request->SegundoApellido,
+        'Cedula' => $request->Cedula,
+    ]);
 
-        // Buscar o crear propiedad para especialidad
-        $propEspecialidad = Propiedade::firstOrCreate(['nombre' => $request->especialidade_input]);
+    // Buscar o crear propiedades
+    $propEspecialidad = Propiedade::firstOrCreate(['nombre' => $request->especialidade_input]);
+    $especialidad = Especialidade::firstOrCreate(['propiedade_id' => $propEspecialidad->id]);
 
-        // Buscar o crear especialidad con ese propiedade_id
-        $especialidad = Especialidade::firstOrCreate(['propiedade_id' => $propEspecialidad->id]);
+    $propSeccion = Propiedade::firstOrCreate(['nombre' => $request->seccione_input]);
+    $seccion = Seccione::firstOrCreate(['propiedade_id' => $propSeccion->id]);
 
-        // Buscar o crear propiedad para sección
-        $propSeccion = Propiedade::firstOrCreate(['nombre' => $request->seccione_input]);
+    $estudiante = $persona->estudiante;
+    $estudiante->especialidade_id = $especialidad->id;
+    $estudiante->seccione_id = $seccion->id;
 
-        // Buscar o crear sección con ese propiedade_id
-        $seccion = Seccione::firstOrCreate(['propiedade_id' => $propSeccion->id]);
-
-        // Actualizar estudiante con los IDs correspondientes
-        $estudiante = $persona->estudiante;
-        $estudiante->especialidade_id = $especialidad->id;
-        $estudiante->seccione_id = $seccion->id;
-        $estudiante->tipo_beca_id = $request->tipo_beca_id;
-
-        // Actualizar foto si se sube una nueva
-        if ($request->hasFile('foto')) {
-            $foto = $request->file('foto')->store('fotos', 'public');
-            $estudiante->foto = $foto;
+    // Manejo de foto
+    if ($request->hasFile('foto')) {
+        // Eliminar foto anterior si existe
+        if ($estudiante->foto && Storage::disk('public')->exists($estudiante->foto)) {
+            Storage::disk('public')->delete($estudiante->foto);
         }
-
-        $estudiante->save();
-
-       return redirect()->route('estudiantes.informacion', ['editar' => 0])
-                 ->with('guardado', true);
+        // Guardar nueva foto
+        $estudiante->foto = $request->file('foto')->store('fotos', 'public');
     }
+
+    $estudiante->save();
+
+    // Sincronizar becas (tabla pivot)
+    $estudiante->tipoBecas()->sync($request->tipo_beca_id);
+
+    return redirect()->route('estudiantes.informacion', ['editar' => 0])
+        ->with('guardado', true);
+}
 
 
 
@@ -385,91 +371,20 @@ public function store(Request $request)
 public function mostrarEnComedor(Request $request)
 {
     $persona = null;
-    $asistencias = [];
 
     if ($request->filled('cedula')) {
         // Traer la persona con relaciones necesarias
         $persona = Persona::with([
             'estudiante.seccione.propiedade',
             'estudiante.especialidade.propiedade',
-            'estudiante.tipoBeca.propiedade'
+            'estudiante.tipoBecas.propiedade'
         ])
         ->where('TipoUsuario', 'Estudiante')
         ->where('Cedula', $request->cedula)
         ->first();
-
-        if ($persona && $persona->estudiante) {
-
-            // Tomamos el tipo de asistencia seleccionado por el usuario
-            $tipoSeleccionado = $request->input('tipo_asistencia');
-
-            // Validación del tipo de beca del estudiante
-            $tipoBecaRaw = $persona->estudiante->tipoBeca->propiedade->nombre ?? '';
-            $tipoBeca = strtolower(str_replace([' ', '-'], ['','_'], $tipoBecaRaw));
-
-            $tiposPermitidos = [];
-            switch ($tipoBeca) {
-                case 'desayuno':
-                    $tiposPermitidos = ['desayuno'];
-                    break;
-                case 'almuerzo':
-                    $tiposPermitidos = ['almuerzo'];
-                    break;
-                case 'desayuno_almuerzo':
-                    $tiposPermitidos = ['desayuno', 'almuerzo'];
-                    break;
-            }
-
-            if (!in_array($tipoSeleccionado, $tiposPermitidos)) {
-                return redirect()->back()->with('error', 'El estudiante no cuenta con este tipo de beca.');
-            }
-
-            // Buscar la asistencia del día para el tipo seleccionado
-            $asistencia = Asistencia::whereDate('fecha_hora', Carbon::today())
-                ->where('tipo_asistencia', $tipoSeleccionado)
-                ->first();
-
-            if ($asistencia) {
-
-                // 🔹 Eliminar cualquier ListadoAsistencia previa del estudiante para este tipo
-                $idsAsistenciasDia = Asistencia::whereDate('fecha_hora', Carbon::today())
-                    ->where('tipo_asistencia', $tipoSeleccionado)
-                    ->pluck('id');
-
-                ListadoAsistencia::where('estudiante_id', $persona->estudiante->id)
-                    ->whereIn('asistencia_id', $idsAsistenciasDia)
-                    ->delete();
-
-                // 🔹 Crear nuevo ListadoAsistencia con presente
-                ListadoAsistencia::create([
-                    'estudiante_id' => $persona->estudiante->id,
-                    'asistencia_id' => $asistencia->id,
-                    'observaciones' => null
-                ]);
-
-                // 🔹 Actualizar estado de la asistencia a presente
-                $asistencia->update(['estado' => 'presente']);
-            }
-
-            // Obtener asistencias del estudiante para el mes actual
-            $inicioMes = Carbon::now()->startOfMonth();
-            $finMes = Carbon::now()->endOfMonth();
-
-            $listado = ListadoAsistencia::with('asistencia')
-                ->where('estudiante_id', $persona->estudiante->id)
-                ->whereHas('asistencia', function ($query) use ($inicioMes, $finMes) {
-                    $query->whereBetween('fecha_hora', [$inicioMes, $finMes]);
-                })->get();
-
-            // Preparar arreglo con fecha => estado para el calendario
-            foreach ($listado as $item) {
-                $fecha = $item->asistencia->fecha_hora->format('Y-m-d');
-                $asistencias[$fecha] = $item->asistencia->estado; // 'presente' o 'ausente'
-            }
-        }
     }
 
-    return view('IngresoCom.IngresoComedor', compact('persona', 'asistencias'));
+    return view('IngresoCom.IngresoComedor', compact('persona'));
 }
 
 

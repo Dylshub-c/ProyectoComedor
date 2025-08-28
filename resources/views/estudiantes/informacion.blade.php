@@ -145,7 +145,15 @@
 
                     <div class="mb-5 form-group-horizontal">
                         <label class="form-label form-label-fixed color1 fs-5"><strong>Tipo de beca</strong></label>
-                        <div class="form-input-flex inputColor input-ancho-reducido fs-5" aria-readonly="true">{{ $persona->estudiante->tipoBeca->propiedade->nombre ?? 'N/A' }}</div>
+                        <div class="form-input-flex inputColor input-ancho-reducido fs-5 d-flex flex-wrap gap-2">
+                            @if($persona->estudiante && $persona->estudiante->tipoBecas->count())
+                                @foreach($persona->estudiante->tipoBecas as $beca)
+                                    <span class="text-dark">{{ $beca->propiedade->nombre ?? 'Sin nombre' }}</span>
+                                @endforeach
+                            @else
+                                N/A
+                            @endif
+                        </div>
                     </div>
 
                     <div class="mb-5 form-group-horizontal">
@@ -242,19 +250,35 @@
                         @error('seccione_input')<small class="text-danger">{{ $message }}</small>@enderror
                     </div>
 
-                    <div class="mb-3">
-                        <label for="tipo_beca_id" class="form-label color1 fs-5"><strong>Tipo de beca</strong></label>to
-                        <select id="tipo_beca_id" name="tipo_beca_id" class="form-select inputColor fs-5" required>
-                            <option value="">Seleccione un tipo de beca</option>
-                            @foreach($tiposBeca as $tipo)
-                                <option value="{{ $tipo->id }}"
-                                    {{ $persona->estudiante->tipo_beca_id == $tipo->id ? 'selected' : '' }}>
-                                    {{ $tipo->propiedade->nombre ?? 'Sin nombre' }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('tipo_beca_id')<small class="text-danger">{{ $message }}</small>@enderror
+                    <div class="mb-4 row align-items-start">
+                        <label class="col-sm-3 col-form-label text-end color1 fs-5"><strong>Tipo de beca</strong></label>
+                        <div class="col-sm-9">
+                            <div class="border rounded p-3" style="max-height: 220px; overflow-y: auto;">
+                                <div class="row">
+                                    @foreach($tiposBeca as $index => $tipo)
+                                        <div class="col-6">
+                                            <div class="form-check">
+                                                <input 
+                                                    class="form-check-input" 
+                                                    type="checkbox" 
+                                                    name="tipo_beca_id[]" 
+                                                    value="{{ $tipo->id }}" 
+                                                    id="beca_{{ $tipo->id }}"
+                                                    {{ $persona->estudiante->tipoBecas->contains($tipo->id) ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="beca_{{ $tipo->id }}">
+                                                    {{ $tipo->propiedade->nombre ?? 'Sin nombre' }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            <small class="text-muted">Puede seleccionar una o varias becas.</small>
+                            @error('tipo_beca_id')<small class="text-danger">{{ $message }}</small>@enderror
+                        </div>
                     </div>
+
+
 
                     <div class="mb-3">
                         <label for="foto" class="form-label color1 fs-5"><strong>Foto</strong></label>

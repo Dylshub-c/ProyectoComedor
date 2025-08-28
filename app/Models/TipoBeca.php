@@ -9,9 +9,9 @@ class TipoBeca extends Model
     protected $fillable = ['propiedade_id'];
 
     // una beca tiene muchos estudiantes
-    public function estudiante()
+    public function estudiantes()
     {
-        return $this->hasMany(Estudiante::class);
+        return $this->belongsToMany(Estudiante::class, 'estudiante_tipo_beca');
     }
 
     // una beca pertenece a una propiedad

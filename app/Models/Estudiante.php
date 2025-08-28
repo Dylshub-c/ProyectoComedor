@@ -21,15 +21,14 @@ class Estudiante extends Model
         'foto',
         'especialidade_id',
         'persona_id',
-        'seccione_id',
-        'tipo_beca_id'
+        'seccione_id'
     ];
 
 
     // un estudiante pertenece a un tipo de beca
-    public function tipoBeca()
+    public function tipoBecas()
     {
-        return $this->belongsTo(TipoBeca::class);
+        return $this->belongsToMany(TipoBeca::class, 'estudiante_tipo_beca');
     }
 
     // un estudiante pertenece a una seccion

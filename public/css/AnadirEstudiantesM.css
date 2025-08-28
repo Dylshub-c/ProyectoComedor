@@ -51,39 +51,39 @@ strong {
 }
 
 #btnAbrir {
-    background-color: #106AA4;
+    background-color: #032B3F;
     color: #f7f7f7;
     font-size: x-large;
 }
 
 #btnIndividual {
-    background-color: #106AA4;
+    background-color: #032B3F;
     color: #f7f7f7;
     font-size: x-large;
 }
 
 #btnComprimido {
-    background-color: #106AA4;
+    background-color: #032B3F;
     color: #f7f7f7;
     font-size: x-large;
 }
 
 #btnSubir {
-    background-color: #0095C8;
+    background-color: #032B3F;
     color: #f7f7f7;
     font-size: x-large;
     display: none;
 }
 
 #btnDescomprimir {
-    background-color: #0095C8;
+    background-color: #032B3F;
     color: #f7f7f7;
     font-size: x-large;
     display: none;
 }
 
 #btnCeleste {
-    background-color: #0095C8;
+    background-color: #032B3F;
     color: #f7f7f7;
     font-size: x-large;
 }
@@ -106,7 +106,7 @@ strong {
 }
 
 #tabla {
-    border-color: #346c88;
+    border-color: #0c2d46;
 }
 
 /*------------------------------------------------------------------------*/
@@ -121,3 +121,28 @@ strong {
 }
 
 /*------------------------------------------------------------------------*/
+.btnPrimario {
+  background-color: #032B3F;
+  color: white;
+  border: none;
+  border-radius: 13px;
+  font-size: 14px;
+  padding: 6px 16px;
+  width: 100%;
+  max-width: 300px;
+  box-sizing: border-box;
+
+  /* Alineación horizontal y vertical del ícono + texto */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* Espacio entre ícono y texto */
+}
+.btnPrimario:hover {
+  background-color: white;
+  color: black;
+}
+
+.btnPrimario i {
+  margin: 0;
+}

@@ -15,7 +15,7 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body>
-<button id="btn-Menu" class="btn ms-3 mb-3 fs-5 py-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
+    <button id="btn-Menu" class="btn ms-3 mb-3 fs-5 py-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
         <i class="fa-solid fa-bars fa-xl" style="color: #f7f7f7;"></i>
     </button>
      <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
@@ -124,13 +124,38 @@
       </div>
 
 
-      <div class="mb-4 textarea-box">
-        <div class="etiqueta-superior">
-          <label for="explicacion" class="m-0 text-white fw-semibold fs-5">Explicación del caso:</label>
-          <i class="bi bi-clipboard-fill clipboard-icon text-white"></i>
+      <div style="display: flex; gap: 2rem; align-items: flex-start;">
+      <!-- Tabla con nombre, tipo de beca y checkbox -->
+      <table class="becas-tabla" style="flex: 1.5;">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Tipo de Beca</th>
+            <th>Marcar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Juan Pérez</td>
+            <td>Beca completa</td>
+            <td class="text-start"><input type="checkbox" /></td>
+          </tr>
+          <!-- más filas si quieres -->
+        </tbody>
+      </table>
+
+      <!-- Caja con etiqueta y textarea -->
+      <div class="mb-4 textarea-box" style="flex: 2;">
+        <div class="etiqueta-superior" style="display: flex; align-items: center; gap: 0.5rem; color: black;">
+          <label for="explicacion" class="m-0 fw-semibold fs-5">Explicación del caso:</label>
+          <i class="bi bi-clipboard-fill clipboard-icon" style="color: black;"></i>
         </div>
-        <textarea id="explicacion" class="form-control fs-4" rows="6" placeholder="Escriba aquí..."></textarea>
+        <textarea id="explicacion" class="form-control fs-4" rows="6" placeholder="Escriba aquí..." style="color: black;"></textarea>
       </div>
+    </div>
+
+
+
 
 
       <div class="d-flex justify-content-end">

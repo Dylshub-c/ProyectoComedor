@@ -18,7 +18,6 @@ return new class extends Migration
             $table->foreignId('especialidade_id')->constrained('especialidades')->onDelete('cascade');
             $table->foreignId('persona_id')->constrained('personas')->onDelete('cascade');
             $table->foreignId('seccione_id')->constrained('secciones')->onDelete('cascade');
-            $table->foreignId('tipo_beca_id')->constrained('tipo_becas')->onDelete('cascade');
             $table->timestamps();
         });
     }

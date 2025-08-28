@@ -96,14 +96,14 @@
               <div class="mb-4 row align-items-center">
                 <label for="nombre" class="col-sm-3 col-form-label text-end color1 fs-5"><strong>Nombre completo</strong></label>
                 <div class="col-sm-9">
-                  <input type="text" id="nombre" name="nombre" class="form-input-flex inputColor fs-5" placeholder="Ingrese nombre completo" >
+                  <input type="text" id="nombre" name="nombre" class="form-input-flex inputColor fs-5" placeholder="Ingrese nombre completo">
                 </div>
               </div>
 
               <div class="mb-4 row align-items-center">
                 <label for="cedula" class="col-sm-3 col-form-label text-end color1 fs-5"><strong>Cédula</strong></label>
                 <div class="col-sm-9">
-                  <input type="text" id="cedula" name="cedula" class="form-input-flex inputColor fs-5" placeholder="Ingrese la cédula" >
+                  <input type="text" id="cedula" name="cedula" class="form-input-flex inputColor fs-5" placeholder="Ingrese la cédula">
                 </div>
               </div>
             </div>
@@ -112,7 +112,7 @@
             <div id="campo-correo" style="display:none;" class="mb-4 row align-items-center">
               <label for="correo" class="col-sm-3 col-form-label text-end color1 fs-5"><strong>Correo electrónico</strong></label>
               <div class="col-sm-9">
-                <input type="email" id="correo" name="correo" class="form-input-flex inputColor fs-5" placeholder="Ingrese correo electrónico" >
+                <input type="email" id="correo" name="correo" class="form-input-flex inputColor fs-5" placeholder="Ingrese correo electrónico">
               </div>
             </div>
 
@@ -121,26 +121,43 @@
               <div class="mb-4 row align-items-center">
                 <label for="seccion" class="col-sm-3 col-form-label text-end color1 fs-5"><strong>Sección</strong></label>
                 <div class="col-sm-9">
-                  <input type="text" id="seccion" name="seccion" class="form-input-flex inputColor fs-5" placeholder="Ingrese la sección" >
+                  <input type="text" id="seccion" name="seccion" class="form-input-flex inputColor fs-5" placeholder="Ingrese la sección">
                 </div>
               </div>
 
+              <!-- Especialidad (restaurada) -->
               <div class="mb-4 row align-items-center">
                 <label for="especialidad" class="col-sm-3 col-form-label text-end color1 fs-5"><strong>Especialidad</strong></label>
                 <div class="col-sm-9">
-                  <input type="text" id="especialidad" name="especialidad" class="form-input-flex inputColor fs-5" placeholder="Ingrese la especialidad" >
+                  <input type="text" id="especialidad" name="especialidad" class="form-input-flex inputColor fs-5" placeholder="Ingrese la especialidad">
                 </div>
               </div>
 
-              <div class="mb-4 row align-items-center">
-                <label for="tipo_beca_id" class="col-sm-3 col-form-label text-end color1 fs-5"><strong>Tipo de beca</strong></label>
+              <!-- Becas (multi-selección con checkboxes) -->
+              <div class="mb-4 row align-items-start">
+                <label class="col-sm-3 col-form-label text-end color1 fs-5"><strong>Tipo de beca</strong></label>
                 <div class="col-sm-9">
-                  <select id="tipo_beca_id" name="tipo_beca_id" class="form-select inputColor fs-5" >
-                    <option disabled selected value="">Seleccione una opción</option>
-                    @foreach ($tiposBeca as $beca)
-                      <option value="{{ $beca->id }}">{{ $beca->propiedade->nombre }}</option>
-                    @endforeach
-                  </select>
+                  <div class="border rounded p-3" style="max-height: 220px; overflow-y: auto;">
+                    <div class="row">
+                      @foreach ($tiposBeca as $beca)
+                        <div class="col-md-6">
+                          <div class="form-check">
+                            <input
+                              class="form-check-input"
+                              type="checkbox"
+                              name="tipo_beca_id[]"
+                              value="{{ $beca->id }}"
+                              id="beca_{{ $beca->id }}"
+                            >
+                            <label class="form-check-label" for="beca_{{ $beca->id }}">
+                              {{ $beca->propiedade->nombre }}
+                            </label>
+                          </div>
+                        </div>
+                      @endforeach
+                    </div>
+                  </div>
+                  <small class="text-muted">Puede seleccionar una o varias becas.</small>
                 </div>
               </div>
             </div>
@@ -169,7 +186,6 @@
               alt="Previsualización Foto"
               class="foto-estudiante"
             />
-
             <button
               class="btn-agregar-foto"
               type="button"
@@ -201,10 +217,10 @@
     fotoWrapper.style.setProperty('display', 'none', 'important');
     campoCorreo.style.setProperty('display', 'none', 'important');
 
-    // Resetear required
-    ['nombre', 'cedula', 'correo', 'seccion', 'especialidad', 'tipo_beca_id', 'foto'].forEach(id => {
+    // Resetear required (solo inputs que existen por ID)
+    ['nombre', 'cedula', 'correo', 'seccion', 'especialidad', 'foto'].forEach(id => {
       const el = document.getElementById(id);
-      if(el) el.required = false;
+      if (el) el.required = false;
     });
 
     if (!rol) return;
@@ -213,24 +229,24 @@
     camposComunes.style.setProperty('display', 'block', 'important');
     ['nombre', 'cedula'].forEach(id => {
       const el = document.getElementById(id);
-      if(el) el.required = true;
+      if (el) el.required = true;
     });
 
     if (rol === 'estudiante') {
       camposEstudiante.style.setProperty('display', 'block', 'important');
-      fotoWrapper.style.setProperty('display', 'flex', 'important'); // foto visible solo para estudiante
+      fotoWrapper.style.setProperty('display', 'flex', 'important');
       campoCorreo.style.setProperty('display', 'none', 'important');
 
       ['seccion', 'especialidad'].forEach(id => {
         const el = document.getElementById(id);
-        if(el) el.required = true;
+        if (el) el.required = true;
       });
 
     } else {
       // Para otros roles
       campoCorreo.style.setProperty('display', 'flex', 'important');
       const correo = document.getElementById('correo');
-      if(correo) correo.required = true;
+      if (correo) correo.required = true;
     }
   }
 
@@ -243,7 +259,7 @@
   // Previsualización de foto
   document.getElementById('foto').addEventListener('change', function() {
     const [file] = this.files;
-    if(file) {
+    if (file) {
       document.getElementById('previewFoto').src = URL.createObjectURL(file);
     }
   });

@@ -52,19 +52,15 @@
                     <i class="fa-solid fa-address-card fa-lg" id="icono-menu"></i>
                     | Ver lista de usuarios
                 </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('Reportes.DescargarReporte') }}'">
                     <i class="fa-solid fa-download fa-lg" id="icono-menu"></i>
                     | Descargar reportes
-                </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
-                    <i class="fa-solid fa-calendar-check fa-lg" id="icono-menu"></i>
-                    | Gestionar asistencias
                 </button>
                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('tipobeca.index') }}'">
                     <i class="fa-solid fa-hand-holding-medical fa-lg" id="icono-menu"></i>
                     | Becas
                 </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('AsistenciaRapida.asistenciaRapida') }}'">
                     <i class="fa-solid fa-star-half-stroke fa-lg" id="icono-menu"></i>
                     | Asistencia rápida
                 </button>
@@ -99,8 +95,8 @@
             <div id="PrimerModulo" class="container-fluid text-center mt-5">
               @php
     $foto = isset($persona) && $persona?->estudiante?->foto
-        ? asset('storage/' . $persona->estudiante->foto)
-        : asset('/img/FotoEstudiante.webp');
+    ? asset($persona->estudiante->foto) // <-- aquí usamos $persona->estudiante->foto
+    : asset('/img/FotoEstudiante.webp');
 @endphp
 
 <img class="img-fluid" id="fotoEstudiante" src="{{ $foto }}" alt="Foto del estudiante">
@@ -257,7 +253,7 @@
 <script>
   document.getElementById('formBuscar').addEventListener('submit', function(e){
     const select = document.getElementById('TipoAsistencia');
-   
+
     let input = document.createElement('input');
     input.type = 'hidden';
     input.name = 'tipo_asistencia';

@@ -11,12 +11,68 @@
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
 
 <link rel="stylesheet" href="{{ asset('css/EstiloRevisarAs.css') }}">
+<link rel="Stylesheet" href="{{ asset('css/MenuLateral.css') }}" type="text/css" />
+
 </head>
 <body>
+<button id="btn-Menu" class="btn ms-3 mb-3 fs-5 py-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
+        <i class="fa-solid fa-bars fa-xl" style="color: #f7f7f7;"></i>
+    </button>
+     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+        <div class="offcanvas-header justify-content-end">
+            <button type="button" class="btn" data-bs-dismiss="offcanvas" aria-label="Close"> <i class="fa-solid fa-xmark fa-2xl" style="color: #f7f7f7;"></i> </button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="d-grid gap-3">
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location.href='{{ route('admin.home') }}'">
+                    <i class="fa-solid fa-house-chimney fa-lg" id="icono-menu" ></i>
+                    | Home
+                </button>
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+                    <i class="fa-solid fa-clipboard-list fa-lg" id="icono-menu"></i>
+                    | Ingreso al comedor
+                </button>
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('estudiantes.importar.form') }}'">
+                    <i class="fa-solid fa-street-view fa-lg" id="icono-menu"></i>
+                    | Agregar usuarios
+                </button>
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('estudiantes.informacion') }}'">
+                    <i class="fa-solid fa-address-card fa-lg" id="icono-menu"></i>
+                    | Ver lista de usuarios
+                </button>
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('Reportes.DescargarReporte') }}'">
+                    <i class="fa-solid fa-download fa-lg" id="icono-menu"></i>
+                    | Descargar reportes
+                </button>
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('tipobeca.index') }}'">
+                    <i class="fa-solid fa-hand-holding-medical fa-lg" id="icono-menu"></i>
+                    | Becas
+                </button>
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('AsistenciaRapida.asistenciaRapida') }}'">
+                    <i class="fa-solid fa-star-half-stroke fa-lg" id="icono-menu"></i>
+                    | Asistencia rápida
+                </button>
+
+            </div>
+        </div>
+        <div class="offcanvas-footer p-3 border-top">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+                <i class="fa-solid fa-arrow-right-to-bracket fa-lg" id="icono-menu"></i>
+                | Cerrar sesión
+                </button>
+            </form>
+
+            </div>
+        </div>
+
+
+
   @if(!$persona)
     <div class="container mt-4">
       <div class="alert alert-warning text-center">
-        No hay estudiante seleccionado.  
+        No hay estudiante seleccionado.
         <a href="{{ route('estudiantes.informacion') }}" class="btn btn-link">Volver</a>
       </div>
     </div>
@@ -47,12 +103,12 @@
             $beca = $persona->estudiante->tipoBeca->propiedade->nombre ?? '';
           @endphp
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" 
+            <input class="form-check-input" type="checkbox"
                    {{ in_array($beca, ['Desayuno', 'Desayuno - Almuerzo']) ? 'checked' : '' }}>
             <label class="form-check-label">Beca de Desayuno</label>
           </div>
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" 
+            <input class="form-check-input" type="checkbox"
                    {{ in_array($beca, ['Almuerzo', 'Desayuno - Almuerzo']) ? 'checked' : '' }}>
             <label class="form-check-label">Beca de Almuerzo</label>
           </div>

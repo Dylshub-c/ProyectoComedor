@@ -35,7 +35,7 @@
                     <i class="fa-solid fa-house-chimney fa-lg" id="icono-menu" ></i>
                     | Home
                 </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('IngresoCom.IngresoComedor') }}'">
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
                     <i class="fa-solid fa-clipboard-list fa-lg" id="icono-menu"></i>
                     | Ingreso al comedor
                 </button>
@@ -47,19 +47,15 @@
                     <i class="fa-solid fa-address-card fa-lg" id="icono-menu"></i>
                     | Ver lista de usuarios
                 </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('Reportes.DescargarReporte') }}'">
                     <i class="fa-solid fa-download fa-lg" id="icono-menu"></i>
                     | Descargar reportes
-                </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
-                    <i class="fa-solid fa-calendar-check fa-lg" id="icono-menu"></i>
-                    | Gestionar asistencias
                 </button>
                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('tipobeca.index') }}'">
                     <i class="fa-solid fa-hand-holding-medical fa-lg" id="icono-menu"></i>
                     | Becas
                 </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('AsistenciaRapida.asistenciaRapida') }}'">
                     <i class="fa-solid fa-star-half-stroke fa-lg" id="icono-menu"></i>
                     | Asistencia rápida
                 </button>
@@ -74,6 +70,7 @@
                 | Cerrar sesión
                 </button>
             </form>
+
             </div>
         </div>
     <main class="flex-grow-1">

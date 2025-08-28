@@ -11,7 +11,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/css/bootstrap-datepicker.min.css" rel="stylesheet">
-    <link rel="Stylesheet" href="{{ asset('css/DescargarReporte.css') }}">
+    <link rel="Stylesheet" href="{{ asset('css/descargarReporte.css') }}">
+     <link rel="Stylesheet" href="{{ asset('css/MenuLateral.css') }}" type="text/css" />
 
     <!-- Iconos de la página -->
     <link rel="icon" href="../img/LogoDW-Negro.png" media="(prefers-color-scheme: light)">
@@ -20,74 +21,57 @@
 
 <!------------------------------------------------------------------------------------------------------------------------->
 <!---------------------------------------------------------NAVBAR---------------------------------------------------------->
-
-    <button id="btn-Menu" class="btn ms-3 mb-3 fs-5 py-3" data-bs-toggle="offcanvas" 
-      data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
-      <i class="fa-solid fa-bars fa-xl" style="color: #f7f7f7;"></i>
+<button id="btn-Menu" class="btn ms-3 mb-3 fs-5 py-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
+        <i class="fa-solid fa-bars fa-xl" style="color: #f7f7f7;"></i>
     </button>
-        
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
-      <div class="offcanvas-header justify-content-end">
-          <button type="button" class="btn" data-bs-dismiss="offcanvas" aria-label="Close"> 
-            <i class="fa-solid fa-xmark fa-2xl" style="color: #f7f7f7;"></i> 
-          </button>
-      </div>
-      
-      <div class="offcanvas-body mt-5">
-          <div class="d-grid gap-3">
-            <a href="/HTML/Home.html">
-              <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
-                  <i class="fa-solid fa-house-chimney fa-lg" id="icono-menu"></i>
-                  | Inicio
-              </button>
-            </a>
-            <a href="/HTML/IngresoComedor.html">
-              <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
-                  <i class="fa-solid fa-clipboard-list fa-lg" id="icono-menu"></i>
-                  | Ingreso al comedor
-              </button>
-            </a>
-            <a href="/HTML/AñadirEstudiantesM.html">
-              <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
-                  <i class="fa-solid fa-street-view fa-lg" id="icono-menu"></i>
-                  | Añadir estudiantes
-              </button>
-            </a>
-            <a href="/HTML/InformacionEstudiante.html">
-              <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
-                  <i class="fa-solid fa-address-card fa-lg" id="icono-menu"></i>
-                  | Información de Estudiantes
-              </button>
-            </a>
-            <a href="#">
-              <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
-                  <i class="fa-solid fa-download fa-lg" id="icono-menu"></i>
-                  | Descargar reporte
-              </button>
-            </a>
-            <a href="/HTML/TipoBeca.html">
-              <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
-                  <i class="fa-solid fa-hand-holding-medical fa-lg" id="icono-menu"></i>
-                  | Becas
-              </button>
-            </a>
-            <a href="/HTML/AsistenciaRapida.html">
-              <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
-                  <i class="fa-solid fa-star-half-stroke fa-lg" id="icono-menu"></i>
-                  | Asistencia rápida
-              </button>
-            </a>
-          </div>
-      </div>
-
-        <div class="offcanvas-footer p-3 border-top">
-          <button id="btn-opcionF" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
-              <i class="fa-solid fa-arrow-right-to-bracket fa-lg" id="icono-menu"></i>
-              | Cerrar sesión
-          </button>
+     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+        <div class="offcanvas-header justify-content-end">
+            <button type="button" class="btn" data-bs-dismiss="offcanvas" aria-label="Close"> <i class="fa-solid fa-xmark fa-2xl" style="color: #f7f7f7;"></i> </button>
         </div>
-    </div>
+        <div class="offcanvas-body">
+            <div class="d-grid gap-3">
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location.href='{{ route('admin.home') }}'">
+                    <i class="fa-solid fa-house-chimney fa-lg" id="icono-menu" ></i>
+                    | Home
+                </button>
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+                    <i class="fa-solid fa-clipboard-list fa-lg" id="icono-menu"></i>
+                    | Ingreso al comedor
+                </button>
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('estudiantes.importar.form') }}'">
+                    <i class="fa-solid fa-street-view fa-lg" id="icono-menu"></i>
+                    | Agregar usuarios
+                </button>
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('estudiantes.informacion') }}'">
+                    <i class="fa-solid fa-address-card fa-lg" id="icono-menu"></i>
+                    | Ver lista de usuarios
+                </button>
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('Reportes.DescargarReporte') }}'">
+                    <i class="fa-solid fa-download fa-lg" id="icono-menu"></i>
+                    | Descargar reportes
+                </button>
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('tipobeca.index') }}'">
+                    <i class="fa-solid fa-hand-holding-medical fa-lg" id="icono-menu"></i>
+                    | Becas
+                </button>
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('AsistenciaRapida.asistenciaRapida') }}'">
+                    <i class="fa-solid fa-star-half-stroke fa-lg" id="icono-menu"></i>
+                    | Asistencia rápida
+                </button>
 
+            </div>
+        </div>
+        <div class="offcanvas-footer p-3 border-top">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+                <i class="fa-solid fa-arrow-right-to-bracket fa-lg" id="icono-menu"></i>
+                | Cerrar sesión
+                </button>
+            </form>
+
+            </div>
+        </div>
 <!------------------------------------------------------------------------------------------------------------------------->
 <!-----------------------------------------------------CONTENIDO----------------------------------------------------------->
 <body class="d-flex flex-column min-vh-100 bg-light">
@@ -143,7 +127,7 @@
 
 
 <!------------------------------------------------------------------------------------------------------------------------->
-<!-------------------------------------------------------FOOTER------------------------------------------------------------>   
+<!-------------------------------------------------------FOOTER------------------------------------------------------------>
 
   <footer id="DivFooter" class="text-dark py-3 mt-auto">
     <div class="container">

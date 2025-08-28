@@ -7,12 +7,15 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
   <link rel="stylesheet" href="{{ asset('css/EstiloRevisarAs.css') }}">
+   <link rel="Stylesheet" href="{{ asset('css/MenuLateral.css') }}" type="text/css" />
 </head>
 <body>
+
+
 @if(!$persona)
   <div class="container mt-4">
     <div class="alert alert-warning text-center">
-      No hay estudiante seleccionado.  
+      No hay estudiante seleccionado.
       <a href="{{ route('estudiantes.informacion') }}" class="btn btn-link">Volver</a>
     </div>
   </div>
@@ -33,6 +36,8 @@
         </h5>
         <p class="card-text">{{ $persona->Cedula }}</p>
       </div>
+
+
     </div>
 
     <!-- Formulario para crear/editar asistencia -->

@@ -28,6 +28,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Response;
 
 
 class EstudiantesController extends Controller
@@ -57,17 +60,23 @@ class EstudiantesController extends Controller
      */
 public function store(Request $request)
 {
-    // Validación
+    // Validación general
     $request->validate([
         'nombre' => 'required|string',
         'cedula' => 'required|string|unique:personas,Cedula',
         'rol' => 'required|exists:roles,name',
-        'correo' => 'required_if:rol,!Estudiante|email',
         'seccion' => 'required_if:rol,Estudiante|string|nullable',
         'especialidad' => 'required_if:rol,Estudiante|string|nullable',
         'tipo_beca_id' => 'required_if:rol,Estudiante|nullable|exists:tipo_becas,id',
         'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
     ]);
+
+    // Validar correo solo si no es estudiante
+    if (strtolower($request->rol) !== 'estudiante') {
+        $request->validate([
+            'correo' => 'required|email'
+        ]);
+    }
 
     // Dividir nombre completo
     $partes = explode(' ', trim($request->nombre));
@@ -167,6 +176,7 @@ public function store(Request $request)
 
 
 
+
     /**
      * Display the specified resource.
      */
@@ -186,7 +196,7 @@ public function store(Request $request)
     /**
      * Update the specified resource in storage.
      */
-    public function informacion(Request $request)
+   public function informacion(Request $request)
 {
     $editar = $request->input('editar') == 1;
     $persona = null;
@@ -200,7 +210,7 @@ public function store(Request $request)
             'estudiante.seccione.propiedade',
             'estudiante.especialidade.propiedade',
             'estudiante.tipoBeca.propiedade',
-            'user.roles' // traer roles del usuario
+            'usuario.roles' // Cambiado de user.roles a usuario.roles
         ])->find(session('persona_id'));
     }
 
@@ -210,7 +220,7 @@ public function store(Request $request)
             'estudiante.seccione.propiedade',
             'estudiante.especialidade.propiedade',
             'estudiante.tipoBeca.propiedade',
-            'user.roles'
+            'usuario.roles'
         ])->where('TipoUsuario', 'Estudiante');
 
         if ($request->filled('cedula')) {
@@ -355,25 +365,23 @@ public function store(Request $request)
         return view('estudiantes.importar', compact('estudiantes'));
     }
 
-    public function eliminarLista()
-    {
-        // Aquí borras los estudiantes que se importaron
-        // Si quieres borrar TODO de la tabla Estudiantes:
-        Estudiante::truncate();
+    public function eliminarUltimaImportacion()
+{
+    Estudiante::where('importado', true)->delete();
 
-        // También puedes borrar personas relacionadas si quieres, o solo estudiantes.
+    return redirect()->back()->with('success', 'Se ha eliminado la lista de estudiantes importados desde Excel.');
+}
 
-        return redirect()->route('estudiantes.informacion')->with('success', 'Lista de estudiantes eliminada.');
-    }
 
     public function recargarLista()
-    {
-        // Simplemente redirige o carga la vista sin estudiantes
-        // Podrías pasar una colección vacía
-        $estudiantes = collect();
+{
+    // Elimina la última importación de la tabla temporal
+    Estudiante::where('import_batch_id', session('last_import_batch'))->delete();
+    session()->forget('last_import_batch');
 
-        return view('estudiantes.informacion', compact('estudiantes'));
-    }
+    $estudiantes = collect(); // lista vacía
+    return view('estudiantes.informacion', compact('estudiantes'));
+}
 public function mostrarEnComedor(Request $request)
 {
     $persona = null;

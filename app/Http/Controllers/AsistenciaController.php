@@ -8,23 +8,31 @@ use App\Models\ListadoAsistencia;
 use App\Models\Estudiante;
 use App\Models\Persona;
 use Carbon\Carbon;
+use App\Models\TipoBeca;
 
 class AsistenciaController extends Controller
 {
     public function index()
     {
         $fecha = Carbon::today(); // Fecha actual sin hora
-        $tipos = ['desayuno', 'almuerzo'];
         $estados = ['presente', 'ausente'];
-
-        // 1️⃣ Crear asistencias del día si no existen
+    
+        // 1️⃣ Obtener dinámicamente los tipos de asistencia desde las becas
+        $tipos = TipoBeca::with('propiedade')
+            ->get()
+            ->pluck('propiedade.nombre')
+            ->map(fn($nombre) => strtolower(str_replace([' ', '-'], ['_', '_'], $nombre)))
+            ->unique()
+            ->toArray();
+    
+        // 2️⃣ Crear asistencias del día si no existen
         foreach ($tipos as $tipo) {
             foreach ($estados as $estado) {
                 $yaExiste = Asistencia::whereDate('fecha_hora', $fecha)
                     ->where('tipo_asistencia', $tipo)
                     ->where('estado', $estado)
                     ->exists();
-
+    
                 if (!$yaExiste) {
                     Asistencia::create([
                         'fecha_hora' => Carbon::now(),
@@ -34,43 +42,27 @@ class AsistenciaController extends Controller
                 }
             }
         }
-
-        // 2️⃣ Asignar ausencias según becas
+    
+        // 3️⃣ Asignar ausencias según las becas de cada estudiante
         $estudiantes = Estudiante::with('tipoBecas.propiedade')->get();
-
+    
         foreach ($estudiantes as $estudiante) {
-            $tiposAsignar = [];
-
-            foreach ($estudiante->tipoBecas as $beca) {
-                $nombreBeca = strtolower(str_replace([' ', '-'], ['','_'], $beca->propiedade->nombre ?? ''));
-
-                switch ($nombreBeca) {
-                    case 'desayuno':
-                        $tiposAsignar[] = 'desayuno';
-                        break;
-                    case 'almuerzo':
-                        $tiposAsignar[] = 'almuerzo';
-                        break;
-                    case 'desayuno_almuerzo':
-                        $tiposAsignar[] = 'desayuno';
-                        $tiposAsignar[] = 'almuerzo';
-                        break;
-                }
-            }
-
-            $tiposAsignar = array_unique($tiposAsignar);
-
+            // Sacar los tipos de asistencia de este estudiante
+            $tiposAsignar = $estudiante->tipoBecas
+                ->map(fn($beca) => strtolower(str_replace([' ', '-'], ['_', '_'], $beca->propiedade->nombre ?? '')))
+                ->unique();
+    
             foreach ($tiposAsignar as $tipo) {
                 $asistencia = Asistencia::whereDate('fecha_hora', $fecha)
                     ->where('tipo_asistencia', $tipo)
                     ->where('estado', 'ausente')
                     ->first();
-
+    
                 if ($asistencia) {
                     $yaRegistrado = ListadoAsistencia::where('estudiante_id', $estudiante->id)
                         ->where('asistencia_id', $asistencia->id)
                         ->exists();
-
+    
                     if (!$yaRegistrado) {
                         ListadoAsistencia::create([
                             'estudiante_id' => $estudiante->id,
@@ -81,10 +73,10 @@ class AsistenciaController extends Controller
                 }
             }
         }
-
+    
         return view('IngresoCom.IngresoComedor');
     }
-
+    
     public function buscarEstudiante(Request $request)
     {
         $cedula = $request->input('cedula');

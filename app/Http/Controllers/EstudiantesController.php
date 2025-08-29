@@ -384,7 +384,8 @@ public function mostrarEnComedor(Request $request)
         ->first();
     }
 
-    return view('IngresoCom.IngresoComedor', compact('persona'));
+    return view('IngresoCom.IngresoComedor', ['persona' => $persona ?? null]);
+
 }
 
 

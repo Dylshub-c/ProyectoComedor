@@ -10,7 +10,7 @@ class CreateAsistenciasTable extends Migration
         Schema::create('asistencias', function (Blueprint $table) {
             $table->id();
             $table->date('fecha_hora'); // Fecha del registro
-            $table->enum('tipo_asistencia', ['desayuno', 'almuerzo']);
+            $table->string('tipo_asistencia', 255);
             $table->enum('estado', ['presente', 'ausente']);
             $table->timestamps();
         });

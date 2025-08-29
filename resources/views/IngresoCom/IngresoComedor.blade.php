@@ -89,19 +89,23 @@
 
                     <!-- LADO IZQUIERDO: Información del estudiante + botones -->
                     <div class="d-flex flex-column gap-4" style="flex: 1;">
+
                         <!-- Card del estudiante -->
                         <div id="PrimerModulo" class="text-center card shadow-lg p-3" style="border-radius: 15px; background-color: #f7f7f7;">
                             @php
-                                $foto = isset($persona) && $persona?->estudiante?->foto
+                                $foto = $persona?->estudiante?->foto
                                     ? asset($persona->estudiante->foto)
                                     : asset('/img/FotoEstudiante.webp');
+
+                                $tipoBecas = $persona?->estudiante?->tipoBecas ?? [];
                             @endphp
 
-                            <img class="img-fluid rounded-circle mb-3" id="fotoEstudiante" src="{{ $foto }}" alt="Foto del estudiante" style="width: 180px; height: 180px; object-fit: cover; border:2px solid #032B3F;">
+                            <img class="img-fluid rounded-circle mb-3" id="fotoEstudiante" src="{{ $foto }}" alt="Foto del estudiante"
+                                style="width: 180px; height: 180px; object-fit: cover; border:2px solid #032B3F;">
 
                             <label id="NomEstudiante" class="mt-1 text-center fs-4">
                                 <strong>
-                                    {{ isset($persona) ? "{$persona->Nombre} {$persona->PrimerApellido} {$persona->SegundoApellido}" : 'Nombre del estudiante' }}
+                                    {{ $persona ? "{$persona->Nombre} {$persona->PrimerApellido} {$persona->SegundoApellido}" : 'Nombre del estudiante' }}
                                 </strong>
                             </label>
 
@@ -117,23 +121,19 @@
                                 <li class="list-group-item">
                                     <strong class="fs-5">Tipo de beca:</strong><br />
                                     <span id="tipo-beca">
-                                        @if($persona?->estudiante?->tipoBecas)
-                                            @foreach($persona->estudiante->tipoBecas as $beca)
-                                                {{ $beca->propiedade->nombre }}@if(!$loop->last), @endif
-                                            @endforeach
-                                        @else
+                                        @forelse($tipoBecas as $beca)
+                                            {{ $beca->propiedade->nombre }}@if(!$loop->last), @endif
+                                        @empty
                                             -
-                                        @endif
+                                        @endforelse
                                     </span>
                                 </li>
                             </ul>
 
-                            <!-- Botones de Confirmar y Rechazar Asistencia dentro de la card -->
                             <div class="d-flex gap-3 justify-content-center mt-3">
                                 <button type="button" class="btn btn-success fs-5 flex-fill" style="border-radius: 8px;">Confirmar asistencia</button>
                                 <button type="button" class="btn btn-danger fs-5 flex-fill" style="border-radius: 8px;">Rechazar asistencia</button>
                             </div>
-
                         </div>
 
                         <!-- Botón Buscar por cédula -->
@@ -169,18 +169,18 @@
 
                     <!-- LADO DERECHO: Activar cámara -->
                     <div class="d-flex flex-column align-items-center mt-3" style="flex: 1;">
-                          <div class="card shadow-lg" style="width: 320px; border-radius: 15px; background-color: #f7f7f7;">
-                              <div class="card-header text-center" style="background-color: #032B3F; color: #f7f7f7; border-top-left-radius: 15px; border-top-right-radius: 15px;">
-                                  <h5 class="mb-0">Activar cámara</h5>
-                              </div>
-                              <div class="card-body d-flex flex-column align-items-center">
-                                  <video id="video" width="280" height="280" style="border:2px solid #032B3F; border-radius: 12px;" autoplay muted></video>
-                                  <button id="btnActivarCamara" class="btn btn-primary mt-3 fs-5" style="background-color: #0A5386; border: none; border-radius: 8px; padding: 8px 20px;">
-                                      Activar cámara
-                                  </button>
-                              </div>
-                          </div>
-                      </div>
+                        <div class="card shadow-lg" style="width: 320px; border-radius: 15px; background-color: #f7f7f7;">
+                            <div class="card-header text-center" style="background-color: #032B3F; color: #f7f7f7; border-top-left-radius: 15px; border-top-right-radius: 15px;">
+                                <h5 class="mb-0">Activar cámara</h5>
+                            </div>
+                            <div class="card-body d-flex flex-column align-items-center">
+                                <video id="video" width="280" height="280" style="border:2px solid #032B3F; border-radius: 12px;" autoplay muted></video>
+                                <button id="btnActivarCamara" class="btn btn-primary mt-3 fs-5" style="background-color: #0A5386; border: none; border-radius: 8px; padding: 8px 20px;">
+                                    Activar cámara
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
                 </div>
 
@@ -188,6 +188,7 @@
         </div>
     </div>
 </main>
+
 
     <!-- FOOTER -->
     <footer id="DivFooter" class="text-dark py-3 mt-auto">

@@ -92,6 +92,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/comedor/buscar', [EstudiantesController::class, 'mostrarEnComedor'])
         ->name('comedor.buscar')
         ->middleware('permission:ver ingreso comedor');
+
+        Route::post('/asistencia/confirmar', [AsistenciaController::class, 'confirmar'])->name('asistencia.confirmar');
+
+
+
 });
 
 //----------------------------------------

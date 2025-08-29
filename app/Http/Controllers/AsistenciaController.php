@@ -73,8 +73,9 @@ class AsistenciaController extends Controller
                 }
             }
         }
-    
-        return view('IngresoCom.IngresoComedor');
+        $tiposBeca = TipoBeca::with('propiedade')->get();
+        $persona = null; // Siempre definido, aunque sea null
+        return view('IngresoCom.IngresoComedor', compact('persona', 'tiposBeca'));
     }
     
     public function buscarEstudiante(Request $request)
@@ -225,4 +226,54 @@ class AsistenciaController extends Controller
 
         return back()->with('success', 'Asistencia guardada correctamente.');
     }
+    public function confirmar(Request $request)
+    {
+        $request->validate([
+            'estudiante_id' => 'required|exists:estudiantes,id',
+            'tipo_beca' => 'required|exists:tipo_becas,id',
+        ]);
+    
+        $estudiante = Estudiante::with('tipoBecas')->find($request->estudiante_id);
+    
+        if (!$estudiante->tipoBecas->pluck('id')->contains($request->tipo_beca)) {
+            return back()->with('error', 'El estudiante no tiene la beca seleccionada.');
+        }
+    
+        $tipoBeca = TipoBeca::find($request->tipo_beca);
+        $tipo_asistencia = strtolower(str_replace([' ', '-'], ['_', '_'], $tipoBeca->propiedade->nombre));
+    
+        $hoy = now()->startOfDay();
+    
+        // 1️⃣ Eliminar cualquier asistencia ausente existente del estudiante para este tipo de beca
+        $asistenciaAusente = Asistencia::whereDate('fecha_hora', $hoy)
+            ->where('tipo_asistencia', $tipo_asistencia)
+            ->where('estado', 'ausente')
+            ->first();
+    
+        if ($asistenciaAusente) {
+            ListadoAsistencia::where('estudiante_id', $estudiante->id)
+                ->where('asistencia_id', $asistenciaAusente->id)
+                ->delete();
+            $asistenciaAusente->delete();
+        }
+    
+        // 2️⃣ Crear o usar la asistencia presente del día
+        $asistenciaPresente = Asistencia::firstOrCreate(
+            [
+                'fecha_hora' => $hoy,
+                'tipo_asistencia' => $tipo_asistencia,
+                'estado' => 'presente'
+            ]
+        );
+    
+        // 3️⃣ Crear registro en ListadoAsistencia solo si no existe
+        ListadoAsistencia::firstOrCreate([
+            'estudiante_id' => $estudiante->id,
+            'asistencia_id' => $asistenciaPresente->id,
+        ]);
+    
+        return back()->with('success', 'Asistencia registrada correctamente.');
+    }
+    
+
 }

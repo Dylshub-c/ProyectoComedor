@@ -124,35 +124,40 @@
       </div>
 
 
-      <div style="display: flex; gap: 2rem; align-items: flex-start;">
+      <div class="d-flex flex-column flex-md-row gap-4">
       <!-- Tabla con nombre, tipo de beca y checkbox -->
-      <table class="becas-tabla" style="flex: 1.5;">
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Tipo de Beca</th>
-            <th>Marcar</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Juan Pérez</td>
-            <td>Beca completa</td>
-            <td class="text-start"><input type="checkbox" /></td>
-          </tr>
-          <!-- más filas si quieres -->
-        </tbody>
-      </table>
+      <div class="flex-fill">
+        <table class="becas-tabla table table-bordered w-100">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Tipo de Beca</th>
+              <th>Marcar</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Juan Pérez</td>
+              <td>Beca completa</td>
+              <td class="text-start"><input type="checkbox" /></td>
+            </tr>
+            <!-- más filas si quieres -->
+          </tbody>
+        </table>
+      </div>
 
       <!-- Caja con etiqueta y textarea -->
-      <div class="mb-4 textarea-box" style="flex: 2;">
-        <div class="etiqueta-superior" style="display: flex; align-items: center; gap: 0.5rem; color: black;">
-          <label for="explicacion" class="m-0 fw-semibold fs-5">Explicación del caso:</label>
-          <i class="bi bi-clipboard-fill clipboard-icon" style="color: black;"></i>
+      <div class="flex-fill">
+        <div class="mb-4 textarea-box">
+          <div class="etiqueta-superior d-flex align-items-center gap-2 text-dark">
+            <label for="explicacion" class="m-0 tituloBlanco fw-semibold fs-5">Explicación del caso:</label>
+            <i class="bi bi-clipboard-fill clipboard-icon text-white"></i>
+          </div>
+          <textarea id="explicacion" class="form-control fs-4" rows="6" placeholder="Escriba aquí..." style="color: black;"></textarea>
         </div>
-        <textarea id="explicacion" class="form-control fs-4" rows="6" placeholder="Escriba aquí..." style="color: black;"></textarea>
       </div>
     </div>
+
 
 
 

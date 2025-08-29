@@ -174,3 +174,6 @@
   height: auto;
 }
 
+.ms-7 {
+  margin-left: 1rem !important; 
+}

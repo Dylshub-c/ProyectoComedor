@@ -287,6 +287,49 @@ public function revisarAsistencia($persona_id)
     return view('estudiantes.informacion', compact('persona', 'asistencias'));
 }
 
-    
 
+
+    public function revisar($persona_id)
+    {
+        // Traemos la persona con su relación estudiante
+        $persona = Persona::with('estudiante')->findOrFail($persona_id);
+
+        return view('RevisarAsistencia.AsistenciaEstudiante', compact('persona'));
+    }
+
+public function guardar(Request $request)
+{
+    $request->validate([
+        'estudiante_id' => 'required|exists:estudiantes,id',
+        'tipo_asistencia' => 'required|string',
+        'estado' => 'required|in:presente,ausente',
+        'fecha' => 'required|date',
+    ]);
+
+    $estudianteId = $request->estudiante_id;
+    $tipoAsistencia = $request->tipo_asistencia;
+    $estado = $request->estado;
+    $fecha = $request->fecha;
+
+    // Buscar o crear la asistencia correspondiente (no se borra)
+    $asistencia = Asistencia::firstOrCreate(
+        ['fecha_hora' => $fecha, 'tipo_asistencia' => $tipoAsistencia],
+        ['estado' => $estado]
+    );
+
+    // Eliminar listado existente solo para este estudiante
+    ListadoAsistencia::where('asistencia_id', $asistencia->id)
+        ->where('estudiante_id', $estudianteId)
+        ->delete();
+
+    // Crear nuevo listado para el estudiante
+    ListadoAsistencia::create([
+        'estudiante_id' => $estudianteId,
+        'asistencia_id' => $asistencia->id,
+        'observaciones' => null,
+    ]);
+
+    return redirect()->back()->with('success', 'Asistencia creada o modificada correctamente.');
 }
+}
+

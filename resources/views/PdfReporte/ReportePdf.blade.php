@@ -24,204 +24,108 @@
     <p style="text-align: center">Mes: {{ $mes }} - Año: {{ $anio }}</p>
 </div>
 
-{{-- Recorrer tipos de beca --}}
-@foreach(['Almuerzo', 'Desayuno', 'Desayuno - Almuerzo'] as $tipoBeca)
+{{-- Recorrer tipos de beca dinámicos --}}
+@foreach($resumenGeneral as $tipoBeca => $estudiantesBeca)
     <div class="tipo-beca">
         <h2>Becados de {{ $tipoBeca }}</h2>
 
-        @if(count($resumenGeneral[$tipoBeca]) === 0)
+        @if(count($estudiantesBeca) === 0)
             <p>No hay registros de asistencias para esta categoría de beca.</p>
         @else
             @php
                 $semanasAgrupadas = [];
-                $mesTotalDesayunoAsist = 0;
-                $mesTotalDesayunoAus = 0;
-                $mesTotalAlmuerzoAsist = 0;
-                $mesTotalAlmuerzoAus = 0;
+                $mesTotalPresente = 0;
+                $mesTotalAusente = 0;
 
-                foreach($resumenGeneral[$tipoBeca] as $estudiante) {
+                foreach($estudiantesBeca as $estudiante) {
                     foreach($estudiante['semanas'] as $numSemana => $datos) {
                         $semanasAgrupadas[$numSemana][] = [
                             'nombre' => $estudiante['nombre'],
-                            'desayuno_asist' => $datos['desayuno_asist'],
-                            'desayuno_ausente' => $datos['desayuno_ausente'],
-                            'almuerzo_asist' => $datos['almuerzo_asist'],
-                            'almuerzo_ausente' => $datos['almuerzo_ausente'],
+                            'presente' => $datos['presente'],
+                            'ausente' => $datos['ausente'],
                         ];
-
-                        // Totales mensuales
-                        $mesTotalDesayunoAsist += $datos['desayuno_asist'];
-                        $mesTotalDesayunoAus += $datos['desayuno_ausente'];
-                        $mesTotalAlmuerzoAsist += $datos['almuerzo_asist'];
-                        $mesTotalAlmuerzoAus += $datos['almuerzo_ausente'];
+                        $mesTotalPresente += $datos['presente'];
+                        $mesTotalAusente += $datos['ausente'];
                     }
                 }
             @endphp
 
+            {{-- Imprimir por semanas --}}
             @foreach($semanasAgrupadas as $numSemana => $estudiantesSemana)
                 <p class="semana-title">Semana {{ $numSemana }}</p>
                 <table>
                     <thead>
                         <tr>
                             <th>Estudiante</th>
-                            @if($tipoBeca == 'Almuerzo')
-                                <th>Almuerzo (P)</th>
-                                <th>Almuerzo (A)</th>
-                                <th>% Almuerzo</th>
-                            @elseif($tipoBeca == 'Desayuno')
-                                <th>Desayuno (P)</th>
-                                <th>Desayuno (A)</th>
-                                <th>% Desayuno</th>
-                            @else
-                                <th>Desayuno (P)</th>
-                                <th>Desayuno (A)</th>
-                                <th>% Desayuno</th>
-                                <th>Almuerzo (P)</th>
-                                <th>Almuerzo (A)</th>
-                                <th>% Almuerzo</th>
-                            @endif
+                            <th>Presente</th>
+                            <th>Ausente</th>
+                            <th>% Asistencia</th>
                         </tr>
                     </thead>
                     <tbody>
                         @php
-                            $totalDesayunoAsist = 0;
-                            $totalDesayunoAus = 0;
-                            $totalAlmuerzoAsist = 0;
-                            $totalAlmuerzoAus = 0;
+                            $totalPresenteSemana = 0;
+                            $totalAusenteSemana = 0;
                         @endphp
 
-                        @foreach($estudiantesSemana as $totales)
+                        @foreach($estudiantesSemana as $datos)
+                            @php
+                                $totalSemana = $datos['presente'] + $datos['ausente'];
+                                $porcentaje = $totalSemana > 0 ? round(($datos['presente'] / $totalSemana) * 100, 2) : 0;
+                                $totalPresenteSemana += $datos['presente'];
+                                $totalAusenteSemana += $datos['ausente'];
+                            @endphp
                             <tr>
-                                <td>{{ $totales['nombre'] }}</td>
-                                @if($tipoBeca == 'Almuerzo')
-                                    @php
-                                        $totalAlmuerzoAsist += $totales['almuerzo_asist'];
-                                        $totalAlmuerzoAus += $totales['almuerzo_ausente'];
-                                        $totalAlmuerzo = $totales['almuerzo_asist'] + $totales['almuerzo_ausente'];
-                                        $porcAlmuerzo = $totalAlmuerzo > 0 ? round(($totales['almuerzo_asist'] / $totalAlmuerzo) * 100, 2) : 0;
-                                    @endphp
-                                    <td>{{ $totales['almuerzo_asist'] }}</td>
-                                    <td>{{ $totales['almuerzo_ausente'] }}</td>
-                                    <td>{{ $porcAlmuerzo }}%</td>
-                                @elseif($tipoBeca == 'Desayuno')
-                                    @php
-                                        $totalDesayunoAsist += $totales['desayuno_asist'];
-                                        $totalDesayunoAus += $totales['desayuno_ausente'];
-                                        $totalDesayuno = $totales['desayuno_asist'] + $totales['desayuno_ausente'];
-                                        $porcDesayuno = $totalDesayuno > 0 ? round(($totales['desayuno_asist'] / $totalDesayuno) * 100, 2) : 0;
-                                    @endphp
-                                    <td>{{ $totales['desayuno_asist'] }}</td>
-                                    <td>{{ $totales['desayuno_ausente'] }}</td>
-                                    <td>{{ $porcDesayuno }}%</td>
-                                @else
-                                    @php
-                                        $totalDesayunoAsist += $totales['desayuno_asist'];
-                                        $totalDesayunoAus += $totales['desayuno_ausente'];
-                                        $totalAlmuerzoAsist += $totales['almuerzo_asist'];
-                                        $totalAlmuerzoAus += $totales['almuerzo_ausente'];
-                                        $totalDesayuno = $totales['desayuno_asist'] + $totales['desayuno_ausente'];
-                                        $porcDesayuno = $totalDesayuno > 0 ? round(($totales['desayuno_asist'] / $totalDesayuno) * 100, 2) : 0;
-                                        $totalAlmuerzo = $totales['almuerzo_asist'] + $totales['almuerzo_ausente'];
-                                        $porcAlmuerzo = $totalAlmuerzo > 0 ? round(($totales['almuerzo_asist'] / $totalAlmuerzo) * 100, 2) : 0;
-                                    @endphp
-                                    <td>{{ $totales['desayuno_asist'] }}</td>
-                                    <td>{{ $totales['desayuno_ausente'] }}</td>
-                                    <td>{{ $porcDesayuno }}%</td>
-                                    <td>{{ $totales['almuerzo_asist'] }}</td>
-                                    <td>{{ $totales['almuerzo_ausente'] }}</td>
-                                    <td>{{ $porcAlmuerzo }}%</td>
-                                @endif
+                                <td>{{ $datos['nombre'] }}</td>
+                                <td>{{ $datos['presente'] }}</td>
+                                <td>{{ $datos['ausente'] }}</td>
+                                <td>{{ $porcentaje }}%</td>
                             </tr>
                         @endforeach
 
-                        {{-- Fila de porcentaje general por semana --}}
+                        {{-- Totales por semana --}}
+                        @php
+                            $porcGeneralSemana = ($totalPresenteSemana + $totalAusenteSemana) > 0 
+                                ? round(($totalPresenteSemana / ($totalPresenteSemana + $totalAusenteSemana)) * 100, 2) 
+                                : 0;
+                        @endphp
                         <tr class="total-row">
                             <td>Total / % General</td>
-                            @if($tipoBeca == 'Almuerzo')
-                                @php
-                                    $totalGeneral = $totalAlmuerzoAsist + $totalAlmuerzoAus;
-                                    $porcGeneral = $totalGeneral > 0 ? round(($totalAlmuerzoAsist / $totalGeneral) * 100, 2) : 0;
-                                @endphp
-                                <td>{{ $totalAlmuerzoAsist }}</td>
-                                <td>{{ $totalAlmuerzoAus }}</td>
-                                <td>{{ $porcGeneral }}%</td>
-                            @elseif($tipoBeca == 'Desayuno')
-                                @php
-                                    $totalGeneral = $totalDesayunoAsist + $totalDesayunoAus;
-                                    $porcGeneral = $totalGeneral > 0 ? round(($totalDesayunoAsist / $totalGeneral) * 100, 2) : 0;
-                                @endphp
-                                <td>{{ $totalDesayunoAsist }}</td>
-                                <td>{{ $totalDesayunoAus }}</td>
-                                <td>{{ $porcGeneral }}%</td>
-                            @else
-                                @php
-                                    $totalGeneralDesayuno = $totalDesayunoAsist + $totalDesayunoAus;
-                                    $porcGeneralDesayuno = $totalGeneralDesayuno > 0 ? round(($totalDesayunoAsist / $totalGeneralDesayuno) * 100, 2) : 0;
-                                    $totalGeneralAlmuerzo = $totalAlmuerzoAsist + $totalAlmuerzoAus;
-                                    $porcGeneralAlmuerzo = $totalGeneralAlmuerzo > 0 ? round(($totalAlmuerzoAsist / $totalGeneralAlmuerzo) * 100, 2) : 0;
-                                @endphp
-                                <td>{{ $totalDesayunoAsist }}</td>
-                                <td>{{ $totalDesayunoAus }}</td>
-                                                                <td>{{ $porcGeneralDesayuno }}%</td>
-                                <td>{{ $totalAlmuerzoAsist }}</td>
-                                <td>{{ $totalAlmuerzoAus }}</td>
-                                <td>{{ $porcGeneralAlmuerzo }}%</td>
-                            @endif
+                            <td>{{ $totalPresenteSemana }}</td>
+                            <td>{{ $totalAusenteSemana }}</td>
+                            <td>{{ $porcGeneralSemana }}%</td>
                         </tr>
-
                     </tbody>
                 </table>
             @endforeach
 
-            {{-- Porcentaje mensual general por tipo de beca --}}
+            {{-- Totales mensuales por tipo de beca --}}
             <div class="resumen-final">
                 <h3>Porcentaje Mensual General - {{ $tipoBeca }}</h3>
+                @php
+                    $totalMes = $mesTotalPresente + $mesTotalAusente;
+                    $porcMes = $totalMes > 0 ? round(($mesTotalPresente / $totalMes) * 100, 2) : 0;
+                @endphp
                 <table>
                     <thead>
                         <tr>
-                            @if($tipoBeca != 'Almuerzo')
-                                <th>Desayuno (P)</th>
-                                <th>Desayuno (A)</th>
-                                <th>% Desayuno</th>
-                            @endif
-                            @if($tipoBeca != 'Desayuno')
-                                <th>Almuerzo (P)</th>
-                                <th>Almuerzo (A)</th>
-                                <th>% Almuerzo</th>
-                            @endif
+                            <th>Presente</th>
+                            <th>Ausente</th>
+                            <th>% Asistencia</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr class="total-row">
-                            @if($tipoBeca != 'Almuerzo')
-                                @php
-                                    $porcMensualDesayuno = ($mesTotalDesayunoAsist + $mesTotalDesayunoAus) > 0
-                                        ? round(($mesTotalDesayunoAsist / ($mesTotalDesayunoAsist + $mesTotalDesayunoAus)) * 100, 2)
-                                        : 0;
-                                @endphp
-                                <td>{{ $mesTotalDesayunoAsist }}</td>
-                                <td>{{ $mesTotalDesayunoAus }}</td>
-                                <td>{{ $porcMensualDesayuno }}%</td>
-                            @endif
-                            @if($tipoBeca != 'Desayuno')
-                                @php
-                                    $porcMensualAlmuerzo = ($mesTotalAlmuerzoAsist + $mesTotalAlmuerzoAus) > 0
-                                        ? round(($mesTotalAlmuerzoAsist / ($mesTotalAlmuerzoAsist + $mesTotalAlmuerzoAus)) * 100, 2)
-                                        : 0;
-                                @endphp
-                                <td>{{ $mesTotalAlmuerzoAsist }}</td>
-                                <td>{{ $mesTotalAlmuerzoAus }}</td>
-                                <td>{{ $porcMensualAlmuerzo }}%</td>
-                            @endif
+                            <td>{{ $mesTotalPresente }}</td>
+                            <td>{{ $mesTotalAusente }}</td>
+                            <td>{{ $porcMes }}%</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-
         @endif
     </div>
 @endforeach
 
 </body>
 </html>
-

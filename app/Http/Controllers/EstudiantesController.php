@@ -371,21 +371,16 @@ class EstudiantesController extends Controller
 public function mostrarEnComedor(Request $request)
 {
     $persona = null;
+    $asistencias = [];
+    $todasLasBecas = TipoBeca::with('propiedade')->get(); // 👈 aquí obtienes todas
 
     if ($request->filled('cedula')) {
-        // Traer la persona con relaciones necesarias
         $persona = Persona::with([
-            'estudiante.seccione.propiedade',
-            'estudiante.especialidade.propiedade',
             'estudiante.tipoBecas.propiedade'
-        ])
-        ->where('TipoUsuario', 'Estudiante')
-        ->where('Cedula', $request->cedula)
-        ->first();
+        ])->where('cedula', $request->cedula)->first();
     }
 
-    return view('IngresoCom.IngresoComedor', ['persona' => $persona ?? null]);
-
+    return view('IngresoCom.IngresoComedor', compact('persona', 'asistencias', 'todasLasBecas'));
 }
 
 

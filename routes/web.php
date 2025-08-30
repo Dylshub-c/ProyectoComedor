@@ -154,6 +154,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/estudiantes', [EstudiantesController::class, 'index'])
         ->name('estudiantes.index')
         ->middleware('permission:ver estudiantes');
+
+Route::get('/estudiantes/{estudiante}/asistencias', [EstudiantesController::class, 'getAsistencias'])->name('estudiantes.getAsistencias');
+
 });
 
 //----------------------------------------

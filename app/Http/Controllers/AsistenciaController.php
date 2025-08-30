@@ -13,83 +13,79 @@ use App\Models\TipoBeca;
 class AsistenciaController extends Controller
 {
 public function index()
-{
-    $fecha = Carbon::today(); // Fecha actual sin hora
-    $estados = ['presente', 'ausente'];
+    {
+        $fecha = Carbon::now('America/Costa_Rica')->startOfDay(); // Fecha actual en Costa Rica
+        $estados = ['presente', 'ausente'];
 
-    // 1️⃣ Obtener dinámicamente los tipos de asistencia desde las becas
-    $tipos = TipoBeca::with('propiedade')
-        ->get()
-        ->pluck('propiedade.nombre')
-        ->map(fn($nombre) => strtolower(str_replace([' ', '-'], ['_', '_'], $nombre)))
-        ->unique()
-        ->toArray();
+        // 1️⃣ Obtener dinámicamente los tipos de asistencia desde las becas
+        $tipos = TipoBeca::with('propiedade')
+            ->get()
+            ->pluck('propiedade.nombre')
+            ->map(fn($nombre) => strtolower(str_replace([' ', '-'], ['_', '_'], $nombre)))
+            ->unique()
+            ->toArray();
 
-    // 2️⃣ Crear asistencias del día si no existen
-    foreach ($tipos as $tipo) {
-        foreach ($estados as $estado) {
-            $yaExiste = Asistencia::whereDate('fecha_hora', $fecha)
-                ->where('tipo_asistencia', $tipo)
-                ->where('estado', $estado)
-                ->exists();
+        // 2️⃣ Crear asistencias del día si no existen
+        foreach ($tipos as $tipo) {
+            foreach ($estados as $estado) {
+                $yaExiste = Asistencia::whereDate('fecha_hora', $fecha)
+                    ->where('tipo_asistencia', $tipo)
+                    ->where('estado', $estado)
+                    ->exists();
 
-            if (!$yaExiste) {
-                Asistencia::create([
-                    'fecha_hora' => Carbon::now(),
-                    'tipo_asistencia' => $tipo,
-                    'estado' => $estado,
-                ]);
+                if (!$yaExiste) {
+                    Asistencia::create([
+                        'fecha_hora' => Carbon::now('America/Costa_Rica'),
+                        'tipo_asistencia' => $tipo,
+                        'estado' => $estado,
+                    ]);
+                }
             }
         }
-    }
 
-    // 3️⃣ Asignar ausencias según las becas de cada estudiante
-    $estudiantes = Estudiante::with('tipoBecas.propiedade')->get();
+        // 3️⃣ Asignar ausencias según las becas de cada estudiante
+        $estudiantes = Estudiante::with('tipoBecas.propiedade')->get();
 
-    foreach ($estudiantes as $estudiante) {
-        // Sacar los tipos de asistencia de este estudiante
-        $tiposAsignar = $estudiante->tipoBecas
-            ->map(fn($beca) => strtolower(str_replace([' ', '-'], ['_', '_'], $beca->propiedade->nombre ?? '')))
-            ->unique();
+        foreach ($estudiantes as $estudiante) {
+            $tiposAsignar = $estudiante->tipoBecas
+                ->map(fn($beca) => strtolower(str_replace([' ', '-'], ['_', '_'], $beca->propiedade->nombre ?? '')))
+                ->unique();
 
-        foreach ($tiposAsignar as $tipo) {
-            // 3.1️⃣ Verificar si el estudiante ya tiene presente
-            $tienePresente = ListadoAsistencia::where('estudiante_id', $estudiante->id)
-                ->whereHas('asistencia', function ($q) use ($tipo, $fecha) {
-                    $q->whereDate('fecha_hora', $fecha)
-                      ->where('tipo_asistencia', $tipo)
-                      ->where('estado', 'presente');
-                })->exists();
+            foreach ($tiposAsignar as $tipo) {
+                $tienePresente = ListadoAsistencia::where('estudiante_id', $estudiante->id)
+                    ->whereHas('asistencia', function ($q) use ($tipo, $fecha) {
+                        $q->whereDate('fecha_hora', $fecha)
+                          ->where('tipo_asistencia', $tipo)
+                          ->where('estado', 'presente');
+                    })->exists();
 
-            // 3.2️⃣ Solo asignar ausente si no tiene presente
-            if (!$tienePresente) {
-                $asistenciaAusente = Asistencia::whereDate('fecha_hora', $fecha)
-                    ->where('tipo_asistencia', $tipo)
-                    ->where('estado', 'ausente')
-                    ->first();
+                if (!$tienePresente) {
+                    $asistenciaAusente = Asistencia::whereDate('fecha_hora', $fecha)
+                        ->where('tipo_asistencia', $tipo)
+                        ->where('estado', 'ausente')
+                        ->first();
 
-                if ($asistenciaAusente) {
-                    $yaRegistrado = ListadoAsistencia::where('estudiante_id', $estudiante->id)
-                        ->where('asistencia_id', $asistenciaAusente->id)
-                        ->exists();
+                    if ($asistenciaAusente) {
+                        $yaRegistrado = ListadoAsistencia::where('estudiante_id', $estudiante->id)
+                            ->where('asistencia_id', $asistenciaAusente->id)
+                            ->exists();
 
-                    if (!$yaRegistrado) {
-                        ListadoAsistencia::create([
-                            'estudiante_id' => $estudiante->id,
-                            'asistencia_id' => $asistenciaAusente->id,
-                            'observaciones' => null
-                        ]);
+                        if (!$yaRegistrado) {
+                            ListadoAsistencia::create([
+                                'estudiante_id' => $estudiante->id,
+                                'asistencia_id' => $asistenciaAusente->id,
+                                'observaciones' => null
+                            ]);
+                        }
                     }
                 }
             }
         }
+
+        $tiposBeca = TipoBeca::with('propiedade')->get();
+        $persona = null; 
+        return view('IngresoCom.IngresoComedor', compact('persona', 'tiposBeca'));
     }
-
-    $tiposBeca = TipoBeca::with('propiedade')->get();
-    $persona = null; // Siempre definido, aunque sea null
-    return view('IngresoCom.IngresoComedor', compact('persona', 'tiposBeca'));
-}
-
     
     public function buscarEstudiante(Request $request)
     {
@@ -102,95 +98,88 @@ public function index()
         return view('IngresoCom.IngresoComedor', compact('estudiante'));
     }
 
-    public function guardarAsistenciaRapida(Request $request)
-    {
-        $validated = $request->validate([
-            'fecha_hora' => 'required|date',
-            'tipo_asistencia' => 'required|string|in:Desayuno,Almuerzo,Desayuno - Almuerzo',
-            'estado' => 'required|string|in:Presente,Ausente',
-            'observaciones' => 'nullable|string',
-        ]);
-
-        try {
-            $fecha = $request->input('fecha_hora');
-            $tipoSeleccionado = $request->input('tipo_asistencia');
-            $estado = $request->input('estado');
-            $observaciones = $request->input('observaciones');
-
-            $estudiantes = Estudiante::with('tipoBecas.propiedade')->get();
-
-            $tiposCrear = $tipoSeleccionado === 'Desayuno - Almuerzo' ? ['Desayuno', 'Almuerzo'] : [$tipoSeleccionado];
-
-            foreach ($tiposCrear as $tipoProc) {
-                Asistencia::whereDate('fecha_hora', $fecha)
-                    ->where('tipo_asistencia', $tipoProc)
-                    ->delete();
-
-                $asistencia = Asistencia::create([
-                    'fecha_hora' => $fecha,
-                    'tipo_asistencia' => $tipoProc,
-                    'estado' => $estado,
-                    'observaciones' => $observaciones
-                ]);
-
-                foreach ($estudiantes as $estudiante) {
-                    $asignar = $estudiante->tipoBecas->contains(function ($b) use ($tipoProc) {
-                        $nombre = strtolower($b->propiedade->nombre ?? '');
-                        return ($tipoProc === 'Desayuno' && str_contains($nombre, 'desayuno'))
-                            || ($tipoProc === 'Almuerzo' && str_contains($nombre, 'almuerzo'));
-                    });
-
-                    if ($asignar) {
-                        ListadoAsistencia::updateOrCreate(
-                            [
-                                'estudiante_id' => $estudiante->id,
-                                'asistencia_id' => $asistencia->id
-                            ],
-                            [
-                                'observaciones' => $observaciones
-                            ]
-                        );
-                    }
-                }
-            }
-
-            return response()->json(['message' => 'Asistencias creadas y asignadas correctamente'], 200);
-
-        } catch (\Exception $e) {
-            \Log::error('Error al guardar asistencia rápida: ' . $e->getMessage());
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
-    }
-
     public function asistenciaRapidaIndex(Request $request)
-    {
-        return view('AsistenciaRapida.asistenciaRapida');
+{
+    // Si viene AJAX y se envía beca_id, devolver estudiantes
+    if($request->ajax() && $request->has('beca_id')){
+        $estudiantes = Estudiante::with('tipoBecas.propiedade', 'persona')
+            ->whereHas('tipoBecas', function($q) use ($request){
+                $q->where('tipo_beca_id', $request->beca_id);
+            })->get();
+
+        $res = $estudiantes->map(function($e){
+            return [
+                'id' => $e->id,
+                'nombre_completo' => $e->persona->Nombre . ' ' . $e->persona->PrimerApellido . ' ' . $e->persona->SegundoApellido,
+                'beca' => $e->tipoBecas->first()->propiedade->nombre ?? '-'
+            ];
+        });
+
+        return response()->json($res);
     }
 
-    public function revisarAsistencia(Request $request, $persona_id = null)
-    {
-        $id = $persona_id ?? $request->query('persona_id') ?? session('persona_id');
+    $tiposBeca = TipoBeca::with('propiedade')->get();
+    return view('AsistenciaRapida.asistenciaRapida', compact('tiposBeca'));
 
-        if (!$id) {
-            return redirect()->route('estudiantes.informacion')
-                ->with('warning', 'Primero selecciona/busca un estudiante.');
-        }
+}
+public function guardarAsistenciaRapida(Request $request)
+{
+    $request->validate([
+        'fecha_hora' => 'required|date',
+        'tipo_asistencia' => 'required|exists:tipo_becas,id',
+        'estudiantes' => 'required|array',
+        'estudiantes.*.id' => 'required|exists:estudiantes,id',
+        'estudiantes.*.presente' => 'required|boolean',
+        'observaciones' => 'nullable|string',
+    ]);
 
-        $persona = Persona::with([
-            'estudiante.tipoBecas.propiedade',
-            'estudiante.listadosAsistencia.asistencia'
-        ])->find($id);
+    $fecha = Carbon::parse($request->fecha_hora)->startOfDay();
+    $tipoBeca = TipoBeca::find($request->tipo_asistencia);
+    $tipo_asistencia = strtolower(str_replace([' ', '-'], ['_', '_'], $tipoBeca->propiedade->nombre));
 
-        if (!$persona) {
-            return redirect()->route('estudiantes.informacion')
-                ->with('warning', 'Estudiante no encontrado.');
-        }
-
-        $listados = $persona->estudiante->listadosAsistencia
-            ->sortByDesc(fn($l) => $l->asistencia->fecha_hora);
-
-        return view('Asistencia.Asistenciass', compact('persona', 'listados'));
+    // Crear o usar asistencias del día
+    foreach (['presente', 'ausente'] as $estado) {
+        Asistencia::firstOrCreate([
+            'fecha_hora' => $fecha,
+            'tipo_asistencia' => $tipo_asistencia,
+            'estado' => $estado,
+        ]);
     }
+
+    // Obtener IDs de las asistencias para esa fecha y tipo
+    $asistencias = Asistencia::whereDate('fecha_hora', $fecha)
+        ->where('tipo_asistencia', $tipo_asistencia)
+        ->pluck('id')
+        ->toArray();
+
+    foreach ($request->estudiantes as $estudianteData) {
+        $estudianteId = $estudianteData['id'];
+        $estado = $estudianteData['presente'] ? 'presente' : 'ausente';
+
+        // Eliminar cualquier registro previo de este estudiante para estas asistencias
+        ListadoAsistencia::where('estudiante_id', $estudianteId)
+            ->whereIn('asistencia_id', $asistencias)
+            ->delete();
+
+        // Crear el nuevo registro solo para el estado actual
+        $asistencia = Asistencia::whereDate('fecha_hora', $fecha)
+            ->where('tipo_asistencia', $tipo_asistencia)
+            ->where('estado', $estado)
+            ->first();
+
+        if ($asistencia) {
+            ListadoAsistencia::create([
+                'estudiante_id' => $estudianteId,
+                'asistencia_id' => $asistencia->id,
+                'observaciones' => $request->observaciones,
+            ]);
+        }
+    }
+
+    return response()->json(['message' => 'Asistencia registrada correctamente.']);
+}
+
+
 
     public function guardarAsistenciaEstudiante(Request $request)
     {
@@ -286,6 +275,17 @@ public function confirmar(Request $request)
     return back()->with('success', 'Asistencia registrada correctamente.');
 }
 
+public function revisarAsistencia($persona_id)
+{
+    // Obtener el estudiante por persona_id
+    $persona = Persona::with('estudiante.tipoBecas', 'estudiante.seccione', 'estudiante.especialidade')->findOrFail($persona_id);
+
+    // Opcional: obtener asistencias del estudiante
+    $asistencias = $persona->estudiante->asistencias ?? [];
+
+    // Retornar la vista con los datos
+    return view('estudiantes.informacion', compact('persona', 'asistencias'));
+}
 
     
 

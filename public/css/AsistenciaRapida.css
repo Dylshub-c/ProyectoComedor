@@ -231,6 +231,7 @@ label.bg-primary {
   justify-content: space-between;
   align-items: center;
   font-size: 15px;
+  color:white;
 }
 
 /*la caja del textarea */
@@ -287,4 +288,52 @@ label.bg-primary {
 #btn-editar {
   background-color: #4f4f52;
   border-radius: 10px;
+}
+.becas-tabla {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid black;
+  border-radius: 7px;
+  color: black;
+  font-family: Arial, sans-serif;
+}
+
+.becas-tabla thead tr th {
+  padding: 0.5rem;
+  border-bottom: 1px solid black;
+  background-color: #f0f0f0;
+}
+
+.becas-tabla tbody tr td {
+  padding: 0.5rem;
+  border-bottom: 1px solid black;
+}
+
+.becas-tabla tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Bordes redondeados en las esquinas de la tabla */
+.becas-tabla thead tr th:first-child {
+  border-top-left-radius: 10px;
+}
+
+.becas-tabla thead tr th:last-child {
+  border-top-right-radius: 10px;
+}
+
+.becas-tabla tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 10px;
+}
+
+.becas-tabla tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 10px;
+}
+
+.text-center {
+  text-align: center;
+}
+.tituloBlanco{
+  color:white;
 }

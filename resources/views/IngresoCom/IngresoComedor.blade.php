@@ -73,9 +73,9 @@
         </div>
     </div>
 
-    <!-- CONTENIDO PRINCIPAL -->
-    <main class="flex-grow-1">
+<main class="flex-grow-1">
     <div class="container-fluid">
+        {{-- Mensajes de error --}}
         @if(session('error'))
             <div class="alert alert-danger fs-5">
                 {{ session('error') }}
@@ -84,17 +84,20 @@
 
         <div class="row justify-content-center mt-5">
             <div class="col-12 col-md-10">
-
                 <div class="d-flex flex-column flex-md-row justify-content-between gap-4">
 
                     <!-- LADO IZQUIERDO: Información del estudiante + botones -->
                     <div class="d-flex flex-column gap-4" style="flex: 1;">
                         @if($persona && $persona->estudiante)
+                        <form id="formAsistencia" method="POST" action="{{ route('asistencia.confirmar') }}">
+                            @csrf
+                            <input type="hidden" name="estudiante_id" value="{{ $persona->estudiante->id }}">
+
                             <div class="mb-3">
                                 <label for="tipoBecaSelect" class="form-label fs-5">Seleccionar tipo de beca:</label>
-                                <select class="form-select" id="tipoBecaSelect" name="tipo_beca">
+                                <select class="form-select" id="tipoBecaSelect" name="tipo_beca" required>
                                     <option value="" selected>-- Seleccione una beca --</option>
-                                    @foreach($persona->estudiante->tipoBecas as $beca)
+                                    @foreach($todasLasBecas as $beca)
                                         <option value="{{ $beca->id }}">
                                             {{ $beca->propiedade->nombre ?? 'Sin nombre' }}
                                         </option>
@@ -110,7 +113,7 @@
                                 @endphp
 
                                 <img class="img-fluid rounded-circle mb-3" id="fotoEstudiante" src="{{ $foto }}" alt="Foto del estudiante"
-                                    style="width: 180px; height: 180px; object-fit: cover; border:2px solid #032B3F;">
+                                     style="width: 180px; height: 180px; object-fit: cover; border:2px solid #032B3F;">
 
                                 <label id="NomEstudiante" class="mt-1 text-center fs-4">
                                     <strong>{{ $persona->Nombre }} {{ $persona->PrimerApellido }} {{ $persona->SegundoApellido }}</strong>
@@ -126,7 +129,7 @@
                                         <span id="especialidad">{{ $persona->estudiante->especialidade?->propiedade?->nombre ?? '-' }}</span>
                                     </li>
                                     <li class="list-group-item">
-                                        <strong class="fs-5">Tipo de beca:</strong><br />
+                                        <strong class="fs-5">Becas del estudiante:</strong><br />
                                         <span id="tipo-beca">
                                             @forelse($persona->estudiante->tipoBecas as $beca)
                                                 {{ $beca->propiedade->nombre }}@if(!$loop->last), @endif
@@ -138,58 +141,72 @@
                                 </ul>
 
                                 <div class="d-flex gap-3 justify-content-center mt-3">
-                                    <button type="button" class="btn btn-success fs-5 flex-fill" style="border-radius: 8px;" 
+                                    <button type="button" class="btn btn-success fs-5 flex-fill" style="border-radius: 8px;"
                                             data-bs-toggle="modal" data-bs-target="#confirmModal">
                                         Confirmar asistencia
                                     </button>
-                                    <button type="button" class="btn btn-danger fs-5 flex-fill" style="border-radius: 8px;">Rechazar asistencia</button>
+                                    <button type="button" class="btn btn-danger fs-5 flex-fill" style="border-radius: 8px;">
+                                        Rechazar asistencia
+                                    </button>
                                 </div>
                             </div>
 
-                            <!-- Modal de confirmación -->
+                            {{-- Modal de confirmación --}}
                             <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered">
-                                    <form id="formAsistencia" method="POST" action="{{ route('asistencia.confirmar') }}">
-                                        @csrf
-                                        <input type="hidden" name="estudiante_id" value="{{ $persona->estudiante->id }}">
-                                        <input type="hidden" name="tipo_beca_id" id="tipoBecaId">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="confirmModalLabel">Confirmar asistencia</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <p>¿Está seguro que desea marcar presente al estudiante para la beca seleccionada?</p>
-                                                <div class="mb-3">
-                                                    <label for="tipoBecaSelectModal" class="form-label">Tipo de beca</label>
-                                                    <select class="form-select" id="tipoBecaSelectModal" name="tipo_beca">
-                                                        <option value="" selected>-- Seleccione una beca --</option>
-                                                        @foreach($persona->estudiante->tipoBecas as $beca)
-                                                            <option value="{{ $beca->id }}">{{ $beca->propiedade->nombre }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                                <button type="submit" class="btn btn-success">Confirmar</button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-
-                            <!-- Modal de resultado (éxito o error) -->
-                            <div class="modal fade" id="resultModal" tabindex="-1" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content">
-                                        <div class="modal-body" id="resultMessage"></div>
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="confirmModalLabel">Confirmar asistencia</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>
+                                                ¿Marcar <strong>presente</strong> al estudiante
+                                                para la beca seleccionada?
+                                            </p>
+                                            <p class="mb-0">
+                                                <small>Se eliminará la ausencia del día para ese tipo (si existe)
+                                                y se registrará la presencia.</small>
+                                            </p>
+                                        </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <button type="submit" class="btn btn-success">Confirmar</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                        </form>
+
+                        {{-- Modal de éxito --}}
+                        {{-- Modal de éxito --}}
+                        @if(session('success'))
+                        <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content border-success">
+                                    <div class="modal-header bg-success text-white">
+                                        <h5 class="modal-title" id="successModalLabel">¡Éxito!</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        {{ session('success') }}
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                var successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                                successModal.show();
+                            });
+                        </script>
+                        @endif
+
+                        {{-- JS para select y modal éxito --}}
+                        
 
                         @else
                             <div class="alert alert-info fs-5">Por favor, busque un estudiante por cédula para mostrar la información.</div>
@@ -223,7 +240,6 @@
                                 </div>
                             </div>
                         </form>
-
                     </div>
 
                     <!-- LADO DERECHO: Activar cámara -->
@@ -242,11 +258,11 @@
                     </div>
 
                 </div>
-
             </div>
         </div>
     </div>
 </main>
+
 
 
     <!-- FOOTER -->
@@ -317,6 +333,32 @@
             }
         });
     </script>
+    <script>
+                            const selectBeca = document.getElementById("tipoBecaSelect");
+
+                            // Cargar selección previa
+                            const becaGuardada = localStorage.getItem("tipo_beca_seleccionada");
+                            if (becaGuardada) {
+                                selectBeca.value = becaGuardada;
+                            }
+
+                            // Guardar cuando cambie
+                            selectBeca.addEventListener("change", function () {
+                                localStorage.setItem("tipo_beca_seleccionada", this.value);
+                            });
+
+                            // Limpiar selección al buscar nuevo estudiante
+                            const formBuscar = document.getElementById("formBuscar");
+                            formBuscar.addEventListener("submit", function () {
+                                localStorage.removeItem("tipo_beca_seleccionada");
+                            });
+
+                            // Abrir modal de éxito si existe
+                            @if(session('success'))
+                                const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                                successModal.show();
+                            @endif
+                        </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"

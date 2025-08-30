@@ -93,7 +93,9 @@ Route::middleware(['auth'])->group(function () {
         ->name('comedor.buscar')
         ->middleware('permission:ver ingreso comedor');
 
-        Route::post('/asistencia/confirmar', [AsistenciaController::class, 'confirmar'])->name('asistencia.confirmar');
+    Route::post('/comedor/asistencia/confirmar', [AsistenciaController::class, 'confirmar'])
+        ->name('asistencia.confirmar');
+
 
 
 

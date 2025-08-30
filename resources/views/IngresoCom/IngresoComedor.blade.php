@@ -145,7 +145,7 @@
                                             data-bs-toggle="modal" data-bs-target="#confirmModal">
                                         Confirmar asistencia
                                     </button>
-                                    <button type="button" class="btn btn-danger fs-5 flex-fill" style="border-radius: 8px;">
+                                    <button type="button" id="btnRechazar" class="btn btn-danger fs-5 flex-fill" style="border-radius: 8px;">
                                         Rechazar asistencia
                                     </button>
                                 </div>
@@ -296,6 +296,25 @@
     });
 </script>
 <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const btnRechazar = document.getElementById('btnRechazar');
+        const formAsistencia = document.getElementById('formAsistencia');
+
+        btnRechazar.addEventListener('click', function () {
+            // Confirmación opcional
+            if(!confirm('¿Está seguro que desea rechazar la asistencia?')) return;
+
+            // Limpiar el formulario y datos del estudiante
+            formAsistencia.reset();
+
+            // Quitar la información visual del estudiante
+            const primerModulo = document.getElementById('PrimerModulo');
+            if(primerModulo) {
+                primerModulo.innerHTML = '<p class="text-center fs-5">Estudiante rechazado. Por favor, busque otro estudiante.</p>';
+            }
+        });
+    });
+</script>
         const btnIniciarScan = document.getElementById('btnIniciarScan');
         const scanStatus = document.getElementById('scanStatus');
         let html5QrCode;

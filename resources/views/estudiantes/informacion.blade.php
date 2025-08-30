@@ -165,8 +165,9 @@
                         <div class="text-center mt-2">
 
                         <a href="{{ route('asistencia.revisar', ['persona_id' => $persona->id]) }}" class="btnPrimario fs-5">
-                            <i class="bi bi-person-badge-fill"></i><strong> | Revisar Asistencia</strong>
-                        </a>
+    <i class="bi bi-person-badge-fill"></i><strong> | Revisar Asistencia</strong>
+</a>
+
                     </div>
 
                         <form method="POST" action="{{ route('estudiantes.destroy', $persona->id) }}" id="formEliminar">

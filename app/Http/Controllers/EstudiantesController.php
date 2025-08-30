@@ -382,6 +382,42 @@ public function mostrarEnComedor(Request $request)
 
     return view('IngresoCom.IngresoComedor', compact('persona', 'asistencias', 'todasLasBecas'));
 }
+public function getAsistencias(Request $request, $id)
+{
+    $mes = $request->query('mes'); // YYYY-MM
+    $tipoBecaNombre = $request->query('tipo_beca'); // ejemplo: "Hola"
+
+    $estudiante = \App\Models\Estudiante::findOrFail($id);
+
+    $listado = $estudiante->listadosAsistencia()
+        ->with('asistencia')
+        ->when($mes, function($query) use ($mes) {
+            [$anio, $mesNum] = explode('-', $mes);
+            $query->whereHas('asistencia', function($q) use ($anio, $mesNum) {
+                $q->whereYear('fecha_hora', $anio)
+                  ->whereMonth('fecha_hora', $mesNum);
+            });
+        })
+        ->when($tipoBecaNombre, function($query) use ($tipoBecaNombre) {
+            $query->whereHas('asistencia', function($q) use ($tipoBecaNombre) {
+                $q->where('tipo_asistencia', $tipoBecaNombre);
+            });
+        })
+        ->get();
+
+    $result = $listado->map(function($item) {
+        return [
+            'fecha_hora' => $item->asistencia->fecha_hora->format('d/m/Y'),
+            'tipo_asistencia' => $item->asistencia->tipo_asistencia,
+            'estado' => $item->asistencia->estado,
+            'observaciones' => $item->observaciones ?? '',
+        ];
+    });
+
+    return response()->json($result);
+}
+
+
 
 
 

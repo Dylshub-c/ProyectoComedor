@@ -85,9 +85,9 @@ Route::middleware(['auth'])->group(function () {
         ->name('asistencia.guardar')
         ->middleware('permission:asistencia');
 
-    Route::get('/asistencia/revisar/{persona_id?}', [AsistenciaController::class, 'revisarAsistencia'])
-        ->name('asistencia.revisar')
-        ->middleware('permission:ver asistencia');
+    Route::get('/asistencia/revisar/{persona_id}', [AsistenciaController::class, 'revisar'])
+    ->name('asistencia.revisar');
+
 
     Route::get('/comedor/buscar', [EstudiantesController::class, 'mostrarEnComedor'])
         ->name('comedor.buscar')
@@ -96,7 +96,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/comedor/asistencia/confirmar', [AsistenciaController::class, 'confirmar'])
         ->name('asistencia.confirmar');
 
-
+Route::post('/asistencia/guardar', [AsistenciaController::class, 'guardar'])
+    ->name('asistencia.guardar');
 
 
 });
@@ -154,6 +155,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/estudiantes', [EstudiantesController::class, 'index'])
         ->name('estudiantes.index')
         ->middleware('permission:ver estudiantes');
+
+Route::get('/estudiantes/{estudiante}/asistencias', [EstudiantesController::class, 'getAsistencias'])->name('estudiantes.getAsistencias');
+
 });
 
 //----------------------------------------

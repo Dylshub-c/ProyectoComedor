@@ -99,7 +99,7 @@
                 <tbody>
                     @forelse ($roles as $rol)
                     <tr>
-                        <td class="fs-5">{{ $rol->name }}</td>
+                        <td class="fs-7">{{ $rol->name }}</td>
                         <td>
                             @foreach ($rol->permissions as $permiso)
                                 <span class="badge bg-secondary me-1">{{ $permiso->name }}</span>
@@ -107,18 +107,21 @@
                         </td>
                         <td>
                             @if (Str::lower($rol->name) !== 'administrador')
-                                <a href="{{ route('roles.edit', $rol->id) }}" class="btn btn-warning btn-sm me-1">
-                                    <i class="bi bi-pencil"></i> Editar
-                                </a>
-                                <form action="{{ route('roles.destroy', $rol->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar rol? Esta acción no se puede deshacer.')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-danger btn-sm" type="submit">
-                                        <i class="bi bi-trash"></i> Eliminar
-                                    </button>
-                                </form>
+                                <div class="d-inline-flex align-items-center">
+                                    <a href="{{ route('roles.edit', $rol->id) }}" class="btn btnPrimario btn-sm me-1">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </a>
+                                    <form action="{{ route('roles.destroy', $rol->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar rol? Esta acción no se puede deshacer.')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="btn btnPrimario btn-sm" type="submit">
+                                            <i class="bi bi-trash"></i> Eliminar
+                                        </button>
+                                    </form>
+                                </div>
                             @endif
                         </td>
+
                     </tr>
                     @empty
                     <tr>

@@ -79,18 +79,19 @@
 
     <div class="container-fluid p-4 ps-5 pe-5">
         <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-3">
-            <div class="header d-flex flex-column flex-md-row align-items-stretch align-items-md-center flex-grow-1 gap-3 shadow-sm">
-                {{-- Buscar por nombre --}}
-                <div class="input-icon-container d-flex flex-column flex-md-row align-items-start align-items-md-center">
-                    <i class="fa-solid fa-clipboard-user color1"></i>
-                    <input type="text" class="input-line fs-5" placeholder="Buscar por nombre" />
-                </div>
+        <div class="header ms-7 d-flex flex-column flex-md-row align-items-stretch align-items-md-center flex-grow-1 gap-3 shadow-sm">
+    {{-- Buscar por nombre --}}
+    <div class="input-icon-container d-flex flex-column flex-md-row align-items-start align-items-md-center">
+        <i class="fa-solid fa-clipboard-user color1"></i>
+        <input type="text" class="input-line fs-5" placeholder="Buscar por nombre" />
+    </div>
 
-                {{-- Logo --}}
-                <div class="ms-md-auto text-center text-md-end">
-                    <img class="logo" src="{{ asset('img/LogoCovao.webp') }}" alt="Logo" />
-                </div>
-            </div>
+    {{-- Logo --}}
+    <div class="ms-md-auto text-center text-md-end">
+        <img class="logo" src="{{ asset('img/LogoCovao.webp') }}" alt="Logo" />
+    </div>
+</div>
+
         </div>
     </div>
 

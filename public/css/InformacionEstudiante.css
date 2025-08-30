@@ -160,6 +160,11 @@ body {
   justify-content: center;
   gap: 8px; /* Espacio entre ícono y texto */
 }
+.btnPrimario:hover {
+  background-color: white;
+  color: black;
+}
+
 .btnPrimario i {
   margin: 0;
 }

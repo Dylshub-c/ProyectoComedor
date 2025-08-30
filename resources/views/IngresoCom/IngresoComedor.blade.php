@@ -206,7 +206,7 @@
                         @endif
 
                         {{-- JS para select y modal éxito --}}
-                        
+
 
                         @else
                             <div class="alert alert-info fs-5">Por favor, busque un estudiante por cédula para mostrar la información.</div>
@@ -245,17 +245,19 @@
                     <!-- LADO DERECHO: Activar cámara -->
                     <div class="d-flex flex-column align-items-center mt-3" style="flex: 1;">
                         <div class="card shadow-lg" style="width: 320px; border-radius: 15px; background-color: #f7f7f7;">
-                            <div class="card-header text-center" style="background-color: #032B3F; color: #f7f7f7; border-top-left-radius: 15px; border-top-right-radius: 15px;">
-                                <h5 class="mb-0">Activar cámara</h5>
+                            <div class="card-header text-center" style="background-color: #032B3F; color: #f7f7f7; border-radius: 15px 15px 0 0;">
+                                <h5 class="mb-0">Escanear cédula</h5>
                             </div>
                             <div class="card-body d-flex flex-column align-items-center">
-                                <video id="video" width="280" height="280" style="border:2px solid #032B3F; border-radius: 12px;" autoplay muted></video>
-                                <button id="btnActivarCamara" class="btn btn-primary mt-3 fs-5" style="background-color: #0A5386; border: none; border-radius: 8px; padding: 8px 20px;">
-                                    Activar cámara
+                                <div id="reader" style="width:280px; height:280px; border:2px solid #032B3F; border-radius:12px;"></div>
+                                <button id="btnIniciarScan" class="btn btn-primary mt-3 fs-5" style="background-color:#0A5386; border:none; border-radius:8px; padding:8px 20px;">
+                                    Iniciar cámara
                                 </button>
+                                <small id="scanStatus" class="text-muted mt-2"></small>
                             </div>
                         </div>
                     </div>
+
 
                 </div>
             </div>
@@ -278,6 +280,9 @@
 
     <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/1e23feddae.js" crossorigin="anonymous"></script>
     <script>
         const asistenciasEstudiante = @json($asistencias ?? []);
     </script>
@@ -310,6 +315,55 @@
         });
     });
 </script>
+        const btnIniciarScan = document.getElementById('btnIniciarScan');
+        const scanStatus = document.getElementById('scanStatus');
+        let html5QrCode;
+        let scanning = false;
+
+        btnIniciarScan.addEventListener('click', async () => {
+            if (scanning) return;
+            scanning = true;
+            scanStatus.innerText = "Buscando cámaras...";
+
+            html5QrCode = new Html5Qrcode("reader");
+
+            try {
+                const cameras = await Html5Qrcode.getCameras();
+                console.log("Cámaras detectadas:", cameras);
+
+                if (cameras && cameras.length) {
+                    scanStatus.innerText = "Cámara iniciada, apuntar QR...";
+                    const cameraId = cameras[0].id;
+
+                    html5QrCode.start(
+                        cameraId,
+                        { fps: 10, qrbox: 250 },
+                        (decodedText, decodedResult) => {
+                            console.log("Código detectado:", decodedText);
+                            scanStatus.innerText = "Código detectado: " + decodedText;
+
+                            // Llenar el input de búsqueda y enviar
+                            const inputCedula = document.getElementById('cedulaEstudiante');
+                            inputCedula.value = decodedText;
+                            document.getElementById('formBuscar').submit();
+
+                            html5QrCode.stop().then(() => scanning = false);
+                        },
+                        (errorMessage) => {
+                            // error de lectura (normal)
+                        }
+                    );
+                } else {
+                    scanStatus.innerText = "No se encontraron cámaras.";
+                    scanning = false;
+                }
+            } catch (err) {
+                alert("Error al acceder a la cámara: " + err);
+                scanning = false;
+            }
+        });
+    </script>
+
     <script>
         document.getElementById('formBuscar').addEventListener('submit', function(e) {
             const select = document.getElementById('TipoAsistencia');
@@ -334,24 +388,6 @@
         select.addEventListener('change', () => {
             localStorage.setItem('tipo_asistencia', select.value);
         });
-
-        // Activar cámara
-        const btnCamara = document.getElementById('btnActivarCamara');
-        const video = document.getElementById('video');
-
-        btnCamara.addEventListener('click', async () => {
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                    video.srcObject = stream;
-                } catch (err) {
-                    alert('No se pudo acceder a la cámara: ' + err);
-                }
-            } else {
-                alert('Su navegador no soporta cámara.');
-            }
-        });
-    </script>
     <script>
                             const selectBeca = document.getElementById("tipoBecaSelect");
 

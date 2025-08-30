@@ -231,6 +231,7 @@ label.bg-primary {
   justify-content: space-between;
   align-items: center;
   font-size: 15px;
+  color:white;
 }
 
 /*la caja del textarea */
@@ -332,4 +333,7 @@ label.bg-primary {
 
 .text-center {
   text-align: center;
+}
+.tituloBlanco{
+  color:white;
 }

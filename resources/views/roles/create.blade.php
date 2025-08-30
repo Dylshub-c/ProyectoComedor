@@ -25,7 +25,7 @@
       border-color: #032B3F;
     }
     .btnPrimario:hover {
-      background-color: #032B3F;
+      background-color: white;
       border-color: #032B3F;
     }
     label.form-check-label {

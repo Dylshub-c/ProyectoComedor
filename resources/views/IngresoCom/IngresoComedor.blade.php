@@ -89,52 +89,111 @@
 
                     <!-- LADO IZQUIERDO: Información del estudiante + botones -->
                     <div class="d-flex flex-column gap-4" style="flex: 1;">
-                        <!-- Card del estudiante -->
-                        <div id="PrimerModulo" class="text-center card shadow-lg p-3" style="border-radius: 15px; background-color: #f7f7f7;">
-                            @php
-                                $foto = isset($persona) && $persona?->estudiante?->foto
-                                    ? asset($persona->estudiante->foto)
-                                    : asset('/img/FotoEstudiante.webp');
-                            @endphp
-
-                            <img class="img-fluid rounded-circle mb-3" id="fotoEstudiante" src="{{ $foto }}" alt="Foto del estudiante" style="width: 180px; height: 180px; object-fit: cover; border:2px solid #032B3F;">
-
-                            <label id="NomEstudiante" class="mt-1 text-center fs-4">
-                                <strong>
-                                    {{ isset($persona) ? "{$persona->Nombre} {$persona->PrimerApellido} {$persona->SegundoApellido}" : 'Nombre del estudiante' }}
-                                </strong>
-                            </label>
-
-                            <ul id="ul-Estudiante" class="list-group mt-4 mb-3">
-                                <li class="list-group-item">
-                                    <strong class="fs-5">Cédula:</strong><br />
-                                    <span id="cedula">{{ $persona?->Cedula ?? '-' }}</span>
-                                </li>
-                                <li class="list-group-item">
-                                    <strong class="fs-5">Especialidad:</strong><br />
-                                    <span id="especialidad">{{ $persona?->estudiante?->especialidade?->propiedade?->nombre ?? '-' }}</span>
-                                </li>
-                                <li class="list-group-item">
-                                    <strong class="fs-5">Tipo de beca:</strong><br />
-                                    <span id="tipo-beca">
-                                        @if($persona?->estudiante?->tipoBecas)
-                                            @foreach($persona->estudiante->tipoBecas as $beca)
-                                                {{ $beca->propiedade->nombre }}@if(!$loop->last), @endif
-                                            @endforeach
-                                        @else
-                                            -
-                                        @endif
-                                    </span>
-                                </li>
-                            </ul>
-
-                            <!-- Botones de Confirmar y Rechazar Asistencia dentro de la card -->
-                            <div class="d-flex gap-3 justify-content-center mt-3">
-                                <button type="button" class="btn btn-success fs-5 flex-fill" style="border-radius: 8px;">Confirmar asistencia</button>
-                                <button type="button" class="btn btn-danger fs-5 flex-fill" style="border-radius: 8px;">Rechazar asistencia</button>
+                        @if($persona && $persona->estudiante)
+                            <div class="mb-3">
+                                <label for="tipoBecaSelect" class="form-label fs-5">Seleccionar tipo de beca:</label>
+                                <select class="form-select" id="tipoBecaSelect" name="tipo_beca">
+                                    <option value="" selected>-- Seleccione una beca --</option>
+                                    @foreach($persona->estudiante->tipoBecas as $beca)
+                                        <option value="{{ $beca->id }}">
+                                            {{ $beca->propiedade->nombre ?? 'Sin nombre' }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
 
-                        </div>
+                            <div id="PrimerModulo" class="text-center card shadow-lg p-3" style="border-radius: 15px; background-color: #f7f7f7;">
+                                @php
+                                    $foto = $persona->estudiante->foto
+                                        ? asset($persona->estudiante->foto)
+                                        : asset('/img/FotoEstudiante.webp');
+                                @endphp
+
+                                <img class="img-fluid rounded-circle mb-3" id="fotoEstudiante" src="{{ $foto }}" alt="Foto del estudiante"
+                                    style="width: 180px; height: 180px; object-fit: cover; border:2px solid #032B3F;">
+
+                                <label id="NomEstudiante" class="mt-1 text-center fs-4">
+                                    <strong>{{ $persona->Nombre }} {{ $persona->PrimerApellido }} {{ $persona->SegundoApellido }}</strong>
+                                </label>
+
+                                <ul id="ul-Estudiante" class="list-group mt-4 mb-3">
+                                    <li class="list-group-item">
+                                        <strong class="fs-5">Cédula:</strong><br />
+                                        <span id="cedula">{{ $persona->Cedula }}</span>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong class="fs-5">Especialidad:</strong><br />
+                                        <span id="especialidad">{{ $persona->estudiante->especialidade?->propiedade?->nombre ?? '-' }}</span>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong class="fs-5">Tipo de beca:</strong><br />
+                                        <span id="tipo-beca">
+                                            @forelse($persona->estudiante->tipoBecas as $beca)
+                                                {{ $beca->propiedade->nombre }}@if(!$loop->last), @endif
+                                            @empty
+                                                -
+                                            @endforelse
+                                        </span>
+                                    </li>
+                                </ul>
+
+                                <div class="d-flex gap-3 justify-content-center mt-3">
+                                    <button type="button" class="btn btn-success fs-5 flex-fill" style="border-radius: 8px;" 
+                                            data-bs-toggle="modal" data-bs-target="#confirmModal">
+                                        Confirmar asistencia
+                                    </button>
+                                    <button type="button" class="btn btn-danger fs-5 flex-fill" style="border-radius: 8px;">Rechazar asistencia</button>
+                                </div>
+                            </div>
+
+                            <!-- Modal de confirmación -->
+                            <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <form id="formAsistencia" method="POST" action="{{ route('asistencia.confirmar') }}">
+                                        @csrf
+                                        <input type="hidden" name="estudiante_id" value="{{ $persona->estudiante->id }}">
+                                        <input type="hidden" name="tipo_beca_id" id="tipoBecaId">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="confirmModalLabel">Confirmar asistencia</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>¿Está seguro que desea marcar presente al estudiante para la beca seleccionada?</p>
+                                                <div class="mb-3">
+                                                    <label for="tipoBecaSelectModal" class="form-label">Tipo de beca</label>
+                                                    <select class="form-select" id="tipoBecaSelectModal" name="tipo_beca">
+                                                        <option value="" selected>-- Seleccione una beca --</option>
+                                                        @foreach($persona->estudiante->tipoBecas as $beca)
+                                                            <option value="{{ $beca->id }}">{{ $beca->propiedade->nombre }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="submit" class="btn btn-success">Confirmar</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Modal de resultado (éxito o error) -->
+                            <div class="modal fade" id="resultModal" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-body" id="resultMessage"></div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        @else
+                            <div class="alert alert-info fs-5">Por favor, busque un estudiante por cédula para mostrar la información.</div>
+                        @endif
 
                         <!-- Botón Buscar por cédula -->
                         <button type="button" id="finalizarAsistencia" class="btn mt-4 fs-5" data-bs-toggle="modal" data-bs-target="#modalBuscar">
@@ -169,18 +228,18 @@
 
                     <!-- LADO DERECHO: Activar cámara -->
                     <div class="d-flex flex-column align-items-center mt-3" style="flex: 1;">
-                          <div class="card shadow-lg" style="width: 320px; border-radius: 15px; background-color: #f7f7f7;">
-                              <div class="card-header text-center" style="background-color: #032B3F; color: #f7f7f7; border-top-left-radius: 15px; border-top-right-radius: 15px;">
-                                  <h5 class="mb-0">Activar cámara</h5>
-                              </div>
-                              <div class="card-body d-flex flex-column align-items-center">
-                                  <video id="video" width="280" height="280" style="border:2px solid #032B3F; border-radius: 12px;" autoplay muted></video>
-                                  <button id="btnActivarCamara" class="btn btn-primary mt-3 fs-5" style="background-color: #0A5386; border: none; border-radius: 8px; padding: 8px 20px;">
-                                      Activar cámara
-                                  </button>
-                              </div>
-                          </div>
-                      </div>
+                        <div class="card shadow-lg" style="width: 320px; border-radius: 15px; background-color: #f7f7f7;">
+                            <div class="card-header text-center" style="background-color: #032B3F; color: #f7f7f7; border-top-left-radius: 15px; border-top-right-radius: 15px;">
+                                <h5 class="mb-0">Activar cámara</h5>
+                            </div>
+                            <div class="card-body d-flex flex-column align-items-center">
+                                <video id="video" width="280" height="280" style="border:2px solid #032B3F; border-radius: 12px;" autoplay muted></video>
+                                <button id="btnActivarCamara" class="btn btn-primary mt-3 fs-5" style="background-color: #0A5386; border: none; border-radius: 8px; padding: 8px 20px;">
+                                    Activar cámara
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
                 </div>
 
@@ -188,6 +247,7 @@
         </div>
     </div>
 </main>
+
 
     <!-- FOOTER -->
     <footer id="DivFooter" class="text-dark py-3 mt-auto">
@@ -205,6 +265,15 @@
     <script>
         const asistenciasEstudiante = @json($asistencias ?? []);
     </script>
+    <script>
+    const form = document.getElementById('formAsistencia');
+    const selectModal = document.getElementById('tipoBecaSelectModal');
+    const tipoBecaId = document.getElementById('tipoBecaId');
+
+    selectModal.addEventListener('change', () => {
+        tipoBecaId.value = selectModal.value;
+    });
+</script>
 
     <script>
         document.getElementById('formBuscar').addEventListener('submit', function(e) {

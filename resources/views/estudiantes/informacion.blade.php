@@ -259,11 +259,11 @@
                                     @foreach($tiposBeca as $index => $tipo)
                                         <div class="col-6">
                                             <div class="form-check">
-                                                <input 
-                                                    class="form-check-input" 
-                                                    type="checkbox" 
-                                                    name="tipo_beca_id[]" 
-                                                    value="{{ $tipo->id }}" 
+                                                <input
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                    name="tipo_beca_id[]"
+                                                    value="{{ $tipo->id }}"
                                                     id="beca_{{ $tipo->id }}"
                                                     {{ $persona->estudiante->tipoBecas->contains($tipo->id) ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="beca_{{ $tipo->id }}">
@@ -299,11 +299,13 @@
 
             <!-- imagen -->
             <div class="col-md-4 text-center mb-5 align-self-center">
-                <img
-                    src="{{ asset($persona->estudiante && $persona->estudiante->foto ? $persona->estudiante->foto : 'img/FotoEstudiante.webp') }}"
+                <img src="{{ $persona->estudiante && $persona->estudiante->foto
+                    ? asset('storage/' . $persona->estudiante->foto)
+                    : asset('img/FotoEstudiante.webp') }}"
                     alt="Foto del estudiante"
                     class="foto-perfil-redonda"
-                >
+                />
+
             </div>
 
 

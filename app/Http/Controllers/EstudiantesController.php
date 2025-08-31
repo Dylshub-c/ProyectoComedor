@@ -59,122 +59,114 @@ class EstudiantesController extends Controller
     }
 
     public function store(Request $request)
-    {
-        // Validación general
+{
+    // Validación general
+    $request->validate([
+        'nombre' => 'required|string',
+        'cedula' => 'required|string|unique:personas,Cedula',
+        'rol' => 'required|exists:roles,name',
+        'seccion' => 'required_if:rol,Estudiante|string|nullable',
+        'especialidad' => 'required_if:rol,Estudiante|string|nullable',
+        'tipo_beca_id' => 'required_if:rol,Estudiante|array|nullable',
+        'tipo_beca_id.*' => 'exists:tipo_becas,id',
+        'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
+
+    // Validar correo solo si no es estudiante
+    if (strtolower($request->rol) !== 'estudiante') {
         $request->validate([
-            'nombre' => 'required|string',
-            'cedula' => 'required|string|unique:personas,Cedula',
-            'rol' => 'required|exists:roles,name',
-            'seccion' => 'required_if:rol,Estudiante|string|nullable',
-            'especialidad' => 'required_if:rol,Estudiante|string|nullable',
-            'tipo_beca_id' => 'required_if:rol,Estudiante|array|nullable',
-            'tipo_beca_id.*' => 'exists:tipo_becas,id',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'correo' => 'required|email'
+        ]);
+    }
+
+    // Dividir nombre completo
+    $partes = explode(' ', trim($request->nombre));
+    $nombre = '';
+    $primerApellido = '';
+    $segundoApellido = '';
+
+    if (count($partes) >= 3) {
+        $segundoApellido = array_pop($partes);
+        $primerApellido = array_pop($partes);
+        $nombre = implode(' ', $partes);
+    } elseif (count($partes) == 2) {
+        $primerApellido = array_pop($partes);
+        $nombre = $partes[0];
+    } elseif (count($partes) == 1) {
+        $nombre = $partes[0];
+    }
+
+    DB::beginTransaction();
+    try {
+        // Crear persona
+        $persona = Persona::create([
+            'Nombre' => $nombre,
+            'PrimerApellido' => $primerApellido,
+            'SegundoApellido' => $segundoApellido,
+            'Cedula' => $request->cedula,
+            'TipoUsuario' => $request->rol,
         ]);
 
-        // Validar correo solo si no es estudiante
+        // Si no es estudiante, crear usuario
         if (strtolower($request->rol) !== 'estudiante') {
-            $request->validate([
-                'correo' => 'required|email'
-            ]);
-        }
-
-        // Dividir nombre completo
-        $partes = explode(' ', trim($request->nombre));
-        $nombre = '';
-        $primerApellido = '';
-        $segundoApellido = '';
-
-        if (count($partes) >= 3) {
-            $segundoApellido = array_pop($partes);
-            $primerApellido = array_pop($partes);
-            $nombre = implode(' ', $partes);
-        } elseif (count($partes) == 2) {
-            $primerApellido = array_pop($partes);
-            $nombre = $partes[0];
-        } elseif (count($partes) == 1) {
-            $nombre = $partes[0];
-        }
-
-        DB::beginTransaction();
-        try {
-            // Crear persona
-            $persona = Persona::create([
-                'Nombre' => $nombre,
-                'PrimerApellido' => $primerApellido,
-                'SegundoApellido' => $segundoApellido,
-                'Cedula' => $request->cedula,
-                'TipoUsuario' => $request->rol,
-            ]);
-
-            // Si no es estudiante, crear usuario
-            if (strtolower($request->rol) !== 'estudiante') {
-                $password = Str::random(10);
-                $user = User::firstOrCreate(
-                    ['email' => $request->correo],
-                    [
-                        'persona_id' => $persona->id,
-                        'password' => bcrypt($password),
-                    ]
-                );
-
-                // Asignar rol
-                $rol = Role::firstOrCreate(['name' => $request->rol]);
-                $user->syncRoles([$rol->id]);
-
-                // Sincronizar permisos del rol al usuario
-                $user->syncPermissions($rol->permissions);
-
-                // Enviar correo si se creó el usuario
-                if ($user->wasRecentlyCreated) {
-                    Mail::to($user->email)->send(new \App\Mail\AdminRegisteredMail(
-                        $request->correo,
-                        $password,
-                        $persona->Nombre
-                    ));
-                }
-            }
-
-            // Si es estudiante, crear registro en estudiantes
-            if (strtolower($request->rol) === 'estudiante') {
-                $fotoRuta = null;
-                if ($request->hasFile('foto')) {
-                    $file = $request->file('foto');
-                    $nombreArchivo = time() . '_' . $file->getClientOriginalName();
-                    $rutaDestino = public_path('fotos');
-                    if (!file_exists($rutaDestino)) mkdir($rutaDestino, 0755, true);
-                    $file->move($rutaDestino, $nombreArchivo);
-                    $fotoRuta = 'fotos/' . $nombreArchivo;
-                }
-
-                $especialidadProp = Propiedade::firstOrCreate(['nombre' => $request->especialidad]);
-                $seccionProp = Propiedade::firstOrCreate(['nombre' => $request->seccion]);
-
-                $especialidad = Especialidade::firstOrCreate(['propiedade_id' => $especialidadProp->id]);
-                $seccion = Seccione::firstOrCreate(['propiedade_id' => $seccionProp->id]);
-
-                $estudiante = Estudiante::create([
+            $password = Str::random(10);
+            $user = User::firstOrCreate(
+                ['email' => $request->correo],
+                [
                     'persona_id' => $persona->id,
-                    'especialidade_id' => $especialidad->id,
-                    'seccione_id' => $seccion->id,
-                    'foto' => $fotoRuta,
-                ]);
+                    'password' => bcrypt($password),
+                ]
+            );
 
-                // Asignar becas (array)
-                if ($request->has('tipo_beca_id')) {
-                    $estudiante->tipoBecas()->attach($request->tipo_beca_id);
-                }
+            $rol = Role::firstOrCreate(['name' => $request->rol]);
+            $user->syncRoles([$rol->id]);
+            $user->syncPermissions($rol->permissions);
+
+            if ($user->wasRecentlyCreated) {
+                Mail::to($user->email)->send(new \App\Mail\AdminRegisteredMail(
+                    $request->correo,
+                    $password,
+                    $persona->Nombre
+                ));
+            }
+        }
+
+        // Si es estudiante, crear registro en estudiantes
+        if (strtolower($request->rol) === 'estudiante') {
+            $fotoRuta = null;
+
+            if ($request->hasFile('foto')) {
+                $fotoRuta = $request->file('foto')->store('public/fotos'); // storage/app/public/fotos
+                $fotoRuta = str_replace('public/', '', $fotoRuta); // Guardamos solo "fotos/nombre.jpg"
             }
 
-            DB::commit();
-            return redirect()->route('estudiantes.informacion')
-                ->with('success', 'Registro completado correctamente.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->withErrors(['error' => 'Error al guardar: ' . $e->getMessage()])
-                ->withInput();
+            $especialidadProp = Propiedade::firstOrCreate(['nombre' => $request->especialidad]);
+            $seccionProp = Propiedade::firstOrCreate(['nombre' => $request->seccion]);
+
+            $especialidad = Especialidade::firstOrCreate(['propiedade_id' => $especialidadProp->id]);
+            $seccion = Seccione::firstOrCreate(['propiedade_id' => $seccionProp->id]);
+
+            $estudiante = Estudiante::create([
+                'persona_id' => $persona->id,
+                'especialidade_id' => $especialidad->id,
+                'seccione_id' => $seccion->id,
+                'foto' => $fotoRuta,
+            ]);
+
+            if ($request->has('tipo_beca_id')) {
+                $estudiante->tipoBecas()->attach($request->tipo_beca_id);
+            }
         }
+
+        DB::commit();
+        return redirect()->route('estudiantes.informacion')
+            ->with('success', 'Registro completado correctamente.');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return back()->withErrors(['error' => 'Error al guardar: ' . $e->getMessage()])
+            ->withInput();
     }
+}
 
     public function show(string $id)
     {
@@ -308,14 +300,29 @@ class EstudiantesController extends Controller
 
 
 
-    public function destroy(Persona $persona)
+    public function destroy($id)
     {
-        // Eliminar persona y/o datos relacionados si es necesario
-        $persona->delete();
+        try {
+            $estudiante = Estudiante::findOrFail($id);
 
-        return redirect()->route('estudiantes.informacion')
-        ->with('success', 'Estudiante eliminado correctamente.');
+            // Eliminar relaciones tipoBecas
+            $estudiante->tipoBecas()->detach();
+
+            // Eliminar estudiante
+            $estudiante->delete();
+
+            // Eliminar persona asociada
+            $persona = $estudiante->persona;
+            if ($persona) {
+                $persona->delete();
+            }
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()]);
+        }
     }
+
 
 
     public function formImportar()
@@ -342,9 +349,8 @@ class EstudiantesController extends Controller
         $cantidadImportados = $countDespues - $countAntes;
 
         // Obtener los nuevos estudiantes
-        $estudiantes = Estudiante::with(['persona', 'especialidade.propiedade', 'tipoBeca.propiedade'])
+        $estudiantes = Estudiante::with(['persona', 'especialidade.propiedade', 'tipoBecas.propiedade'])
                         ->latest()
-                        ->take($cantidadImportados)
                         ->get();
 
         // Pasarlos a la vista solo esta vez
@@ -416,6 +422,19 @@ public function getAsistencias(Request $request, $id)
 
     return response()->json($result);
 }
+
+// EstudianteController.php
+public function mostrarFoto($nombre)
+{
+    $ruta = storage_path('app/fotos/' . $nombre);
+
+    if (!file_exists($ruta)) {
+        abort(404);
+    }
+
+    return response()->file($ruta); // sirve el archivo directamente
+}
+
 
 
 

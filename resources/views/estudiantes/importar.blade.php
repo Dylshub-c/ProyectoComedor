@@ -112,15 +112,6 @@
                 </div>
 
                 <div class="col-2 text-end"></div>
-
-                <div class="col-4 justify-content-center d-flex">
-                    <button type="btn btn-success" id="btnCeleste" class="btn fs-5 me-3 mt-4 px-3 py-1">
-                        <i class="fa-solid fa-file-excel fa-lg" style="color: #f7f7f7;"></i> | Eliminar lista
-                    </button>
-                    <button type="btn btn-success" id="btnCeleste" class="btn fs-5 mt-4 px-4 py-1">
-                        <i class="fa-solid fa-repeat fa-lg" style="color: #f7f7f7;"></i> | Recargar lista
-                    </button>
-                </div>
             </div>
 
             <div class="row px-5">

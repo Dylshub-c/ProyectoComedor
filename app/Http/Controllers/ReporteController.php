@@ -24,69 +24,68 @@ class ReporteController extends Controller
         return view('Reportes.DescargarReporte', compact('estudiantes'));
     }
 
- public function mensualPdf(Request $request)
-    {
-        $mes = $request->input('mes', Carbon::now()->month);
-        $anio = $request->input('anio', Carbon::now()->year);
+public function mensualPdf(Request $request)
+{
+    $mes = $request->input('mes', Carbon::now()->month);
+    $anio = $request->input('anio', Carbon::now()->year);
 
-        $inicioMes = Carbon::create($anio, $mes, 1)->startOfMonth();
-        $finMes = Carbon::create($anio, $mes, 1)->endOfMonth();
+    $inicioMes = Carbon::create($anio, $mes, 1)->startOfMonth();
+    $finMes = Carbon::create($anio, $mes, 1)->endOfMonth();
 
-        // Obtener todos los estudiantes con sus relaciones necesarias
-        $estudiantes = Estudiante::with([
-            'persona',
-            'tipoBecas.propiedade',
-            'listadosAsistencia.asistencia' => function($q) use ($inicioMes, $finMes) {
-                $q->whereBetween('fecha_hora', [$inicioMes, $finMes]);
-            }
-        ])->get();
-
-        // Inicializar resumen dinámico según los tipos de beca encontrados
-        $tiposBeca = \App\Models\TipoBeca::with('propiedade')->get();
-        $resumenGeneral = [];
-        foreach ($tiposBeca as $tipo) {
-            $resumenGeneral[$tipo->propiedade->nombre] = [];
+    $estudiantes = Estudiante::with([
+        'persona',
+        'tipoBecas.propiedade',
+        'listadosAsistencia.asistencia' => function($q) use ($inicioMes, $finMes) {
+            $q->whereBetween('fecha_hora', [$inicioMes, $finMes]);
         }
+    ])->get();
 
-        foreach ($estudiantes as $estudiante) {
-            $persona = $estudiante->persona;
-            $nombre = $persona ? trim("{$persona->Nombre} {$persona->PrimerApellido} {$persona->SegundoApellido}") : 'Sin Nombre';
-
-            foreach ($estudiante->tipoBecas as $beca) {
-                $tipoBecaNombre = optional($beca->propiedade)->nombre ?? 'Sin Beca';
-                $semanas = [];
-
-                foreach ($estudiante->listadosAsistencia as $listado) {
-                    $asistencia = $listado->asistencia;
-                    if (!$asistencia) continue;
-
-                    $semana = Carbon::parse($asistencia->fecha_hora)->weekOfMonth;
-
-                    if (!isset($semanas[$semana])) {
-                        $semanas[$semana] = ['presente' => 0, 'ausente' => 0];
-                    }
-
-                    // Contabilizar solo si la asistencia coincide con el tipo de beca
-                    if (strtolower($asistencia->tipo_asistencia) == strtolower($tipoBecaNombre)) {
-                        $asistencia->estado === 'presente'
-                            ? $semanas[$semana]['presente']++
-                            : $semanas[$semana]['ausente']++;
-                    }
-                }
-
-                if (count($semanas) > 0) {
-                    $resumenGeneral[$tipoBecaNombre][] = [
-                        'nombre' => $nombre,
-                        'semanas' => $semanas
-                    ];
-                }
-            }
-        }
-
-        // Generar PDF
-        $pdf = Pdf::loadView('PdfReporte.ReportePdf', compact('resumenGeneral', 'mes', 'anio'));
-        return $pdf->download("reporte_asistencia_{$mes}_{$anio}.pdf");
+    $tiposBeca = \App\Models\TipoBeca::with('propiedade')->get();
+    $resumenGeneral = [];
+    foreach ($tiposBeca as $tipo) {
+        $resumenGeneral[$tipo->propiedade->nombre] = [];
     }
+
+    foreach ($estudiantes as $estudiante) {
+        $persona = $estudiante->persona;
+        $nombre = $persona ? trim("{$persona->Nombre} {$persona->PrimerApellido} {$persona->SegundoApellido}") : 'Sin Nombre';
+
+        foreach ($estudiante->tipoBecas as $beca) {
+            $tipoBecaNombre = optional($beca->propiedade)->nombre ?? 'Sin Beca';
+            $bloques = [];
+
+            foreach ($estudiante->listadosAsistencia as $listado) {
+                $asistencia = $listado->asistencia;
+                if (!$asistencia) continue;
+
+                $fecha = Carbon::parse($asistencia->fecha_hora);
+                $dia = $fecha->day;
+                $bloque = ceil($dia / 10); // Bloques de 10 días
+
+                if (!isset($bloques[$bloque])) {
+                    $bloques[$bloque] = ['presente' => 0, 'ausente' => 0];
+                }
+
+                if (strtolower($asistencia->tipo_asistencia) == strtolower($tipoBecaNombre)) {
+                    $asistencia->estado === 'presente'
+                        ? $bloques[$bloque]['presente']++
+                        : $bloques[$bloque]['ausente']++;
+                }
+            }
+
+            if (count($bloques) > 0) {
+                $resumenGeneral[$tipoBecaNombre][] = [
+                    'nombre' => $nombre,
+                    'bloques' => $bloques
+                ];
+            }
+        }
+    }
+
+    $pdf = Pdf::loadView('PdfReporte.ReportePdf', compact('resumenGeneral', 'mes', 'anio'));
+    return $pdf->download("reporte_asistencia_{$mes}_{$anio}.pdf");
+}
+
 public function pdf(Request $request)
 {
  // Recibir fecha en formato YYYY-MM

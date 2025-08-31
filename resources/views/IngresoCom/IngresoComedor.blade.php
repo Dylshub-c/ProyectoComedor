@@ -281,8 +281,8 @@
     <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://kit.fontawesome.com/1e23feddae.js" crossorigin="anonymous"></script>
+
     <script>
         const asistenciasEstudiante = @json($asistencias ?? []);
     </script>
@@ -294,27 +294,28 @@
     selectModal.addEventListener('change', () => {
         tipoBecaId.value = selectModal.value;
     });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const btnRechazar = document.getElementById('btnRechazar');
-        const formAsistencia = document.getElementById('formAsistencia');
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const btnRechazar = document.getElementById('btnRechazar');
+            const formAsistencia = document.getElementById('formAsistencia');
 
-        btnRechazar.addEventListener('click', function () {
-            // Confirmación opcional
-            if(!confirm('¿Está seguro que desea rechazar la asistencia?')) return;
+            btnRechazar.addEventListener('click', function () {
+                // Confirmación opcional
+                if(!confirm('¿Está seguro que desea rechazar la asistencia?')) return;
 
-            // Limpiar el formulario y datos del estudiante
-            formAsistencia.reset();
+                // Limpiar el formulario y datos del estudiante
+                formAsistencia.reset();
 
-            // Quitar la información visual del estudiante
-            const primerModulo = document.getElementById('PrimerModulo');
-            if(primerModulo) {
-                primerModulo.innerHTML = '<p class="text-center fs-5">Estudiante rechazado. Por favor, busque otro estudiante.</p>';
-            }
+                // Quitar la información visual del estudiante
+                const primerModulo = document.getElementById('PrimerModulo');
+                if(primerModulo) {
+                    primerModulo.innerHTML = '<p class="text-center fs-5">Estudiante rechazado. Por favor, busque otro estudiante.</p>';
+                }
+            });
         });
-    });
-</script>
+    </script>
+    <script>
         const btnIniciarScan = document.getElementById('btnIniciarScan');
         const scanStatus = document.getElementById('scanStatus');
         let html5QrCode;
@@ -388,38 +389,33 @@
         select.addEventListener('change', () => {
             localStorage.setItem('tipo_asistencia', select.value);
         });
+    </script>
     <script>
-                            const selectBeca = document.getElementById("tipoBecaSelect");
+        const selectBeca = document.getElementById("tipoBecaSelect");
 
-                            // Cargar selección previa
-                            const becaGuardada = localStorage.getItem("tipo_beca_seleccionada");
-                            if (becaGuardada) {
-                                selectBeca.value = becaGuardada;
-                            }
+        // Cargar selección previa
+        const becaGuardada = localStorage.getItem("tipo_beca_seleccionada");
+        if (becaGuardada) {
+            selectBeca.value = becaGuardada;
+        }
 
-                            // Guardar cuando cambie
-                            selectBeca.addEventListener("change", function () {
-                                localStorage.setItem("tipo_beca_seleccionada", this.value);
-                            });
+        // Guardar cuando cambie
+        selectBeca.addEventListener("change", function () {
+            localStorage.setItem("tipo_beca_seleccionada", this.value);
+        });
 
-                            // Limpiar selección al buscar nuevo estudiante
-                            const formBuscar = document.getElementById("formBuscar");
-                            formBuscar.addEventListener("submit", function () {
-                                localStorage.removeItem("tipo_beca_seleccionada");
-                            });
+        // Limpiar selección al buscar nuevo estudiante
+        const formBuscar = document.getElementById("formBuscar");
+        formBuscar.addEventListener("submit", function () {
+            localStorage.removeItem("tipo_beca_seleccionada");
+        });
 
-                            // Abrir modal de éxito si existe
-                            @if(session('success'))
-                                const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-                                successModal.show();
-                            @endif
-                        </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
-    <script src="https://kit.fontawesome.com/1e23feddae.js" crossorigin="anonymous"></script>
-
+        // Abrir modal de éxito si existe
+        @if(session('success'))
+            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+            successModal.show();
+        @endif
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
-
 </html>

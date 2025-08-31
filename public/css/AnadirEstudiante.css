@@ -1,9 +1,4 @@
 /* Estilos generales */
-body {
-  margin: 3rem;
-}
-
-
 .main-header {
   padding: 10px 20px;
   display: flex;
@@ -120,16 +115,7 @@ body {
 .bgModal {
   background-color: #0A5386 !important;
 }
-.inputColor {
-  background-color: #CDD2D5 !important;
-  color: black !important;
-  font-weight: bold !important;
-  border: none !important;
-  padding: 8px 12px !important;
-  border-radius: 12px !important;
-  width: 100% !important;          /* Ocupa todo el ancho disponible */
-  max-width: 100% !important;      /* No se limite */
-}
+
 /* Contenedor de imagen + botón */
 .foto-estudiante-wrapper {
   position: relative;
@@ -173,4 +159,30 @@ body {
 
 .btn-agregar-foto:hover {
   background-color: #0d5b90;
+}
+
+/*------------------------------FOOTER------------------------------------*/
+
+#DivFooter {
+    background-color: #032B3F;
+}
+
+#footerText {
+    color: #f7f7f7;
+}
+
+/*------------------------------------------------------------------------*/
+.form-select {
+  background-color: #fdfdfd;
+  border-color: #0A5386;
+}
+
+.form-control {
+  background-color: #fdfdfd;
+  border-color: #0A5386;
+}
+
+.border {
+  background-color: #fdfdfd;
+  border-color: #0A5386;
 }

@@ -69,21 +69,8 @@
   color: white;
   border: none;
   border-radius: 13px;
-  font-size: 14px;
-  padding: 6px 16px;
-  width: 100%;
-  max-width: 300px;
-  box-sizing: border-box;
+}
 
-  /* Alineación horizontal y vertical del ícono + texto */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px; /* Espacio entre ícono y texto */
-}
-.btnPrimario i {
-  margin: 0;
-}
 /* Contenedor de botones alineados horizontalmente */
 .botones-editar {
   display: flex;
@@ -92,13 +79,7 @@
   gap: 12px; /* espacio entre botones */
 }
 
-/* Nuevo estilo adicional para botones más pequeños y no tan anchos */
-.btnEditar {
-  width: auto !important;      /* sobrescribe el width: 100% de btnPrimario */
-  max-width: none !important;  /* permite que el botón se ajuste al contenido */
-  padding: 6px 14px;           /* un poco más compacto */
-  font-size: 14px;
-}
+
 .alert-success {
   background-color: #1F73AA; /* tu color personalizado */
   color: white;
@@ -114,25 +95,6 @@
 
 .form-editar {
   display: none;
-}
-
-/* Etiquetas */
-.form-label-fixed {
-  white-space: normal; /* permite quiebre de texto */
-  width: auto;
-  padding-left: 1rem;
-  min-width: 130px;
-  flex-shrink: 0; /* evita que se encoja demasiado */
-}
-
-.form-group-horizontal {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-left: 2rem;
-  flex-wrap: wrap;
-  max-width: calc(100% - 2rem); /* Ajusta el ancho para no salirse */
-  box-sizing: border-box;
 }
 
 
@@ -177,3 +139,54 @@
 .ms-7 {
   margin-left: 1rem !important; 
 }
+
+/*------------------------------FOOTER------------------------------------*/
+
+#DivFooter {
+    background-color: #032B3F;
+}
+
+#footerText {
+    color: #f7f7f7;
+}
+
+/*------------------------------------------------------------------------*/
+.btnEliminar {
+  background-color: #1F73AA;
+  color: white;
+  border-radius: 11px;
+}
+
+.btnEliminar:hover {
+  background-color: #3795d4;
+  color: white;
+}
+
+.btnEditar {
+  background-color:#032B3F;
+  color: white;
+  border-radius: 11px;
+}
+
+.btnEditar:hover {
+  background-color: #114964;
+  color: white;
+}
+
+.btnCancelar {
+  background-color:#303233;
+  color: white;
+  border-radius: 11px;
+}
+
+.btnCancelar:hover {
+  background-color: #494b4d;
+  color: white;
+}
+
+.modal-header {
+  border-width: 2px;
+  background-color: #1F73AA;
+  color: white;
+}
+

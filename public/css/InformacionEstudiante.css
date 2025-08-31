@@ -1,7 +1,8 @@
 
 /*********Estilos Barra horizontal*********************************************************************************************************************/
-body {
-  margin: 3rem;
+* {
+	margin: 0;
+	padding: 0;
 }
 
 .main-header {
@@ -12,13 +13,11 @@ body {
   flex-wrap: wrap;
 }
 
-
 .header {
   background-color: white;
   border-radius: 12px;
   padding: 15px 20px;
 }
-
 
 .botonBarra {
   background-color: #032B3F;
@@ -30,8 +29,6 @@ body {
   justify-content: center;
   padding: 0;
 }
-
-
 
 .user-info {
   display: flex;
@@ -126,7 +123,7 @@ body {
 .color1 { color: #032B3F; }
 .color2 { color: #0A5386; }
 .color3 { background-color: #CDD2D5; }
-.color4 { color: #464040; }
+.color4 { color: #000000; }
 .color5 { color: white; }
 
 /* Líneas */
@@ -143,7 +140,7 @@ body {
 }
 
 /* Botones */
-.btnPrimario {
+.btnCrearRol {
   background-color: #032B3F;
   color: white;
   border: none;
@@ -160,14 +157,15 @@ body {
   justify-content: center;
   gap: 8px; /* Espacio entre ícono y texto */
 }
-.btnPrimario:hover {
-  background-color: white;
-  color: black;
+.btnCrearRol:hover {
+  background-color: #074768;
+  color: rgb(255, 255, 255);
 }
 
-.btnPrimario i {
+.btnCrearRol i {
   margin: 0;
 }
+
 /* Solo en este contexto, quitamos el width: 100% */
 .btnAjustado {
   width: auto !important;
@@ -262,8 +260,6 @@ body {
   max-width: 200px;
 }
 
-
-
 /* Contenedor del formulario */
 #formEditar {
   background: #f9fbfc; /* fondo suave */
@@ -272,5 +268,125 @@ body {
   padding: 2rem 2.5rem;
   margin-top: 1rem;
   transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/*------------------------------FOOTER------------------------------------*/
+
+#DivFooter {
+    background-color: #032B3F;
+}
+
+#footerText {
+    color: #f7f7f7;
+}
+
+/*------------------------------------------------------------------------*/
+
+.roles {
+  background-color: #1F73AA;
+}
+
+body {
+  background-image: url('/img/FondoPrincipal.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
+}
+.card {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+.btnPrimario {
+  background-color: #032B3F;
+  border-color: #032B3F;
+}
+.btnPrimario:hover {
+  background-color: white;
+  border-color: #032B3F;
+}
+label.form-check-label {
+  user-select: none;
+}
+.form-check-input:checked {
+  background-color: #032B3F;
+  border-color: #032B3F;
+}
+
+/* Botones */
+.btnCancelar {
+  background-color: #303233;
+  color: white;
+  border: none;
+  border-radius: 13px;
+  font-size: 14px;
+  padding: 6px 16px;
+  width: 100%;
+  max-width: 300px;
+  box-sizing: border-box;
+
+  /* Alineación horizontal y vertical del ícono + texto */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* Espacio entre ícono y texto */
+}
+.btnCancelar:hover {
+  background-color: #4b4c4d;
+  color: rgb(255, 255, 255);
+}
+
+.btnCancelar i {
+  margin: 0;
+}
+
+.modal-header {
+  background-color: #0A5386;
+  color: white;
+}
+
+.contenedor {
+  background-color: white;
+  border-radius: 11px;
+}
+
+.btnEliminar {
+  background-color: #1F73AA;
+  color: white;
+  border-radius: 11px;
+}
+
+.btnEliminar:hover {
+  background-color: #3795d4;
+  color: white;
+}
+
+.btnEditar {
+  background-color:#032B3F;
+  color: white;
+  border-radius: 11px;
+}
+
+.btnEditar:hover {
+  background-color: #114964;
+  color: white;
+}
+
+.btnCancelar {
+  background-color:#303233;
+  color: white;
+  border-radius: 11px;
+}
+
+.btnCancelar:hover {
+  background-color: #494b4d;
+  color: white;
+}
+
+.modal-header {
+  border-width: 2px;
+  background-color: #1F73AA;
+  color: white;
 }
 

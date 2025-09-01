@@ -19,10 +19,10 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
          $personaData = [
-        'Nombre' => 'Natalia',
-        'PrimerApellido' => 'Martinez',
-        'SegundoApellido' => 'Uribe',
-        'Cedula' => '78938234',
+        'Nombre' => 'Dylan',
+        'PrimerApellido' => 'Pereira',
+        'SegundoApellido' => 'Sarabia',
+        'Cedula' => '30482823',
         'TipoUsuario' => 'admin',
         ];
 
@@ -32,7 +32,7 @@ class AdminSeeder extends Seeder
             $personaData
         );
 
-        $email = 'uwu@gmail.com';
+        $email = 'dylanperira0204@gmail.com';
 
 
         // Generar una contraseña predeterminada o aleatoria

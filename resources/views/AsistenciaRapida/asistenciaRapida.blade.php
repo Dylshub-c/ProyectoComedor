@@ -145,7 +145,7 @@
                 <div class="modal-content text-center">
                     <div class="modal-body">
                         <p class="fs-5 mb-0">La asistencia se realizó con éxito.</p>
-                        <button type="button" class="btn btn-primary mt-3" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btnRealizar mt-3" data-bs-dismiss="modal">Cerrar</button>
                     </div>
                 </div>
             </div>

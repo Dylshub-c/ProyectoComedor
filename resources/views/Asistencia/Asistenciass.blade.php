@@ -27,9 +27,12 @@
 
     <!-- Perfil del estudiante -->
     <div class="card estudiante-card text-center mb-3">
-      <img src="{{ asset($persona->estudiante->foto ?? 'img/FotoEstudiante.webp') }}"
-           class="estudiante-avatar"
-           alt="Avatar del estudiante" />
+      <img src="{{ optional($persona->estudiante)->foto
+                        ? asset('storage/' . optional($persona->estudiante)->foto)
+                        : asset('img/FotoEstudiante.webp') }}"
+                        alt="Foto del estudiante"
+                        class="foto-perfil-redonda"
+                    />
       <div class="card-body">
         <h5 class="card-title">
           {{ $persona->Nombre }} {{ $persona->PrimerApellido }} {{ $persona->SegundoApellido }}

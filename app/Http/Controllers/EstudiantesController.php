@@ -136,8 +136,8 @@ class EstudiantesController extends Controller
             $fotoRuta = null;
 
             if ($request->hasFile('foto')) {
-                $fotoRuta = $request->file('foto')->store('public/fotos'); // storage/app/public/fotos
-                $fotoRuta = str_replace('public/', '', $fotoRuta); // Guardamos solo "fotos/nombre.jpg"
+                // Guarda igual que en update (en disk "public")
+                $fotoRuta = $request->file('foto')->store('fotos', 'public');
             }
 
             $especialidadProp = Propiedade::firstOrCreate(['nombre' => $request->especialidad]);
@@ -167,6 +167,7 @@ class EstudiantesController extends Controller
             ->withInput();
     }
 }
+
 
     public function show(string $id)
     {

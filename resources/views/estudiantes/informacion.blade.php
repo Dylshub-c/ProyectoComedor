@@ -311,11 +311,13 @@
 
                 </div> <!-- end col-md-8 -->
 
-                <!-- imagen (derecha) -->
-                <div class="col-md-4 text-center mt-5 align-self-start">
-                    <img src="{{ asset($persona->estudiante && $persona->estudiante->foto ? $persona->estudiante->foto : 'img/FotoEstudiante.webp') }}"
+                <div class="col-md-4 text-center mb-5 align-self-center">
+                    <img src="{{ optional($persona->estudiante)->foto
+                        ? asset('storage/' . optional($persona->estudiante)->foto)
+                        : asset('img/FotoEstudiante.webp') }}"
                         alt="Foto del estudiante"
-                        class="foto-perfil-redonda mt-5 ">
+                        class="foto-perfil-redonda"
+                    />
                 </div>
 
             </div> <!-- end row -->
@@ -349,7 +351,8 @@
 
 
         <!-- FOOTER -->
-    <footer id="DivFooter" class="text-dark py-3 mt-auto">
+
+          <footer id="DivFooter" class="text-dark py-3 mt-auto">
         <div class="container">
             <div class="row">
                 <div class="col-12 d-flex justify-content-center text-center align-items-center">
@@ -357,18 +360,9 @@
                 </div>
 
             <!-- imagen -->
-            <div class="col-md-4 text-center mb-5 align-self-center">
-                <img src="{{ $persona->estudiante && $persona->estudiante->foto
-                    ? asset('storage/' . $persona->estudiante->foto)
-                    : asset('img/FotoEstudiante.webp') }}"
-                    alt="Foto del estudiante"
-                    class="foto-perfil-redonda"
-                />
-
-            </div>
         </div>
     </footer>
-    
+
 
   <!-- Scripts -->
 <script>

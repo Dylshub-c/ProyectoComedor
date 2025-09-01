@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
-    
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -19,21 +19,21 @@
     <button id="btn-Menu" class="btn ms-3 mb-3 fs-5 py-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
         <i class="fa-solid fa-bars fa-xl" style="color: #f7f7f7;"></i>
     </button>
-    
+
     <!-- MENÚ LATERAL -->
     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
         <div class="offcanvas-header justify-content-end">
-            <button type="button" class="btn" data-bs-dismiss="offcanvas" aria-label="Close"> 
-                <i class="fa-solid fa-xmark fa-2xl" style="color: #f7f7f7;"></i> 
+            <button type="button" class="btn" data-bs-dismiss="offcanvas" aria-label="Close">
+                <i class="fa-solid fa-xmark fa-2xl" style="color: #f7f7f7;"></i>
             </button>
         </div>
         <div class="offcanvas-body">
             <div class="d-grid gap-3">
                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location.href='{{ route('admin.home') }}'">
-                    <i class="fa-solid fa-house-chimney fa-lg" id="icono-menu"></i>
+                    <i class="fa-solid fa-house-chimney fa-lg" id="icono-menu" ></i>
                     | Home
                 </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('IngresoCom.IngresoComedor') }}'">
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location.href='{{ route('IngresoCom.IngresoComedor') }}'">
                     <i class="fa-solid fa-clipboard-list fa-lg" id="icono-menu"></i>
                     | Ingreso al comedor
                 </button>
@@ -45,21 +45,20 @@
                     <i class="fa-solid fa-address-card fa-lg" id="icono-menu"></i>
                     | Ver lista de usuarios
                 </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('Reportes.DescargarReporte') }}'">
                     <i class="fa-solid fa-download fa-lg" id="icono-menu"></i>
                     | Descargar reportes
-                </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
-                    <i class="fa-solid fa-calendar-check fa-lg" id="icono-menu"></i>
-                    | Gestionar asistencias
                 </button>
                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('tipobeca.index') }}'">
                     <i class="fa-solid fa-hand-holding-medical fa-lg" id="icono-menu"></i>
                     | Becas
                 </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('AsistenciaRapida.asistenciaRapida') }}'">
                     <i class="fa-solid fa-star-half-stroke fa-lg" id="icono-menu"></i>
                     | Asistencia rápida
+                </button>
+                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('roles.index') }}'">
+                   <i class="fa-solid fa-user-shield fa-lg" id="icono-menu"></i> | Gestionar roles
                 </button>
             </div>
         </div>
@@ -196,7 +195,7 @@
             </div>
         </div>
     </footer>
-    
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>

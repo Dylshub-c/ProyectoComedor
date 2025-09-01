@@ -35,7 +35,7 @@
                     <i class="fa-solid fa-house-chimney fa-lg" id="icono-menu" ></i>
                     | Home
                 </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location.href='{{ route('IngresoCom.IngresoComedor') }}'">
                     <i class="fa-solid fa-clipboard-list fa-lg" id="icono-menu"></i>
                     | Ingreso al comedor
                 </button>
@@ -58,6 +58,9 @@
                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('AsistenciaRapida.asistenciaRapida') }}'">
                     <i class="fa-solid fa-star-half-stroke fa-lg" id="icono-menu"></i>
                     | Asistencia rápida
+                </button>
+                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('roles.index') }}'">
+                   <i class="fa-solid fa-user-shield fa-lg" id="icono-menu"></i> | Gestionar roles
                 </button>
 
             </div>

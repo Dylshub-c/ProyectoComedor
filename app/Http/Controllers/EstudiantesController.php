@@ -185,6 +185,7 @@ class EstudiantesController extends Controller
 
         $roles = Role::all();
 
+        // Si hay persona en sesión, la cargamos (para mostrar la última buscada)
         if (session()->has('persona_id')) {
             $persona = Persona::with([
                 'estudiante.seccione.propiedade',
@@ -194,7 +195,8 @@ class EstudiantesController extends Controller
             ])->find(session('persona_id'));
         }
 
-        if ($request->isMethod('post') && ($request->filled('cedula') || $request->filled('nombre') || $request->filled('rol'))) {
+        // Usamos GET para búsquedas: /ruta?cedula=...&nombre=...
+        if ($request->isMethod('get') && ($request->filled('cedula') || $request->filled('nombre') || $request->filled('rol'))) {
             $query = Persona::with([
                 'estudiante.seccione.propiedade',
                 'estudiante.especialidade.propiedade',
@@ -202,15 +204,21 @@ class EstudiantesController extends Controller
                 'usuario.roles'
             ])->where('TipoUsuario', 'Estudiante');
 
+            // Búsqueda parcial por cédula (LIKE)
             if ($request->filled('cedula')) {
-                $query->where('Cedula', $request->cedula);
+                $cedula = trim($request->cedula);
+                $query->where('Cedula', 'LIKE', "%{$cedula}%");
             }
 
+            // Búsqueda por nombre (concatenado), insensible a mayúsculas
             if ($request->filled('nombre')) {
-                $nombre = $request->nombre;
-                $query->whereRaw("CONCAT(Nombre, ' ', PrimerApellido, ' ', SegundoApellido) LIKE ?", ["%{$nombre}%"]);
+                $nombre = trim($request->nombre);
+                // Convertimos el parámetro a minúsculas en PHP y comparamos contra LOWER(...) en SQL
+                $like = '%' . mb_strtolower($nombre) . '%';
+                $query->whereRaw("LOWER(CONCAT(Nombre, ' ', PrimerApellido, ' ', SegundoApellido)) LIKE ?", [$like]);
             }
 
+            // Filtro por rol (si se envía)
             if ($request->filled('rol')) {
                 $rol = $request->rol;
                 $query->whereHas('usuario.roles', function ($q) use ($rol) {

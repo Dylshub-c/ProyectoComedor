@@ -5,11 +5,11 @@ body {
   background-position: center;
   font-family: 'Inter', sans-serif;
   margin: 0;
-  min-height: 100vh;
-  padding: 3rem;
 }
 
-/* Contenedor principal */
+main {
+  padding: 2rem;
+}
 
 .container-fluid2 {
   background-color: #fff;
@@ -48,6 +48,14 @@ body {
   align-items: center;
   gap: 20px;
 }
+
+.formulario {
+  background-color: white;
+  border-radius: 12px;
+  padding: 20px;
+  align-items: center;
+}
+
 .modal-footer .btn {
   background-color: #002b3d; 
   color: white;
@@ -60,14 +68,6 @@ body {
 
 .modal-footer .btn:hover {
   background-color: #004d6d; 
-}
-
-/* Botón menú hamburguesa */
-.btn-menu {
-  background-color: #0c2d46;
-  width: 45px;
-  height: 45px;
-  border: none;
 }
 
 /* Inputs */
@@ -102,18 +102,6 @@ textarea.form-control {
   position: absolute;
 }
 
-/* Etiqueta azul */
-label.bg-primary {
-  font-weight: 600;
-  font-size: 15px;
-}
-
-/* Botones */
-.btn {
-  min-width: 120px;
-  font-weight: 500;
-}
-
 .btn-guardar {
   background-color: #032B3F;
   color: white;
@@ -133,48 +121,6 @@ label.bg-primary {
   font-weight: 500;
 }
 
-/* Sidebar */
-.sidebar {
-  position: fixed;
-  top: 0;
-  left: -250px;
-  width: 250px;
-  height: 100%;
-  background-color: white;
-  z-index: 1050;
-  padding-top: 60px;
-  transition: 0.3s;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
-}
-
-.sidebar.active {
-  left: 0;
-}
-
-#overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
-  z-index: 1040;
-  display: none;
-}
-
-#overlay.active {
-  display: block;
-}
-
-.sidebar ul li {
-  padding: 15px 20px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.sidebar ul li:hover {
-  background-color: #f0f0f0;
-}
 
 .btn-close {
   background-color: #dee2e6;
@@ -336,4 +282,52 @@ label.bg-primary {
 }
 .tituloBlanco{
   color:white;
+}
+
+/*------------------------------FOOTER------------------------------------*/
+
+#DivFooter {
+    background-color: #032B3F;
+}
+
+#footerText {
+    color: #f7f7f7;
+}
+
+/*------------------------------------------------------------------------*/
+
+.btnRealizar {
+  background-color: #002b3d;
+  color: white;
+}
+
+.btnRealizar:hover {
+  background-color: #07445e;
+  color: white;
+}
+
+/* Aplica al thead de tu tabla específica */
+#tablaEstudiantes thead {
+  background-color: #004d6d !important;
+}
+
+#tablaEstudiantes thead th {
+  color: #ffffff !important;
+  background-color: #004d6d !important;
+  text-align: center; /* opcional: centra los títulos */
+}
+
+ 
+/* Estilo de los checkboxes */
+.asistencia-checkbox {
+    width: 20px;
+    height: 20px;
+    accent-color: #004d6d; /* Modern browsers */
+    cursor: pointer;
+}
+
+/* Para navegadores que no soportan accent-color (fallback) */
+.asistencia-checkbox:checked {
+    background-color: #004d6d;
+    border-color: #004d6d;
 }

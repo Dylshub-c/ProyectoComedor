@@ -4,8 +4,14 @@
 }
 
 body {
-	background: #130444;
+	background: #ffffff;
     color: #d6d6d6;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 .row::after {
@@ -13,7 +19,7 @@ body {
     display: table;
     clear: both;
 }
-/*------------------------------------------------------------------------*/
+
 /*--------------------------------MAIN------------------------------------*/
 
 main {
@@ -26,12 +32,15 @@ main {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    height: 100vh;
+    min-height: 100vh; /* mínimo todo el viewport */
+    height: auto;      /* permite crecer si hay contenido extra */
+    background-attachment: fixed; /* opcional: efecto parallax */
 }
 
 strong {
     color: rgb(58, 58, 58);
 }
+
 /*-------------------------------*/
 
 #PrimerModulo {
@@ -40,7 +49,8 @@ strong {
     background:#f7f7f7;
     padding: 2rem;
     color: rgb(58, 58, 58);
-    max-height: 87vh;
+    min-height: 70vh;
+    height: auto;
 }
 
 #fotoEstudiante {
@@ -49,8 +59,8 @@ strong {
 }
 
 #NomEstudiante {
-font-size: 24px;
-color: rgb(58, 58, 58);
+    font-size: 24px;
+    color: rgb(58, 58, 58);
 }
 
 #li-Estudiante {
@@ -71,15 +81,14 @@ color: rgb(58, 58, 58);
 }
 
 /*-------------------------------*/
-/*-------------------------------*/
 
 #SegundoModulo {
     border-radius: 15px;
     overflow: hidden;
     background:#f7f7f7;
-    padding: 2rem;
     color: rgb(58, 58, 58);
-    height: 94vh;
+    min-height: 94vh;
+    height: auto;
 }
 
 #contenedor-calendario {
@@ -99,7 +108,6 @@ color: rgb(58, 58, 58);
 }
 
 /*-------------------------------*/
-/*-------------------------------*/
 
 #TercerModulo {
     border-radius: 15px;
@@ -107,8 +115,11 @@ color: rgb(58, 58, 58);
     background:#f7f7f7;
     padding: 2rem;
     color: rgb(58, 58, 58);
-    height: 94vh;
+    min-height: 94vh;
+    height: auto;
 }
+
+/*-------------------------------*/
 
 #btn-Menu {
     background-color: #032B3F;
@@ -116,6 +127,8 @@ color: rgb(58, 58, 58);
     padding-left: 20px;
     padding-right: 20px;
 }
+
+/*-------------------------------*/
 
 .rounded-bottom-only {
     border-top-left-radius: 0;
@@ -138,7 +151,6 @@ color: rgb(58, 58, 58);
     height: 8rem;
 }
 
-/*------------------------------------------------------------------------*/
 /*------------------------------FOOTER------------------------------------*/
 
 #DivFooter {
@@ -149,7 +161,6 @@ color: rgb(58, 58, 58);
     color: #f7f7f7;
 }
 
-/*------------------------------------------------------------------------*/
 /*--------------------------OFF-CANVAS------------------------------------*/
 
 #offcanvasExample {
@@ -157,7 +168,8 @@ color: rgb(58, 58, 58);
     color: #f7f7f7;
 }
 
-/*------------------------------------------------------------------------*/
+/*-------------------------------*/
+
 .evento-icono i {
     font-size: 1.4rem;
 }
@@ -168,6 +180,8 @@ color: rgb(58, 58, 58);
     padding: 0 !important;
     text-align: center;
 }
+
+/*-------------------------------*/
 
 #popover {
     position: absolute;
@@ -196,48 +210,50 @@ color: rgb(58, 58, 58);
     transform: scale(1.2);
 }
 
+/*-------------------------------*/
+
 .fc-button {
-  background-color: #0A5386 !important;
-  color: white !important;
-  border: none !important;
-  border-radius: 6px !important;
-  padding: 6px 12px !important;
-  font-weight: bold;
-  transition: background-color 0.3s;
+    background-color: #0A5386 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 6px 12px !important;
+    font-weight: bold;
+    transition: background-color 0.3s;
 }
 
 .fc-button:hover {
-  background-color: #0A5386 !important;
+    background-color: #0A5386 !important;
 }
 
 .fc-button-active {
-  background-color: #032B3F !important;
-  box-shadow: 0 0 0 2px #032b3f84;
+    background-color: #032B3F !important;
+    box-shadow: 0 0 0 2px #032b3f84;
 }
 
 .fc .fc-button-group > .fc-button:not(:first-child) {
-  border-left: 1px solid #00000000 !important;
+    border-left: 1px solid #00000000 !important;
 }
 
 .fc .fc-button-group .fc-button {
-  margin-right: 6px;
+    margin-right: 6px;
 }
 
 .fc-toolbar .fc-button {
-  margin: 0 3px;
+    margin: 0 3px;
 }
 
-.modal-confirmacion {
-  display: none;  /* oculto por defecto */
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 1000;
+/*-------------------------------*/
 
-  /* Centrar contenido cuando se muestre */
-  justify-content: center;
-  align-items: center;
+.modal-confirmacion {
+    display: none;  
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
 }
 
 #modal-content {
@@ -250,16 +266,11 @@ color: rgb(58, 58, 58);
 }
 
 .modal-header {
-  height: 35px;
-  background-color: #0A5386;
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
-  margin: 5;
-  padding: 0;
-  color: #f7f7f7;
-  display: block;
-  width: 100%;
+    background-color: #0A5386;
+    color: white;
 }
+
+/*-------------------------------*/
 
 .btn-aceptar {
     margin: 10px;
@@ -273,8 +284,8 @@ color: rgb(58, 58, 58);
 }
 
 .btn-aceptar:hover {
-  background: #084070;
-  color: #f7f7f7;
+    background: #084070;
+    color: #f7f7f7;
 }
 
 .btn-cancelar {
@@ -289,6 +300,63 @@ color: rgb(58, 58, 58);
 }
 
 .btn-cancelar:hover {
-  background: #084070;
-  color: #f7f7f7;
+    background: #084070;
+    color: #f7f7f7;
+}
+
+.cont1 {
+    background-color: white;
+    border-radius: 11px;
+}
+
+.colorB {
+    color: #032B3F;
+}
+
+#finalizarAsistencia {
+    background-color: #0095C8;
+}
+
+#finalizarAsistencia:hover {
+    background-color: #23bff3;
+}
+
+#btnIniciarScan {
+    color: white;
+    background-color: #084070;
+}
+
+#btnIniciarScan:hover {
+    color: white;
+    background-color: #175b97;
+}
+
+.btnRechazar {
+    background-color: #3a3a3a;
+    color: white;
+}
+
+.btnRechazar:hover {
+    background-color: #555454;
+    color: white;
+}
+
+.btnObservaciones {
+    background-color: #032B3F;
+    color: white;
+}
+
+.btnObservaciones:hover {
+    background-color: #0c4968;
+    color: white;
+}
+
+.btnConfirmar {
+    background-color:#106AA4;
+    color: white;
+}
+
+.btnConfirmar:hover {
+    background-color: #2380be;
+    color: white;
 }

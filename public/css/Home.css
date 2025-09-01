@@ -197,5 +197,22 @@ body {
 
 /*------------------------------------------------------------------------*/
 
+.colorB {
+  color: #031e2c;
+}
 
+.btnAceptar {
+  background-color: #032B3F;
+  color: white;
+}
+
+.btnAceptar:hover {
+  background-color: #09415e;
+  color: white;
+}
+
+.modal-header {
+  background-color: #074a76;
+  color: white;
+}
 

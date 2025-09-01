@@ -34,8 +34,8 @@ body {
 }
 
 .estudiante-avatar {
-  width: 100px;
-  height: 100px;
+  width: 150px;
+  height: 150px;
   object-fit: cover;
   margin: auto;
   border-radius: 50%;
@@ -48,7 +48,6 @@ body {
   padding: 15px;
   border-radius: 10px;
   width: 100%;
-  height: 350px;
 }
 
 .logo-covao {
@@ -174,3 +173,47 @@ body {
   
 }
 
+/*------------------------------FOOTER------------------------------------*/
+
+#DivFooter {
+    background-color: #032B3F;
+}
+
+#footerText {
+    color: #f7f7f7;
+}
+
+/*------------------------------------------------------------------------*/
+
+.card-header {
+  background-color: #106AA4;
+  color: white;
+}
+
+.btnEditar {
+  background-color:#032B3F;
+  color: white;
+  border-radius: 11px;
+}
+
+.btnEditar:hover {
+  background-color: #114964;
+  color: white;
+}
+
+
+/* Aplica al thead de tu tabla específica */
+#tablaAsistencias thead {
+  background-color: #106AA4 !important;
+}
+
+#tablaAsistencias thead th {
+  color: #ffffff !important;
+  background-color: #106AA4 !important;
+  text-align: center; /* opcional: centra los títulos */
+}
+
+.modal-header {
+  background-color: #032B3F;
+  color: white;
+}

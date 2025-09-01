@@ -4,19 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SICAB</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.17/locales/es.global.min.js"></script>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="Stylesheet" href="{{ asset('css/IngresoComedor.css') }}">
     <link rel="Stylesheet" href="{{ asset('css/MenuLateral.css') }}" type="text/css" />
     <link rel="icon" href="/img/LogoDW-Negro.png" media="(prefers-color-scheme: light)">
     <link rel="icon" href="/img/LogoDW-Blanco.png" media="(prefers-color-scheme: dark)">
-    <title>Desarrollo Web</title>
 </head>
 
 <body id="fondo" class="d-flex flex-column min-vh-100">
@@ -83,18 +77,18 @@
         @endif
 
         <div class="row justify-content-center mt-5">
-            <div class="col-12 col-md-10">
+            <div class="col-6 py-5 px-5">
                 <div class="d-flex flex-column flex-md-row justify-content-between gap-4">
 
                     <!-- LADO IZQUIERDO: Información del estudiante + botones -->
-                    <div class="d-flex flex-column gap-4" style="flex: 1;">
+                    <div class="d-flex flex-column gap-4 cont1 mb-5" style="flex: 1;">
                         @if($persona && $persona->estudiante)
-                        <form id="formAsistencia" method="POST" action="{{ route('asistencia.confirmar') }}">
+                        <form id="formAsistencia" method="POST" class="px-4 py-4" action="{{ route('asistencia.confirmar') }}">
                             @csrf
                             <input type="hidden" name="estudiante_id" value="{{ $persona->estudiante->id }}">
 
                             <div class="mb-3">
-                                <label for="tipoBecaSelect" class="form-label fs-5">Seleccionar tipo de beca:</label>
+                                <label for="tipoBecaSelect" class="form-label fs-5 colorB">Seleccionar tipo de beca:</label>
                                 <select class="form-select" id="tipoBecaSelect" name="tipo_beca" required>
                                     <option value="" selected>-- Seleccione una beca --</option>
                                     @foreach($todasLasBecas as $beca)
@@ -105,7 +99,7 @@
                                 </select>
                             </div>
 
-                            <div id="PrimerModulo" class="text-center card shadow-lg p-3" style="border-radius: 15px; background-color: #f7f7f7;">
+                            <div id="PrimerModulo" class="text-center justify-content-center align-items-center card p-3">
                                 @php
                                     $foto = $persona->estudiante->foto
                                         ? asset($persona->estudiante->foto)
@@ -113,13 +107,13 @@
                                 @endphp
 
                                 <img class="img-fluid rounded-circle mb-3" id="fotoEstudiante" src="{{ $foto }}" alt="Foto del estudiante"
-                                     style="width: 180px; height: 180px; object-fit: cover; border:2px solid #032B3F;">
+                                     style="width: 180px; height: 180px; object-fit: cover; border:4px solid #032B3F;">
 
                                 <label id="NomEstudiante" class="mt-1 text-center fs-4">
                                     <strong>{{ $persona->Nombre }} {{ $persona->PrimerApellido }} {{ $persona->SegundoApellido }}</strong>
                                 </label>
 
-                                <ul id="ul-Estudiante" class="list-group mt-4 mb-3">
+                                <ul id="ul-Estudiante" class="list-group mt-4 mb-3 w-75">
                                     <li class="list-group-item">
                                         <strong class="fs-5">Cédula:</strong><br />
                                         <span id="cedula">{{ $persona->Cedula }}</span>
@@ -211,55 +205,60 @@
                         @else
                             <div class="alert alert-info fs-5">Por favor, busque un estudiante por cédula para mostrar la información.</div>
                         @endif
+                    </div>
+                </div>
+            </div>
 
-                        <!-- Botón Buscar por cédula -->
-                        <button type="button" id="finalizarAsistencia" class="btn mt-4 fs-5" data-bs-toggle="modal" data-bs-target="#modalBuscar">
-                            <i class="fa-regular fa-address-card fa-lg me-1" style="color: #f7f7f7;"></i>
-                            | Buscar por cédula
-                        </button>
+            <div class="col-6 d-flex flex-column align-items-center px-5 py-5 text-center">
 
-                        <form id="formBuscar" action="{{ route('comedor.buscar') }}" method="GET">
-                            @csrf
-                            <div class="modal fade" id="modalBuscar" tabindex="-1" aria-labelledby="modalBuscarLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title text-center fs-5" id="modalBuscarLabel">Búsqueda por cédula</h5>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="mb-3">
-                                                <label for="cedulaEstudiante" class="form-label fs-5">Ingrese la cédula completa del estudiante:</label>
-                                                <input type="text" class="form-control" name="cedula" id="cedulaEstudiante" >
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-cancelar fs-5" data-bs-dismiss="modal">Cancelar</button>
-                                            <button type="submit" class="btn btn-aceptar fs-5">Realizar búsqueda</button>
-                                        </div>
+                <!-- BLOQUE ESCANER -->
+                <div class="mb-4"> <!-- margen abajo para separar del botón -->
+                    <div class="card shadow-lg" style="width: 600px; border-radius: 15px; background-color: #f7f7f7;">
+                        <div class="card-header text-center" style="background-color: #032B3F; color: #f7f7f7; border-radius: 15px 15px 0 0;">
+                            <h5 class="mb-0">Escanear código de barras</h5>
+                        </div>
+                        <div class="card-body d-flex flex-column align-items-center">
+                            <div id="reader" style="width:380px; height:380px; border:2px solid #032B3F; border-radius:12px;"></div>
+                            <button id="btnIniciarScan" class="btn btn-primary mt-3 fs-5" style="background-color:#0A5386; border:none; border-radius:8px; padding:8px 20px;">
+                                Iniciar cámara
+                            </button>
+                            <small id="scanStatus" class="text-muted mt-2"></small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BLOQUE BOTON CEDULA -->
+                <div>
+                    <button type="button" id="finalizarAsistencia" class="btn mt-4 fs-5 shadow border" data-bs-toggle="modal" data-bs-target="#modalBuscar">
+                        <i class="fa-regular fa-address-card fa-lg me-1" style="color: #f7f7f7;"></i>
+                        | Realizar asistencia por cédula
+                    </button>
+                </div>
+
+                <!-- Modal y formulario de búsqueda -->
+                <form id="formBuscar" action="{{ route('comedor.buscar') }}" method="GET">
+                    @csrf
+                    <div class="modal fade" id="modalBuscar" tabindex="-1" aria-labelledby="modalBuscarLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title text-center fs-5" id="modalBuscarLabel">Búsqueda por cédula</h5>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label for="cedulaEstudiante" class="form-label fs-5 colorB">Ingrese la cédula completa del estudiante:</label>
+                                        <input type="text" class="form-control" name="cedula" id="cedulaEstudiante" >
                                     </div>
                                 </div>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- LADO DERECHO: Activar cámara -->
-                    <div class="d-flex flex-column align-items-center mt-3" style="flex: 1;">
-                        <div class="card shadow-lg" style="width: 320px; border-radius: 15px; background-color: #f7f7f7;">
-                            <div class="card-header text-center" style="background-color: #032B3F; color: #f7f7f7; border-radius: 15px 15px 0 0;">
-                                <h5 class="mb-0">Escanear cédula</h5>
-                            </div>
-                            <div class="card-body d-flex flex-column align-items-center">
-                                <div id="reader" style="width:280px; height:280px; border:2px solid #032B3F; border-radius:12px;"></div>
-                                <button id="btnIniciarScan" class="btn btn-primary mt-3 fs-5" style="background-color:#0A5386; border:none; border-radius:8px; padding:8px 20px;">
-                                    Iniciar cámara
-                                </button>
-                                <small id="scanStatus" class="text-muted mt-2"></small>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-cancelar fs-5" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-aceptar fs-5">Realizar búsqueda</button>
+                                </div>
                             </div>
                         </div>
                     </div>
+                </form>
 
-
-                </div>
             </div>
         </div>
     </div>

@@ -65,6 +65,10 @@ Route::middleware(['auth'])->group(function () {
         ->name('IngresoCom.IngresoComedor')
         ->middleware('permission:ver ingreso comedor');
 
+    Route::post('/asistencia/{id}/observacion', [AsistenciaController::class, 'guardarObservacion'])
+        ->name('asistencia.observacion.guardar')
+        ->middleware('permission:asistencia');
+
     Route::get('/asistencia/buscar', [AsistenciaController::class, 'buscarEstudiante'])
         ->name('buscar.estudiante')
         ->middleware('permission:ver ingreso comedor');

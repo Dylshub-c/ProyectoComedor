@@ -297,39 +297,65 @@ public function revisarAsistencia($persona_id)
         return view('RevisarAsistencia.AsistenciaEstudiante', compact('persona'));
     }
 
-public function guardar(Request $request)
-{
-    $request->validate([
-        'estudiante_id' => 'required|exists:estudiantes,id',
-        'tipo_asistencia' => 'required|string',
-        'estado' => 'required|in:presente,ausente',
-        'fecha' => 'required|date',
-    ]);
+    public function guardar(Request $request)
+    {
+        $request->validate([
+            'estudiante_id' => 'required|exists:estudiantes,id',
+            'tipo_asistencia' => 'required|string',
+            'estado' => 'required|in:presente,ausente',
+            'fecha' => 'required|date',
+        ]);
 
-    $estudianteId = $request->estudiante_id;
-    $tipoAsistencia = $request->tipo_asistencia;
-    $estado = $request->estado;
-    $fecha = $request->fecha;
+        $estudianteId = $request->estudiante_id;
+        $tipoAsistencia = $request->tipo_asistencia;
+        $estado = $request->estado;
+        $fecha = $request->fecha;
 
-    // Buscar o crear la asistencia correspondiente (no se borra)
-    $asistencia = Asistencia::firstOrCreate(
-        ['fecha_hora' => $fecha, 'tipo_asistencia' => $tipoAsistencia],
-        ['estado' => $estado]
-    );
+        // Buscar la asistencia existente
+        $asistencia = Asistencia::where('fecha_hora', $fecha)
+            ->where('tipo_asistencia', $tipoAsistencia)
+            ->first();
 
-    // Eliminar listado existente solo para este estudiante
-    ListadoAsistencia::where('asistencia_id', $asistencia->id)
-        ->where('estudiante_id', $estudianteId)
-        ->delete();
+        if ($asistencia) {
+            // Si existe, actualizar el estado
+            $asistencia->estado = $estado;
+            $asistencia->save();
+        } else {
+            // Si no existe, crear nueva
+            $asistencia = Asistencia::create([
+                'fecha_hora' => $fecha,
+                'tipo_asistencia' => $tipoAsistencia,
+                'estado' => $estado,
+            ]);
+        }
 
-    // Crear nuevo listado para el estudiante
-    ListadoAsistencia::create([
-        'estudiante_id' => $estudianteId,
-        'asistencia_id' => $asistencia->id,
-        'observaciones' => null,
-    ]);
+        // Eliminar listado existente solo para este estudiante
+        ListadoAsistencia::where('asistencia_id', $asistencia->id)
+            ->where('estudiante_id', $estudianteId)
+            ->delete();
 
-    return redirect()->back()->with('success', 'Asistencia creada o modificada correctamente.');
-}
+        // Crear nuevo listado para el estudiante
+        ListadoAsistencia::create([
+            'estudiante_id' => $estudianteId,
+            'asistencia_id' => $asistencia->id,
+            'observaciones' => null,
+        ]);
+
+        return redirect()->back()->with('success', 'Asistencia creada o modificada correctamente.');
+    }
+
+    public function guardarObservacion(Request $request, $id)
+    {
+        // Validación
+        $request->validate([
+            'observaciones' => 'nullable|string'
+        ]);
+
+        $listado = ListadoAsistencia::findOrFail($id);
+        $listado->observaciones = $request->input('observaciones');
+        $listado->save();
+
+        return response()->json(['message' => 'Observación actualizada']);
+    }
 }
 

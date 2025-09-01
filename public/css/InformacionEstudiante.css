@@ -96,8 +96,6 @@
   object-fit: cover;
 }
 
-
-
 /* Tarjeta principal */
 .card {
   position: relative;
@@ -231,22 +229,20 @@
   border-radius: 12px;
 }
 .form-group-horizontal {
-  display: flex;
   align-items: center;
   gap: 1rem;
   margin-left: 2rem;
-  flex-wrap: wrap;
 }
 .form-label-fixed {
   margin: 0;
   white-space: nowrap;
   width: 130px;
   padding-left: 1rem;
+  padding-bottom: 0rem;
 }
 .form-input-flex {
   flex-grow: 1;
   padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
   font-size: 0.9rem;
   height: auto;
 }
@@ -390,3 +386,37 @@ label.form-check-label {
   color: white;
 }
 
+.editor {
+  background-color: #eaebf3;
+  border-color: #0A5386;
+  transition: background-color 0.4s ease, border-color 0.4s ease, border-right 0.4s ease;
+}
+
+.vista {
+  background-color: #eaebf3;
+  border-color: #0A5386;
+}
+
+.editor:hover {
+  background-color: #eaebf3;
+  border-color: #0A5386;
+  border-right: 5rem solid #0A5386; /* grosor + estilo + color */
+}
+
+.editor:focus {
+  background-color: #eaebf3;
+  border-color: #0A5386;
+  border-right: 5rem solid #0A5386; /* grosor + estilo + color */
+  outline: none;          /* quita el borde por defecto */
+  box-shadow: none;   
+}
+
+.borde {
+  background-color: #eaebf3;
+  border: 1px solid #0A5386; /* grosor + estilo + color */
+}
+
+.form-control:focus {
+  outline: none;          /* quita el borde por defecto */
+  box-shadow: none;   
+}

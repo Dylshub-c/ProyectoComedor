@@ -29,32 +29,36 @@
         </div>
         <div class="offcanvas-body">
             <div class="d-grid gap-3">
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas"
-                    onclick="window.location.href='{{ route('admin.home') }}'">
-                    <i class="fa-solid fa-house-chimney fa-lg" id="icono-menu"></i> | Home
+                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location.href='{{ route('admin.home') }}'">
+                    <i class="fa-solid fa-house-chimney fa-lg" id="icono-menu" ></i>
+                    | Home
                 </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas">
-                    <i class="fa-solid fa-clipboard-list fa-lg" id="icono-menu"></i> | Ingreso al comedor
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location.href='{{ route('IngresoCom.IngresoComedor') }}'">
+                    <i class="fa-solid fa-clipboard-list fa-lg" id="icono-menu"></i>
+                    | Ingreso al comedor
                 </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas"
-                    onclick="window.location='{{ route('estudiantes.importar.form') }}'">
-                    <i class="fa-solid fa-street-view fa-lg" id="icono-menu"></i> | Agregar usuarios
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('estudiantes.importar.form') }}'">
+                    <i class="fa-solid fa-street-view fa-lg" id="icono-menu"></i>
+                    | Agregar usuarios
                 </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas"
-                    onclick="window.location='{{ route('estudiantes.informacion') }}'">
-                    <i class="fa-solid fa-address-card fa-lg" id="icono-menu"></i> | Ver lista de usuarios
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('estudiantes.informacion') }}'">
+                    <i class="fa-solid fa-address-card fa-lg" id="icono-menu"></i>
+                    | Ver lista de usuarios
                 </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas"
-                    onclick="window.location='{{ route('Reportes.DescargarReporte') }}'">
-                    <i class="fa-solid fa-download fa-lg" id="icono-menu"></i> | Descargar reportes
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('Reportes.DescargarReporte') }}'">
+                    <i class="fa-solid fa-download fa-lg" id="icono-menu"></i>
+                    | Descargar reportes
                 </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas"
-                    onclick="window.location='{{ route('tipobeca.index') }}'">
-                    <i class="fa-solid fa-hand-holding-medical fa-lg" id="icono-menu"></i> | Becas
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('tipobeca.index') }}'">
+                    <i class="fa-solid fa-hand-holding-medical fa-lg" id="icono-menu"></i>
+                    | Becas
                 </button>
-                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas"
-                    onclick="window.location='{{ route('AsistenciaRapida.asistenciaRapida') }}'">
-                    <i class="fa-solid fa-star-half-stroke fa-lg" id="icono-menu"></i> | Asistencia rápida
+                <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('AsistenciaRapida.asistenciaRapida') }}'">
+                    <i class="fa-solid fa-star-half-stroke fa-lg" id="icono-menu"></i>
+                    | Asistencia rápida
+                </button>
+                 <button id="btn-opcion" class="btn btn-outline-light fs-5" data-bs-dismiss="offcanvas" onclick="window.location='{{ route('roles.index') }}'">
+                   <i class="fa-solid fa-user-shield fa-lg" id="icono-menu"></i> | Gestionar roles
                 </button>
             </div>
         </div>

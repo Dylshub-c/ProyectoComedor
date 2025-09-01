@@ -340,31 +340,36 @@ class EstudiantesController extends Controller
     }
 
     public function importar(Request $request)
-    {
-        $request->validate([
-            'archivo' => 'required|file|mimes:xlsx,csv,xls',
-        ]);
+{
+    $request->validate([
+        'archivo' => 'required|file|mimes:xlsx,csv,xls',
+    ]);
 
-        // Conteo antes
-        $countAntes = Estudiante::count();
+    // Contar estudiantes antes de la importación
+    $countAntes = Estudiante::count();
 
-        // Importar
-        Excel::import(new EstudiantesImport, $request->file('archivo'));
+    // Importar los estudiantes desde el Excel
+    Excel::import(new EstudiantesImport, $request->file('archivo'));
 
-        // Conteo después
-        $countDespues = Estudiante::count();
+    // Contar estudiantes después de la importación
+    $countDespues = Estudiante::count();
 
-        // Calcular los nuevos importados
-        $cantidadImportados = $countDespues - $countAntes;
+    // Calcular cuántos se importaron nuevos
+    $cantidadImportados = $countDespues - $countAntes;
 
-        // Obtener los nuevos estudiantes
-        $estudiantes = Estudiante::with(['persona', 'especialidade.propiedade', 'tipoBecas.propiedade'])
-                        ->latest()
-                        ->get();
+    // Obtener solo los estudiantes recién importados
+    $estudiantes = Estudiante::with([
+                        'persona',
+                        'especialidade.propiedade',
+                        'tipoBecas.propiedade'
+                    ])
+                    ->latest()            // Ordenar por fecha de creación
+                    ->take($cantidadImportados) // Solo los nuevos
+                    ->get();
 
-        // Pasarlos a la vista solo esta vez
-        return view('estudiantes.importar', compact('estudiantes'));
-    }
+    // Retornar la vista con los estudiantes importados
+    return view('estudiantes.importar', compact('estudiantes'));
+}
 
     public function eliminarUltimaImportacion()
 {

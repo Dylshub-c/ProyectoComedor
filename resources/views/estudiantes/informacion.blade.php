@@ -66,7 +66,7 @@
         <img src="{{ asset('img/FondoPrincipal.webp') }}" class="w-100 h-100" alt="Fondo">
     </div>
 
-    <main class="flex-grow-1 mt-5">
+    <main class="flex-grow-1 d-flex flex-column mt-5">
         <!-- Búsqueda / Header -->
         <div class="container-fluid p-4 ps-5 pe-5 mb-4">
             <div class="row align-items-center contenedor g-3 mt-5 py-2 px-1">
@@ -323,6 +323,7 @@
             </div> <!-- end row -->
             </div> <!-- end card -->
         </div> <!-- end container -->
+    </main>
 
         <!-- Modal eliminar -->
         <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
@@ -343,73 +344,70 @@
             </div>
         </div>
 
-
         @elseif(request()->hasAny(['nombre', 'cedula']))
         <!-- Antes: alert; ahora modal se muestra si no hay $persona -->
         {{-- handled above by warningModal --}}
         @endif
 
 
-        <!-- FOOTER -->
-
-          <footer id="DivFooter" class="text-dark py-3 mt-auto">
-        <div class="container">
-            <div class="row">
-                <div class="col-12 d-flex justify-content-center text-center align-items-center">
-                    <p id="footerText" class="mb-0">Copyright ©2025 Especialidad Desarrollo Web | COVAO.</p>
-                </div>
-
-            <!-- imagen -->
-        </div>
-    </footer>
+       <!-- FOOTER -->
+  <footer id="DivFooter" class="text-dark py-3 mt-auto">
+      <div class="container">
+          <div class="row">
+              <div class="col-12 d-flex justify-content-center text-center align-items-center">
+                  <p id="footerText" class="mb-0">Copyright ©2025 Especialidad Desarrollo Web | COVAO.</p>
+              </div>
+          </div>
+      </div>
+  </footer>
 
 
   <!-- Scripts -->
-<script>
-    const btnEditar = document.getElementById('btnEditar');
-    const btnCancelar = document.getElementById('btnCancelar');
-    const btnConfirmDelete = document.getElementById('btnConfirmDelete');
-    const contenidoVista = document.getElementById('contenidoVistaDatos');
-    const contenidoForm = document.getElementById('contenidoFormEditar');
+    <script>
+        const btnEditar = document.getElementById('btnEditar');
+        const btnCancelar = document.getElementById('btnCancelar');
+        const btnConfirmDelete = document.getElementById('btnConfirmDelete');
+        const contenidoVista = document.getElementById('contenidoVistaDatos');
+        const contenidoForm = document.getElementById('contenidoFormEditar');
 
-    if (btnEditar) {
-        btnEditar.addEventListener('click', function () {
-            if (contenidoVista) contenidoVista.classList.add('d-none');
-            if (contenidoForm) contenidoForm.classList.remove('d-none');
-            document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-    }
-    if (btnCancelar) {
-        btnCancelar.addEventListener('click', function () {
-            if (contenidoForm) contenidoForm.classList.add('d-none');
-            if (contenidoVista) contenidoVista.classList.remove('d-none');
-            document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-    }
-    if (btnConfirmDelete) {
-        btnConfirmDelete.addEventListener('click', function () {
-            document.getElementById('formEliminar').submit();
-        });
-    }
-
-    // Abrir modals automáticamente si existen (success / guardado / warning)
-    document.addEventListener('DOMContentLoaded', () => {
-        const successModalEl = document.getElementById('successModal');
-        if (successModalEl) {
-            try { new bootstrap.Modal(successModalEl).show(); } catch(e) {}
+        if (btnEditar) {
+            btnEditar.addEventListener('click', function () {
+                if (contenidoVista) contenidoVista.classList.add('d-none');
+                if (contenidoForm) contenidoForm.classList.remove('d-none');
+                document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        }
+        if (btnCancelar) {
+            btnCancelar.addEventListener('click', function () {
+                if (contenidoForm) contenidoForm.classList.add('d-none');
+                if (contenidoVista) contenidoVista.classList.remove('d-none');
+                document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        }
+        if (btnConfirmDelete) {
+            btnConfirmDelete.addEventListener('click', function () {
+                document.getElementById('formEliminar').submit();
+            });
         }
 
-        const guardadoModalEl = document.getElementById('guardadoModal');
-        if (guardadoModalEl) {
-            try { new bootstrap.Modal(guardadoModalEl).show(); } catch(e) {}
-        }
+        // Abrir modals automáticamente si existen (success / guardado / warning)
+        document.addEventListener('DOMContentLoaded', () => {
+            const successModalEl = document.getElementById('successModal');
+            if (successModalEl) {
+                try { new bootstrap.Modal(successModalEl).show(); } catch(e) {}
+            }
 
-        const warningModalEl = document.getElementById('warningModal');
-        if (warningModalEl) {
-            try { new bootstrap.Modal(warningModalEl).show(); } catch(e) {}
-        }
-    });
-</script>
+            const guardadoModalEl = document.getElementById('guardadoModal');
+            if (guardadoModalEl) {
+                try { new bootstrap.Modal(guardadoModalEl).show(); } catch(e) {}
+            }
+
+            const warningModalEl = document.getElementById('warningModal');
+            if (warningModalEl) {
+                try { new bootstrap.Modal(warningModalEl).show(); } catch(e) {}
+            }
+        });
+    </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>

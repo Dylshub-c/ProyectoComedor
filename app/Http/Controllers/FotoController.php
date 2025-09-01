@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use ZipArchive;
 use Illuminate\Support\Facades\File;
+use App\Models\Estudiante;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+
 
 class FotoController extends Controller
 {
@@ -68,42 +72,48 @@ class FotoController extends Controller
     }
 
 
-    public function importarFotos(Request $request)
-    {
-        $request->validate([
+
+public function importarFotos(Request $request)
+{
+    $request->validate([
         'zip' => 'required|file|mimes:zip',
-        ]);
+    ]);
 
-        $zip = new ZipArchive;
-        $file = $request->file('zip');
-        $destinationPath = public_path('fotos');
+    $zip = new \ZipArchive;
+    $file = $request->file('zip');
+    $destinationPath = storage_path('app/public/fotos'); // Carpeta pública
 
-        if (!File::exists($destinationPath)) {
-            File::makeDirectory($destinationPath, 0755, true);
-        }
+    if (!\File::exists($destinationPath)) {
+        \File::makeDirectory($destinationPath, 0755, true);
+    }
 
-        if ($zip->open($file) === true) {
-            // Extraemos solo los archivos dentro del ZIP sin carpetas
-            for ($i = 0; $i < $zip->numFiles; $i++) {
-                $filename = $zip->getNameIndex($i);
+    if ($zip->open($file) === true) {
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $filename = $zip->getNameIndex($i);
 
-                // Ignorar directorios, solo archivos
-                if (substr($filename, -1) != '/') {
-                    // Extraemos el contenido del archivo
-                    $content = $zip->getFromIndex($i);
+            // Ignorar directorios
+            if (substr($filename, -1) != '/') {
+                $content = $zip->getFromIndex($i);
+                $baseName = basename($filename);
 
-                    // Extraemos el nombre del archivo sin ruta (basename)
-                    $baseName = basename($filename);
+                // Guardar en storage público
+                $nombreUnico = uniqid('foto_', true) . '.' . pathinfo($baseName, PATHINFO_EXTENSION);
+                Storage::disk('public')->put('fotos/' . $nombreUnico, $content);
 
-                    // Guardamos el archivo directamente en la carpeta destino
-                    file_put_contents($destinationPath . DIRECTORY_SEPARATOR . $baseName, $content);
+                // Buscar estudiante por nombre de archivo original
+                $estudiante = Estudiante::where('foto', $baseName)->first();
+                if ($estudiante) {
+                    $estudiante->foto = 'fotos/' . $nombreUnico;
+                    $estudiante->save();
                 }
             }
-            $zip->close();
-
-            return back()->with('success', 'Fotos descomprimidas correctamente.');
         }
+        $zip->close();
 
-        return back()->withErrors(['error' => 'No se pudo descomprimir el archivo.']);
-        }
+        return back()->with('success', 'Fotos asignadas correctamente.');
+    }
+
+    return back()->withErrors(['error' => 'No se pudo descomprimir el archivo.']);
+}
+
 }

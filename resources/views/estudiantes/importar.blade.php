@@ -112,15 +112,6 @@
                 </div>
 
                 <div class="col-2 text-end"></div>
-
-                <div class="col-4 justify-content-center d-flex">
-                    <button type="btn btn-success" id="btnCeleste" class="btn fs-5 me-3 mt-4 px-3 py-1">
-                        <i class="fa-solid fa-file-excel fa-lg" style="color: #f7f7f7;"></i> | Eliminar lista
-                    </button>
-                    <button type="btn btn-success" id="btnCeleste" class="btn fs-5 mt-4 px-4 py-1">
-                        <i class="fa-solid fa-repeat fa-lg" style="color: #f7f7f7;"></i> | Recargar lista
-                    </button>
-                </div>
             </div>
 
             <div class="row px-5">
@@ -147,9 +138,13 @@
                                         {{ $estudiante->persona->SegundoApellido ?? '' }}
                                     </td>
                                     <td id="tb-b">{{ $estudiante->especialidade->propiedade->nombre ?? 'N/A' }}</td>
-                                    <td id="tb-a">{{ $estudiante->tipoBeca->propiedade->nombre ?? 'N/A' }}</td>
+                                    <td id="tb-a">
+                                        {{ $estudiante->tipoBecas->pluck('propiedade.nombre')->implode(', ') ?: 'N/A' }}
+                                    </td>
                                     <td id="tb-b" class="text-center">
-                                        <i class="fa-solid fa-circle-minus fa-lg" style="color: #106AA4;"></i>
+                                        <button class="btn btn-link eliminar-estudiante" data-id="{{ $estudiante->id }}">
+                                            <i class="fa-solid fa-circle-minus fa-lg" style="color: #106AA4;"></i>
+                                        </button>
                                     </td>
                                 </tr>
                             @endforeach
@@ -160,6 +155,24 @@
                         @endif
                     </tbody>
                 </table>
+            </div>
+
+            <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="confirmDeleteLabel">Confirmar eliminación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        ¿Estás seguro de eliminar este estudiante ? Esta acción no se puede deshacer.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" id="confirmDeleteButton" class="btn btn-danger">Eliminar</button>
+                    </div>
+                    </div>
+                </div>
             </div>
 
             <form action="{{ route('subir-fotos.importar') }}" method="POST" form="formSubir" enctype="multipart/form-data">
@@ -226,6 +239,49 @@
             alertError.classList.add('fade');
         }
     }, 3000); // 3000ms = 3 segundos
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    let estudianteId = null;
+
+    // Abrir modal al hacer click en cualquier botón .eliminar-estudiante
+    document.querySelectorAll('.eliminar-estudiante').forEach(button => {
+        button.addEventListener('click', function () {
+            estudianteId = this.getAttribute('data-id');
+            const deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+            deleteModal.show();
+        });
+    });
+
+    // Confirmar eliminación
+    document.getElementById('confirmDeleteButton').addEventListener('click', function () {
+        if (!estudianteId) return;
+
+        fetch(`/estudiantes/${estudianteId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Eliminar fila sin recargar
+                const fila = document.querySelector(`.eliminar-estudiante[data-id='${estudianteId}']`).closest('tr');
+                if (fila) fila.remove();
+                // Cerrar modal
+                const deleteModalEl = document.getElementById('confirmDeleteModal');
+                const modal = bootstrap.Modal.getInstance(deleteModalEl);
+                modal.hide();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(err => alert('Error: ' + err.message));
+    });
+});
 </script>
 
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.min.js"></script>

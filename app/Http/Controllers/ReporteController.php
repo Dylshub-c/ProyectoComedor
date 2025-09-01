@@ -24,69 +24,97 @@ class ReporteController extends Controller
         return view('Reportes.DescargarReporte', compact('estudiantes'));
     }
 
- public function mensualPdf(Request $request)
-    {
-        $mes = $request->input('mes', Carbon::now()->month);
-        $anio = $request->input('anio', Carbon::now()->year);
-
-        $inicioMes = Carbon::create($anio, $mes, 1)->startOfMonth();
-        $finMes = Carbon::create($anio, $mes, 1)->endOfMonth();
-
-        // Obtener todos los estudiantes con sus relaciones necesarias
-        $estudiantes = Estudiante::with([
-            'persona',
-            'tipoBecas.propiedade',
-            'listadosAsistencia.asistencia' => function($q) use ($inicioMes, $finMes) {
-                $q->whereBetween('fecha_hora', [$inicioMes, $finMes]);
-            }
-        ])->get();
-
-        // Inicializar resumen dinámico según los tipos de beca encontrados
-        $tiposBeca = \App\Models\TipoBeca::with('propiedade')->get();
-        $resumenGeneral = [];
-        foreach ($tiposBeca as $tipo) {
-            $resumenGeneral[$tipo->propiedade->nombre] = [];
-        }
-
-        foreach ($estudiantes as $estudiante) {
-            $persona = $estudiante->persona;
-            $nombre = $persona ? trim("{$persona->Nombre} {$persona->PrimerApellido} {$persona->SegundoApellido}") : 'Sin Nombre';
-
-            foreach ($estudiante->tipoBecas as $beca) {
-                $tipoBecaNombre = optional($beca->propiedade)->nombre ?? 'Sin Beca';
-                $semanas = [];
-
-                foreach ($estudiante->listadosAsistencia as $listado) {
-                    $asistencia = $listado->asistencia;
-                    if (!$asistencia) continue;
-
-                    $semana = Carbon::parse($asistencia->fecha_hora)->weekOfMonth;
-
-                    if (!isset($semanas[$semana])) {
-                        $semanas[$semana] = ['presente' => 0, 'ausente' => 0];
-                    }
-
-                    // Contabilizar solo si la asistencia coincide con el tipo de beca
-                    if (strtolower($asistencia->tipo_asistencia) == strtolower($tipoBecaNombre)) {
-                        $asistencia->estado === 'presente'
-                            ? $semanas[$semana]['presente']++
-                            : $semanas[$semana]['ausente']++;
-                    }
-                }
-
-                if (count($semanas) > 0) {
-                    $resumenGeneral[$tipoBecaNombre][] = [
-                        'nombre' => $nombre,
-                        'semanas' => $semanas
-                    ];
-                }
-            }
-        }
-
-        // Generar PDF
-        $pdf = Pdf::loadView('PdfReporte.ReportePdf', compact('resumenGeneral', 'mes', 'anio'));
-        return $pdf->download("reporte_asistencia_{$mes}_{$anio}.pdf");
+public function mensualPdf(Request $request)
+{
+    // Permitir recibir 'fecha' (YYYY-MM) o mes/anio por separado
+    $fecha = $request->input('fecha');
+    if (!empty($fecha) && strpos($fecha, '-') !== false) {
+        [$anio, $mes] = array_map('intval', explode('-', $fecha));
+    } else {
+        $mes = (int) $request->input('mes', \Carbon\Carbon::now()->month);
+        $anio = (int) $request->input('anio', \Carbon\Carbon::now()->year);
     }
+
+    $inicioMes = \Carbon\Carbon::create($anio, $mes, 1)->startOfMonth();
+    $finMes    = \Carbon\Carbon::create($anio, $mes, 1)->endOfMonth();
+
+    // Cargar estudiantes + asistencias SOLO del mes/año seleccionado
+    $estudiantes = \App\Models\Estudiante::with([
+        'persona',
+        'tipoBecas.propiedade',
+        'listadosAsistencia.asistencia' => function ($q) use ($inicioMes, $finMes) {
+            $q->whereBetween('fecha_hora', [$inicioMes, $finMes]);
+        },
+    ])->get();
+
+    // Inicializar por tipos de beca existentes (dinámico)
+    $tiposBeca = \App\Models\TipoBeca::with('propiedade')->get();
+    $resumenGeneral = [];
+    foreach ($tiposBeca as $tipo) {
+        $nombreTipo = $tipo->propiedade->nombre ?? 'Sin Beca';
+        $resumenGeneral[$nombreTipo] = [];
+    }
+
+    foreach ($estudiantes as $estudiante) {
+        $persona = $estudiante->persona;
+        $nombreEst = $persona
+            ? trim("{$persona->Nombre} {$persona->PrimerApellido} {$persona->SegundoApellido}")
+            : 'Sin Nombre';
+
+        foreach ($estudiante->tipoBecas as $beca) {
+            $tipoBecaNombre = optional($beca->propiedade)->nombre ?? 'Sin Beca';
+
+            // Asegurar clave del tipo de beca aunque no estuviera preinicializada
+            if (!array_key_exists($tipoBecaNombre, $resumenGeneral)) {
+                $resumenGeneral[$tipoBecaNombre] = [];
+            }
+
+            $bloques = [];
+
+            foreach ($estudiante->listadosAsistencia as $listado) {
+                $asistencia = $listado->asistencia;
+                if (!$asistencia) continue;
+
+                // Doble validación del mes/año (por si llega algo fuera del rango)
+                $f = \Carbon\Carbon::parse($asistencia->fecha_hora);
+                if ((int)$f->month !== (int)$mes || (int)$f->year !== (int)$anio) continue;
+
+                // Contabilizar SOLO si coincide el tipo de beca
+                if (mb_strtolower($asistencia->tipo_asistencia) !== mb_strtolower($tipoBecaNombre)) continue;
+
+                // Bloque de 10 días
+                $dia = (int) $f->day;              // 1..31
+                $bloque = (int) ceil($dia / 10);   // 1..4
+
+                if (!isset($bloques[$bloque])) {
+                    $bloques[$bloque] = ['presente' => 0, 'ausente' => 0];
+                }
+
+                if ($asistencia->estado === 'presente') {
+                    $bloques[$bloque]['presente']++;
+                } else {
+                    $bloques[$bloque]['ausente']++;
+                }
+            }
+
+            if (!empty($bloques)) {
+                ksort($bloques); // Para imprimir en orden 1,2,3,4
+                $resumenGeneral[$tipoBecaNombre][] = [
+                    'nombre'  => $nombreEst,
+                    'bloques' => $bloques,
+                ];
+            }
+        }
+    }
+
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
+        'PdfReporte.ReportePdf',
+        compact('resumenGeneral', 'mes', 'anio')
+    );
+
+    return $pdf->download("reporte_asistencia_{$mes}_{$anio}.pdf");
+}
+
 public function pdf(Request $request)
 {
  // Recibir fecha en formato YYYY-MM

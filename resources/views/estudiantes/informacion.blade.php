@@ -341,11 +341,12 @@
             </div>
         </div>
 
+
         @elseif(request()->hasAny(['nombre', 'cedula']))
         <!-- Antes: alert; ahora modal se muestra si no hay $persona -->
         {{-- handled above by warningModal --}}
         @endif
-    </main>
+
 
         <!-- FOOTER -->
     <footer id="DivFooter" class="text-dark py-3 mt-auto">
@@ -354,6 +355,16 @@
                 <div class="col-12 d-flex justify-content-center text-center align-items-center">
                     <p id="footerText" class="mb-0">Copyright ©2025 Especialidad Desarrollo Web | COVAO.</p>
                 </div>
+
+            <!-- imagen -->
+            <div class="col-md-4 text-center mb-5 align-self-center">
+                <img src="{{ $persona->estudiante && $persona->estudiante->foto
+                    ? asset('storage/' . $persona->estudiante->foto)
+                    : asset('img/FotoEstudiante.webp') }}"
+                    alt="Foto del estudiante"
+                    class="foto-perfil-redonda"
+                />
+
             </div>
         </div>
     </footer>

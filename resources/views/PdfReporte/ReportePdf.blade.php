@@ -11,7 +11,7 @@
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #444; padding: 6px; text-align: center; }
         th { background-color: #eaeaea; }
-        .semana-title { margin-top: 15px; font-weight: bold; }
+        .bloque-title { margin-top: 15px; font-weight: bold; }
         .total-row { font-weight: bold; background-color: #f2f2f2; }
         .resumen-final { margin-top: 40px; }
     </style>
@@ -24,7 +24,6 @@
     <p style="text-align: center">Mes: {{ $mes }} - Año: {{ $anio }}</p>
 </div>
 
-{{-- Recorrer tipos de beca dinámicos --}}
 @foreach($resumenGeneral as $tipoBeca => $estudiantesBeca)
     <div class="tipo-beca">
         <h2>Becados de {{ $tipoBeca }}</h2>
@@ -33,13 +32,13 @@
             <p>No hay registros de asistencias para esta categoría de beca.</p>
         @else
             @php
-                $semanasAgrupadas = [];
+                $bloquesAgrupados = [];
                 $mesTotalPresente = 0;
                 $mesTotalAusente = 0;
 
                 foreach($estudiantesBeca as $estudiante) {
-                    foreach($estudiante['semanas'] as $numSemana => $datos) {
-                        $semanasAgrupadas[$numSemana][] = [
+                    foreach($estudiante['bloques'] as $numBloque => $datos) {
+                        $bloquesAgrupados[$numBloque][] = [
                             'nombre' => $estudiante['nombre'],
                             'presente' => $datos['presente'],
                             'ausente' => $datos['ausente'],
@@ -50,9 +49,13 @@
                 }
             @endphp
 
-            {{-- Imprimir por semanas --}}
-            @foreach($semanasAgrupadas as $numSemana => $estudiantesSemana)
-                <p class="semana-title">Semana {{ $numSemana }}</p>
+            {{-- Imprimir por bloques de 10 días --}}
+            @foreach($bloquesAgrupados as $numBloque => $estudiantesBloque)
+                @php
+                    $inicio = ($numBloque - 1) * 10 + 1;
+                    $fin = min($numBloque * 10, \Carbon\Carbon::create($anio, $mes, 1)->daysInMonth);
+                @endphp
+                <p class="bloque-title">Días {{ $inicio }} - {{ $fin }}</p>
                 <table>
                     <thead>
                         <tr>
@@ -64,16 +67,16 @@
                     </thead>
                     <tbody>
                         @php
-                            $totalPresenteSemana = 0;
-                            $totalAusenteSemana = 0;
+                            $totalPresenteBloque = 0;
+                            $totalAusenteBloque = 0;
                         @endphp
 
-                        @foreach($estudiantesSemana as $datos)
+                        @foreach($estudiantesBloque as $datos)
                             @php
-                                $totalSemana = $datos['presente'] + $datos['ausente'];
-                                $porcentaje = $totalSemana > 0 ? round(($datos['presente'] / $totalSemana) * 100, 2) : 0;
-                                $totalPresenteSemana += $datos['presente'];
-                                $totalAusenteSemana += $datos['ausente'];
+                                $total = $datos['presente'] + $datos['ausente'];
+                                $porcentaje = $total > 0 ? round(($datos['presente'] / $total) * 100, 2) : 0;
+                                $totalPresenteBloque += $datos['presente'];
+                                $totalAusenteBloque += $datos['ausente'];
                             @endphp
                             <tr>
                                 <td>{{ $datos['nombre'] }}</td>
@@ -83,43 +86,47 @@
                             </tr>
                         @endforeach
 
-                        {{-- Totales por semana --}}
-                        @php
-                            $porcGeneralSemana = ($totalPresenteSemana + $totalAusenteSemana) > 0 
-                                ? round(($totalPresenteSemana / ($totalPresenteSemana + $totalAusenteSemana)) * 100, 2) 
-                                : 0;
-                        @endphp
                         <tr class="total-row">
                             <td>Total / % General</td>
-                            <td>{{ $totalPresenteSemana }}</td>
-                            <td>{{ $totalAusenteSemana }}</td>
-                            <td>{{ $porcGeneralSemana }}%</td>
+                            <td>{{ $totalPresenteBloque }}</td>
+                            <td>{{ $totalAusenteBloque }}</td>
+                            <td>
+                                {{ ($totalPresenteBloque + $totalAusenteBloque) > 0
+                                    ? round(($totalPresenteBloque / ($totalPresenteBloque + $totalAusenteBloque)) * 100, 2)
+                                    : 0 }}%
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             @endforeach
 
-            {{-- Totales mensuales por tipo de beca --}}
+            {{-- Totales mensuales por estudiante --}}
             <div class="resumen-final">
-                <h3>Porcentaje Mensual General - {{ $tipoBeca }}</h3>
-                @php
-                    $totalMes = $mesTotalPresente + $mesTotalAusente;
-                    $porcMes = $totalMes > 0 ? round(($mesTotalPresente / $totalMes) * 100, 2) : 0;
-                @endphp
+                <h3>Resumen Mensual por Estudiante - {{ $tipoBeca }}</h3>
                 <table>
                     <thead>
                         <tr>
+                            <th>Estudiante</th>
                             <th>Presente</th>
                             <th>Ausente</th>
                             <th>% Asistencia</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="total-row">
-                            <td>{{ $mesTotalPresente }}</td>
-                            <td>{{ $mesTotalAusente }}</td>
-                            <td>{{ $porcMes }}%</td>
-                        </tr>
+                        @foreach($estudiantesBeca as $estudiante)
+                            @php
+                                $p = array_sum(array_column($estudiante['bloques'], 'presente'));
+                                $a = array_sum(array_column($estudiante['bloques'], 'ausente'));
+                                $total = $p + $a;
+                                $porcentaje = $total > 0 ? round(($p / $total) * 100, 2) : 0;
+                            @endphp
+                            <tr>
+                                <td>{{ $estudiante['nombre'] }}</td>
+                                <td>{{ $p }}</td>
+                                <td>{{ $a }}</td>
+                                <td>{{ $porcentaje }}%</td>
+                            </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>

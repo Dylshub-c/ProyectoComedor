@@ -10,6 +10,7 @@ use App\Models\TipoBeca;
 use App\Models\Estudiante;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Exception;
 
@@ -21,52 +22,74 @@ class EstudiantesImport implements ToCollection
 
         try {
             foreach ($rows->skip(1) as $index => $row) {
-                // Validar que haya al menos 9 columnas
+                // Validar columnas mínimas
                 if (count($row) < 9) {
                     throw new Exception("Fila " . ($index + 2) . " incompleta. Se requieren al menos 9 columnas.");
                 }
 
-                // Persona
+                // Crear o encontrar persona
                 $persona = Persona::firstOrCreate(
                     ['Cedula' => $row[3]],
                     [
-                        'Nombre' => $row[0],
+                        'Nombre'         => $row[0],
                         'PrimerApellido' => $row[1],
-                        'SegundoApellido' => $row[2],
-                        'TipoUsuario' => $row[4],
+                        'SegundoApellido'=> $row[2],
+                        'TipoUsuario'    => $row[4],
                     ]
                 );
 
-                if (!$persona->id) {
-                    throw new Exception("No se pudo crear o encontrar persona con cédula: " . $row[3]);
-                }
+                // Normalizar nombres
+                $nombreEspecialidad = ucfirst(strtolower(trim($row[5]))); // Contabilidad
+                $nombreSeccion      = strtoupper(trim($row[6]));          // 12-D
+                $becasTexto         = trim($row[7]);
+                $nombreFoto         = trim($row[8]); // solo nombre del archivo, ej: juan.jpg
 
-                // Normaliza nombres
-                $nombreEspecialidad = trim(ucwords(strtolower($row[5])));
-                $nombreSeccion      = trim(ucwords(strtolower($row[6])));
-                $nombreBeca         = trim(ucwords(strtolower($row[7])));
-
-                // Propiedades
+                // Crear propiedades y relaciones
                 $propEspecialidad = Propiedade::firstOrCreate(['nombre' => $nombreEspecialidad]);
                 $propSeccion      = Propiedade::firstOrCreate(['nombre' => $nombreSeccion]);
-                $propBeca         = Propiedade::firstOrCreate(['nombre' => $nombreBeca]);
 
-                // Relaciones
                 $especialidad = Especialidade::firstOrCreate(['propiedade_id' => $propEspecialidad->id]);
                 $seccion      = Seccione::firstOrCreate(['propiedade_id' => $propSeccion->id]);
-                $tipoBeca     = TipoBeca::firstOrCreate(['propiedade_id' => $propBeca->id]);
 
-                // Verificar si ya existe el estudiante
-                $estudianteExistente = Estudiante::where('persona_id', $persona->id)->first();
+                // ----------------------
+                // Procesar becas (insensible a mayúsculas/minúsculas)
+                // ----------------------
+                $tipoBecasIds = [];
+                if (!empty($becasTexto)) {
+                    $becas = preg_split('/\s*,\s*/', $becasTexto, -1, PREG_SPLIT_NO_EMPTY);
 
-                if (!$estudianteExistente) {
-                    Estudiante::create([
-                        'persona_id'       => $persona->id,
+                    foreach ($becas as $nombreBeca) {
+                        $nombreBeca = trim($nombreBeca);
+                        if (empty($nombreBeca)) continue;
+
+                        $tipoBeca = TipoBeca::whereHas('propiedade', function ($q) use ($nombreBeca) {
+                            $q->whereRaw('LOWER(nombre) = ?', [strtolower($nombreBeca)]);
+                        })->first();
+
+                        if (!$tipoBeca) {
+                            $propiedadBeca = Propiedade::firstOrCreate(['nombre' => ucwords(strtolower($nombreBeca))]);
+                            $tipoBeca = TipoBeca::create(['propiedade_id' => $propiedadBeca->id]);
+                        }
+
+                        $tipoBecasIds[] = $tipoBeca->id;
+                    }
+                }
+
+                // ----------------------
+                // Guardar estudiante
+                // ----------------------
+                $estudiante = Estudiante::updateOrCreate(
+                    ['persona_id' => $persona->id],
+                    [
                         'especialidade_id' => $especialidad->id,
                         'seccione_id'      => $seccion->id,
-                        'tipo_beca_id'     => $tipoBeca->id,
-                        'foto'             => 'fotos/' . ($row[8] ?? 'default.jpg'),
-                    ]);
+                        'foto'             => $nombreFoto ?: 'default.jpg', // solo nombre por ahora
+                    ]
+                );
+
+                // Sincronizar becas
+                if (!empty($tipoBecasIds)) {
+                    $estudiante->tipoBecas()->syncWithoutDetaching($tipoBecasIds);
                 }
             }
 
@@ -77,4 +100,3 @@ class EstudiantesImport implements ToCollection
         }
     }
 }
-

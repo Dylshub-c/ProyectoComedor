@@ -29,7 +29,11 @@ Route::get('/', function() {
     return redirect()->route('login');
 });
 
-
+Route::get('/forgot-password', [PasswordResetController::class, 'showResetForm'])->name('admin.password.request');
+    Route::post('/forgot-password', [PasswordResetController::class, 'reset'])->name('admin.password.reset');
+    Route::get('/cambio-contra', [PasswordResetController::class, 'confirmReset'])
+        ->name('admin.password.confirm')
+        ->middleware('signed');
 //----------------------------------------
 // Admin
 Route::prefix('admin')->middleware(['auth', 'permission:administrar usuarios'])->group(function () {
@@ -37,11 +41,6 @@ Route::prefix('admin')->middleware(['auth', 'permission:administrar usuarios'])-
         return view('home');
     })->name('admin.home');
 
-    Route::get('/forgot-password', [PasswordResetController::class, 'showResetForm'])->name('admin.password.request');
-    Route::post('/forgot-password', [PasswordResetController::class, 'reset'])->name('admin.password.reset');
-    Route::get('/cambio-contra', [PasswordResetController::class, 'confirmReset'])
-        ->name('admin.password.confirm')
-        ->middleware('signed');
 });
 
 Route::prefix('admin')->middleware(['auth', 'permission:administrar usuarios'])->group(function () { Route::get('/home', function () { return view('home'); })->name('admin.home'); });
@@ -215,3 +214,4 @@ Route::middleware(['auth'])->group(function () {
         ->name('subir-fotos.importar')
         ->middleware('permission:subir fotos');
 });
+

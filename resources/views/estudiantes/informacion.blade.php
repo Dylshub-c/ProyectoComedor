@@ -237,7 +237,9 @@
                             <form method="POST" action="{{ route('estudiantes.destroy', $persona->id) }}" id="formEliminar">
                                 @csrf
                                 @method('DELETE')
-                                <button type="button" class="btn btnEliminar shadow fs-5" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+                                <button type="button" class="btn btnEliminar shadow fs-5"
+                                        data-id="{{ $persona->estudiante->id ?? '' }}"
+                                        data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
                                     <i class="bi bi-trash-fill"></i><strong> | Eliminar</strong>
                                 </button>
                             </form>
@@ -376,12 +378,14 @@
 
   <!-- Scripts -->
 <script>
+document.addEventListener('DOMContentLoaded', function () {
     const btnEditar = document.getElementById('btnEditar');
     const btnCancelar = document.getElementById('btnCancelar');
-    const btnConfirmDelete = document.getElementById('btnConfirmDelete');
     const contenidoVista = document.getElementById('contenidoVistaDatos');
     const contenidoForm = document.getElementById('contenidoFormEditar');
+    let estudianteId = null;
 
+    // Botón Editar
     if (btnEditar) {
         btnEditar.addEventListener('click', function () {
             if (contenidoVista) contenidoVista.classList.add('d-none');
@@ -389,6 +393,8 @@
             document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
     }
+
+    // Botón Cancelar
     if (btnCancelar) {
         btnCancelar.addEventListener('click', function () {
             if (contenidoForm) contenidoForm.classList.add('d-none');
@@ -396,29 +402,53 @@
             document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
     }
+
+    // Guardar el id del estudiante al abrir el modal
+    document.querySelectorAll('.btnEliminar[data-id]').forEach(button => {
+        button.addEventListener('click', function () {
+            estudianteId = this.getAttribute('data-id');
+        });
+    });
+
+    // Confirmar eliminación
+    const btnConfirmDelete = document.getElementById('btnConfirmDelete');
     if (btnConfirmDelete) {
         btnConfirmDelete.addEventListener('click', function () {
-            document.getElementById('formEliminar').submit();
+            if (!estudianteId) return;
+
+            fetch(`/estudiantes/${estudianteId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                },
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Eliminar el card o fila del DOM
+                    const card = document.querySelector(`.btnEliminar[data-id='${estudianteId}']`).closest('.card');
+                    if (card) card.remove();
+
+                    // Cerrar modal
+                    const deleteModalEl = document.getElementById('confirmDeleteModal');
+                    bootstrap.Modal.getInstance(deleteModalEl).hide();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(err => alert('Error: ' + err.message));
         });
     }
 
     // Abrir modals automáticamente si existen (success / guardado / warning)
-    document.addEventListener('DOMContentLoaded', () => {
-        const successModalEl = document.getElementById('successModal');
-        if (successModalEl) {
-            try { new bootstrap.Modal(successModalEl).show(); } catch(e) {}
-        }
-
-        const guardadoModalEl = document.getElementById('guardadoModal');
-        if (guardadoModalEl) {
-            try { new bootstrap.Modal(guardadoModalEl).show(); } catch(e) {}
-        }
-
-        const warningModalEl = document.getElementById('warningModal');
-        if (warningModalEl) {
-            try { new bootstrap.Modal(warningModalEl).show(); } catch(e) {}
+    ['successModal', 'guardadoModal', 'warningModal'].forEach(modalId => {
+        const modalEl = document.getElementById(modalId);
+        if (modalEl) {
+            try { new bootstrap.Modal(modalEl).show(); } catch(e) {}
         }
     });
+});
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

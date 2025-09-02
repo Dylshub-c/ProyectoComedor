@@ -256,29 +256,40 @@ class AsistenciaController extends Controller
     }
 
     public function guardar(Request $request)
-    {
-        $request->validate([
-            'estudiante_id' => 'required|exists:estudiantes,id',
-            'tipo_asistencia' => 'required|string',
-            'estado' => 'required|in:presente,ausente',
-            'fecha' => 'required|date',
-        ]);
+{
+    $request->validate([
+        'estudiante_id' => 'required|exists:estudiantes,id',
+        'tipo_asistencia' => 'required|string',
+        'estado' => 'required|in:presente,ausente',
+        'fecha' => 'required|date',
+    ]);
 
-        $fecha = Carbon::parse($request->fecha)->startOfDay();
+    $fecha = Carbon::parse($request->fecha)->startOfDay();
 
-        $asistencia = Asistencia::firstOrCreate([
+    // Buscar o crear la asistencia por fecha + tipo (no por estado)
+    $asistencia = Asistencia::updateOrCreate(
+        [
             'fecha_hora' => $fecha,
             'tipo_asistencia' => $request->tipo_asistencia,
+        ],
+        [
             'estado' => $request->estado,
-        ]);
+        ]
+    );
 
-        ListadoAsistencia::updateOrCreate(
-            ['estudiante_id' => $request->estudiante_id, 'asistencia_id' => $asistencia->id],
-            ['observaciones' => null]
-        );
+    // Asociar asistencia con el estudiante
+    ListadoAsistencia::updateOrCreate(
+        [
+            'estudiante_id' => $request->estudiante_id,
+            'asistencia_id' => $asistencia->id,
+        ],
+        [
+            'observaciones' => null
+        ]
+    );
 
-        return redirect()->back()->with('success', 'Asistencia creada o modificada correctamente.');
-    }
+    return redirect()->back()->with('success', 'Asistencia creada o modificada correctamente.');
+}
 
     public function guardarObservacion(Request $request, $id)
     {

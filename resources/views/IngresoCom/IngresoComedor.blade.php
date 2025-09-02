@@ -120,9 +120,9 @@
 
                                 <div id="PrimerModulo" class="text-center justify-content-center align-items-center card">
                                     @php
-                                        $foto = $persona->estudiante->foto
-                                            ? asset($persona->estudiante->foto)
-                                            : asset('/img/FotoEstudiante.webp');
+                                        $foto = optional($persona->estudiante)->foto
+                                                ? asset('storage/' . optional($persona->estudiante)->foto)
+                                                : asset('img/FotoEstudiante.webp')
                                     @endphp
 
                                     <img class="img-fluid rounded-circle mb-3" id="fotoEstudiante" src="{{ $foto }}" alt="Foto del estudiante"

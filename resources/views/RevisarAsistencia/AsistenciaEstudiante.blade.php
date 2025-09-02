@@ -98,7 +98,7 @@
 
             <!-- Tipo de beca -->
             <div class="card tipo-beca-card text-center">
-                <div class="card-header fw-bold">Cree o modifique asistencias</div>
+                <div class="card-header fw-bold">Cree asistencias</div>
                 <div class="card-body">
                     <form action="{{ route('asistencia.guardar') }}" method="POST">
                         @csrf
@@ -130,7 +130,7 @@
                             <input type="date" id="fechaInicio" name="fecha" class="form-control" required>
                         </div>
 
-                        <button type="submit" class="btn btnEditar fs-5 w-100">Modificar / Crear Asistencia</button>
+                        <button type="submit" class="btn btnEditar fs-5 w-100">Crear Asistencia</button>
                     </form>
                 </div>
             </div>
